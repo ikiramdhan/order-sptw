@@ -83,3 +83,18 @@ document.addEventListener('submit', function (e) {
 window.addEventListener('pageshow', function () {
   document.querySelectorAll('button.loading').forEach(function (b) { b.classList.remove('loading'); b.removeAttribute('aria-busy'); });
 });
+
+// Indikator memuat saat pindah halaman (terasa seperti aplikasi asli)
+(function () {
+  var bar = document.querySelector('.navbar-progress');
+  if (!bar) return;
+  document.addEventListener('click', function (e) {
+    var a = e.target.closest('a[href]');
+    if (!a || a.target === '_blank' || e.metaKey || e.ctrlKey || a.hasAttribute('download')) return;
+    var u = a.getAttribute('href');
+    if (!u || u.charAt(0) === '#' || u.indexOf('javascript:') === 0) return;
+    bar.className = 'navbar-progress go';
+  });
+  document.addEventListener('submit', function (e) { if (!e.defaultPrevented) bar.className = 'navbar-progress go'; });
+  window.addEventListener('pageshow', function () { bar.className = 'navbar-progress'; });
+})();

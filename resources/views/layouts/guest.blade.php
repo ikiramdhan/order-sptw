@@ -30,6 +30,6 @@
         <p class="copy">&copy; {{ date('Y') }} Seblak Teh Wanti</p>
     </main>
 </div>
-<script src="/js/app.js?v=4" defer></script>
+<script src="/js/app.js?v=5" defer></script>
 </body>
 </html>

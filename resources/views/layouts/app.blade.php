@@ -75,10 +75,11 @@
         </form>
     </nav>
 
+    <div class="navbar-progress" aria-hidden="true"></div>
     <div class="main">
         <div class="topbar-mobile">
             <img src="/icons/logo.png" alt="Logo Seblak Teh Wanti">
-            <b>{{ $u->name }}<br><small style="color:var(--muted);font-weight:500">{{ $u->roleLabel() }}@if($u->outlet) · {{ $u->outlet->name }}@endif</small></b>
+            <div class="ttl"><b>@yield('title', 'Central Kitchen')</b><small>{{ $u->name }} · {{ $u->roleLabel() }}@if($u->outlet) · {{ $u->outlet->name }}@endif</small></div>
             <a class="bell" href="{{ route('notifications.index') }}" aria-label="Notifikasi"><x-icon name="bell" />@if ($unread > 0)<i class="dot">{{ $unread > 9 ? '9+' : $unread }}</i>@endif</a>
         </div>
 
@@ -128,6 +129,6 @@
         </div>
     </div>
 </div>
-<script src="/js/app.js?v=4" defer></script>
+<script src="/js/app.js?v=5" defer></script>
 </body>
 </html>

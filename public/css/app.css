@@ -383,3 +383,37 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;animation-delay:0s!important;transition-duration:.01ms!important}
 }
+
+/* ================= v7: nuansa aplikasi (PWA) ================= */
+.navbar-progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:100;background:var(--accent);box-shadow:0 0 10px var(--accent);opacity:0;pointer-events:none}
+.navbar-progress.go{opacity:1;width:82%;transition:width 8s cubic-bezier(.1,.7,.2,1)}
+@keyframes pgin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes tilein{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.topbar-mobile .ttl{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.2}
+.topbar-mobile .ttl b{font-size:19px;font-weight:800;letter-spacing:-.4px}
+.topbar-mobile .ttl small{color:var(--muted);font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:900px){
+  .topbar-mobile{position:sticky;top:0;z-index:20;margin:-14px -14px 0;padding:calc(10px + env(safe-area-inset-top)) 14px 10px;width:auto;background:color-mix(in srgb,var(--bg) 82%,transparent);backdrop-filter:saturate(1.6) blur(16px);-webkit-backdrop-filter:saturate(1.6) blur(16px);border-bottom:1px solid transparent}
+  .topbar-mobile img{width:38px;height:38px}
+  .topbar-mobile .bell{width:42px;height:42px}
+  .main>*:not(.topbar-mobile):not(.navbar-progress){animation:pgin .45s cubic-bezier(.2,.7,.2,1) both}
+  .bento>.tile,.stats>.stat{animation:tilein .5s cubic-bezier(.2,.7,.2,1) both}
+  .bento>.tile:nth-child(2),.stats>.stat:nth-child(2){animation-delay:.05s}
+  .bento>.tile:nth-child(3),.stats>.stat:nth-child(3){animation-delay:.1s}
+  .bento>.tile:nth-child(4),.stats>.stat:nth-child(4){animation-delay:.15s}
+  .bento>.tile:nth-child(n+5),.stats>.stat:nth-child(n+5){animation-delay:.2s}
+  .tile,.stats>.stat{border-radius:22px}
+  .tile.hero{padding:18px 20px}
+  .tile.hero h2{font-size:24px;letter-spacing:-.6px}
+  .tile.hero .big{font-size:38px}
+  .tile{padding:14px 16px}
+  .tile.link{min-height:96px;font-size:14px}
+  .tile.link svg{width:26px;height:26px}
+  a.tile,.tabbar a,.tabbar button,.btn,.more .grid a,.more .grid button{transition:transform .15s ease,background-color .2s ease,color .2s ease}
+  a.tile:active,.btn:active,.more .grid a:active,.more .grid button:active{transform:scale(.96)}
+  .tabbar{background:color-mix(in srgb,var(--card) 88%,transparent);backdrop-filter:saturate(1.6) blur(18px);-webkit-backdrop-filter:saturate(1.6) blur(18px);border:1px solid var(--line)}
+  .tabbar a:active,.tabbar button:active{transform:scale(.9)}
+  .tabbar .active svg{animation:pop .35s cubic-bezier(.3,1.6,.5,1)}
+}
+@keyframes pop{0%{transform:scale(.7)}100%{transform:scale(1)}}
+@media (prefers-reduced-motion:reduce){.navbar-progress.go{transition:none}}
