@@ -4,7 +4,7 @@
 @use('App\Support\Fmt')
 <header class="page-head">
     <div><h1>Stok gudang</h1><p>Stok dalam satuan dasar; konversi ke Dus ditampilkan bila ada</p></div>
-    <a class="btn primary" href="{{ route('stock.adjust') }}">Penyesuaian stok</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap"><a class="btn" href="{{ route('stock.waste') }}">Catat waste</a><a class="btn primary" href="{{ route('stock.adjust') }}">Penyesuaian stok</a></div>
 </header>
 <div class="stats">
     <div class="stat"><small>Jenis barang</small><b>{{ $items->count() }}</b></div>

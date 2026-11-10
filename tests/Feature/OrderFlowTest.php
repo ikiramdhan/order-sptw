@@ -132,6 +132,7 @@ class OrderFlowTest extends TestCase
         $dnItem = $note->items->first();
         $this->actingAs($this->outletUser)->post(route('delivery.receive', $note), ['received' => [$dnItem->id => 1.8]])->assertSessionHasNoErrors();
 
+        $this->assertEquals(18, \App\Services\OutletStockService::balance($this->outlet->id, $this->item->id));
         $invoice = Invoice::firstOrFail();
         $this->assertEquals(18000, $invoice->total);
         $this->assertTrue($invoice->due_at->isSameDay(today()->addDays(7)));

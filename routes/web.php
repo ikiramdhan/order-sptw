@@ -13,6 +13,7 @@ use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemImportController;
 use App\Http\Controllers\SupplierImportController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\OutletStockController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RekapController;
 use App\Http\Controllers\StockController;
@@ -91,12 +92,31 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::get('/stok', [StockController::class, 'index'])->name('stock.index');
         Route::get('/stok/penyesuaian', [StockController::class, 'adjustForm'])->name('stock.adjust');
         Route::post('/stok/penyesuaian', [StockController::class, 'adjustStore'])->name('stock.adjust.store');
+        Route::get('/stok/waste', [StockController::class, 'wasteForm'])->name('stock.waste');
+        Route::post('/stok/waste', [StockController::class, 'wasteStore'])->name('stock.waste.store');
         Route::get('/pembelian', [PurchaseController::class, 'index'])->name('purchases.index');
         Route::get('/pembelian/{purchase}', [PurchaseController::class, 'show'])->name('purchases.show');
         Route::post('/pembelian/{purchase}/terima', [PurchaseController::class, 'receive'])->name('purchases.receive');
 
         Route::post('/po/{order}/kirim', [OrderController::class, 'ship'])->name('orders.ship');
         Route::post('/po/{order}/batalkan-backorder', [OrderController::class, 'cancelBackorder'])->name('orders.backorder.cancel');
+    });
+
+    // Stok outlet: pantau (Admin CK, Gudang, Outlet); input penjualan/SO/waste (Outlet atau Admin CK)
+    Route::middleware($semua)->get('/stok-outlet', [OutletStockController::class, 'index'])->name('outletstock.index');
+    Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->group(function () {
+        Route::get('/stok-outlet/penjualan', [OutletStockController::class, 'salesForm'])->name('outletstock.sales');
+        Route::get('/stok-outlet/penjualan/contoh', [OutletStockController::class, 'salesTemplate'])->name('outletstock.sales.template');
+        Route::post('/stok-outlet/penjualan', [OutletStockController::class, 'salesStore'])->name('outletstock.sales.store');
+        Route::get('/stok-outlet/opname', [OutletStockController::class, 'countForm'])->name('outletstock.count');
+        Route::post('/stok-outlet/opname', [OutletStockController::class, 'countStore'])->name('outletstock.count.store');
+        Route::get('/stok-outlet/waste', [OutletStockController::class, 'wasteForm'])->name('outletstock.waste');
+        Route::post('/stok-outlet/waste', [OutletStockController::class, 'wasteStore'])->name('outletstock.waste.store');
+    });
+    Route::middleware($ck)->group(function () {
+        Route::get('/persetujuan-stok', [OutletStockController::class, 'approvals'])->name('approvals.index');
+        Route::post('/persetujuan-stok/{req}/setujui', [OutletStockController::class, 'approve'])->name('approvals.approve');
+        Route::post('/persetujuan-stok/{req}/tolak', [OutletStockController::class, 'reject'])->name('approvals.reject');
     });
 
     // Katalog & keranjang (Outlet)

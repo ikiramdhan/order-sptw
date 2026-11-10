@@ -141,6 +141,7 @@ class ReturnService
                 }
 
                 $row->update(['disposition' => $disp]);
+                OutletStockService::move($ret->outlet_id, $row->item_id, 'retur', -(float) $row->qty_base, $ret, $user->id, $ret->number);
                 $total += (int) $row->value;
 
                 if ($disp === 'masuk_stok') {

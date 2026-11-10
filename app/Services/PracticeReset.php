@@ -12,7 +12,7 @@ class PracticeReset
 
     /** Tabel transaksi, urut aman terhadap foreign key. */
     private const TX_TABLES = [
-        'app_notifications', 'credit_notes', 'payments', 'invoice_items', 'return_items', 'returns',
+        'stock_requests', 'outlet_sales_imports', 'outlet_stock_movements', 'outlet_stocks', 'app_notifications', 'credit_notes', 'payments', 'invoice_items', 'return_items', 'returns',
         'invoices', 'goods_receipts', 'delivery_note_items', 'delivery_notes',
         'purchase_order_items', 'purchase_orders',
         'supplier_payments', 'supplier_purchase_items', 'supplier_purchases',

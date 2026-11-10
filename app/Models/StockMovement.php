@@ -15,6 +15,7 @@ class StockMovement extends Model
         'retur_masuk' => 'Retur masuk stok',
         'retur_pengganti' => 'Barang pengganti retur',
         'penyesuaian' => 'Penyesuaian',
+        'waste' => 'Waste',
     ];
 
     public function item(): BelongsTo

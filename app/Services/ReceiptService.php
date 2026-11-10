@@ -52,6 +52,10 @@ class ReceiptService
 
                 $row->update(['qty_received_base' => $base]);
 
+                if ($base > 0) {
+                    OutletStockService::move($note->outlet_id, $row->item_id, 'masuk', $base, $note, $user->id, $note->number);
+                }
+
                 if ($base > 0 && $row->purchase_order_item_id) {
                     $price = (int) $row->poItem->unit_price_base;
                     $invoiceLines[] = [

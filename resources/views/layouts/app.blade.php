@@ -12,15 +12,18 @@
         $nav[] = ['orders.index', 'PO', 'list'];
         $nav[] = ['delivery.index', 'Terima', 'truck'];
         $nav[] = ['invoices.index', 'Tagihan', 'receipt'];
+        $nav[] = ['outletstock.index', 'Stok', 'box'];
         $nav[] = ['returns.index', 'Retur', 'undo'];
     }
     if ($u->hasRole('admin_ck', 'gudang')) {
+        $nav[] = ['outletstock.index', 'Stok Outlet', 'store'];
         $nav[] = ['orders.index', 'PO', 'list'];
         $nav[] = ['delivery.index', 'Kirim', 'truck'];
         $nav[] = ['stock.index', 'Stok', 'box'];
     }
     if ($u->hasRole('admin_ck')) {
         array_splice($nav, 1, 0, [['dashboard', 'Dashboard', 'chart']]);
+        $nav[] = ['approvals.index', 'Persetujuan', 'list'];
         $nav[] = ['returns.index', 'Retur', 'undo'];
         $nav[] = ['invoices.index', 'Invoice', 'receipt'];
         $nav[] = ['purchases.index', 'Beli', 'cart'];
