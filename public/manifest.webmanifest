@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "Central Kitchen Seblak Teh Wanti",
-  "short_name": "CK Wanti",
+  "name": "Order SPTW",
+  "short_name": "Order SPTW",
   "description": "Aplikasi PO, surat jalan, dan invoice Central Kitchen Seblak Teh Wanti",
   "start_url": "/?source=pwa",
   "scope": "/",
