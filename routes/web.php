@@ -11,6 +11,7 @@ use App\Http\Controllers\ReturnController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\ItemImportController;
+use App\Http\Controllers\SupplierImportController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PurchaseController;
 use App\Http\Controllers\RekapController;
@@ -69,6 +70,9 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::put('/barang/{item}', [ItemController::class, 'update'])->name('items.update');
         Route::post('/barang/{item}/toggle', [ItemController::class, 'toggle'])->name('items.toggle');
 
+        Route::get('/supplier/impor', [SupplierImportController::class, 'form'])->name('suppliers.import');
+        Route::post('/supplier/impor', [SupplierImportController::class, 'preview'])->name('suppliers.import.preview');
+        Route::post('/supplier/impor/simpan', [SupplierImportController::class, 'apply'])->name('suppliers.import.apply');
         Route::get('/supplier', [SupplierController::class, 'index'])->name('suppliers.index');
         Route::get('/supplier/baru', [SupplierController::class, 'create'])->name('suppliers.create');
         Route::post('/supplier', [SupplierController::class, 'store'])->name('suppliers.store');

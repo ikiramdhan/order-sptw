@@ -24,6 +24,21 @@
             <textarea name="address" rows="4">{{ old('address', $supplier->address) }}</textarea>
         </label>
     </div>
+    <div class="card wide">
+        <h3 class="sect">Rekening pembayaran</h3>
+        <div class="row">
+            <label class="field" style="flex:1 1 140px"><span class="lbl">Nama bank <span class="hint">(mis. BCA)</span></span>
+                <input type="text" name="bank_name" value="{{ old('bank_name', $supplier->bank_name) }}">
+            </label>
+            <label class="field" style="flex:2 1 220px">Nomor rekening
+                <input type="text" name="account_number" value="{{ old('account_number', $supplier->account_number) }}" inputmode="numeric">
+                @error('account_number')<span class="err">{{ $message }}</span>@enderror
+            </label>
+            <label class="field" style="flex:2 1 220px">Nama pemilik rekening
+                <input type="text" name="account_name" value="{{ old('account_name', $supplier->account_name) }}">
+            </label>
+        </div>
+    </div>
     <div class="formbar">
         <a class="btn" href="{{ route('suppliers.index') }}">Batal</a>
         <button type="submit" class="btn primary">Simpan supplier</button>

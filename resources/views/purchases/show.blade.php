@@ -7,7 +7,7 @@
     [$sl, $sc] = $purchase->statusLabel();
 @endphp
 <header class="page-head">
-    <div><h1>{{ $purchase->number }}</h1><p>{{ $purchase->supplier->name }}</p></div>
+    <div><h1>{{ $purchase->number }}</h1><p>{{ $purchase->supplier->name }}@if ($purchase->supplier->bankLine()) · {{ $purchase->supplier->bankLine() }}@endif</p></div>
     <a class="btn" href="{{ route('purchases.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>
 @error('receive')<div class="alert" role="alert">{{ $message }}</div>@enderror

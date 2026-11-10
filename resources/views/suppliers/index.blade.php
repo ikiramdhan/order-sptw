@@ -3,13 +3,16 @@
 @section('content')
 <header class="page-head">
     <div><h1>Supplier</h1><p>Tempat Central Kitchen membeli bahan</p></div>
-    <a class="btn primary" href="{{ route('suppliers.create') }}"><x-icon name="plus" :size="18" /> Tambah supplier</a>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a class="btn" href="{{ route('suppliers.import') }}">Impor</a>
+        <a class="btn primary" href="{{ route('suppliers.create') }}"><x-icon name="plus" :size="18" /> Tambah supplier</a>
+    </div>
 </header>
 <section class="list">
     @forelse ($suppliers as $s)
         <div class="item {{ $s->is_active ? '' : 'off' }}">
             <div class="avatar sq">{{ strtoupper(mb_substr($s->name, 0, 2)) }}</div>
-            <div class="who"><b>{{ $s->name }}</b><small>{{ $s->address ?: 'Alamat belum diisi' }}</small></div>
+            <div class="who"><b>{{ $s->name }}</b><small>{{ $s->bankLine() ?: ($s->address ?: 'Rekening belum diisi') }}</small></div>
             <div class="col"><b>{{ $s->phone ?: '-' }}</b></div>
             <span class="badge {{ $s->is_active ? 'ok' : 'bad' }}">{{ $s->is_active ? 'Aktif' : 'Nonaktif' }}</span>
             <div class="actions">

@@ -53,6 +53,9 @@ class SupplierController extends Controller
             'name' => ['required', 'string', 'max:120'],
             'phone' => ['nullable', 'string', 'max:30'],
             'address' => ['nullable', 'string', 'max:255'],
-        ], ['name.required' => 'Nama supplier wajib diisi.']);
+            'bank_name' => ['nullable', 'string', 'max:40'],
+            'account_name' => ['nullable', 'string', 'max:120'],
+            'account_number' => ['nullable', 'string', 'max:40', 'regex:/^[0-9 \-]*$/'],
+        ], ['name.required' => 'Nama supplier wajib diisi.', 'account_number.regex' => 'Nomor rekening hanya boleh angka.']);
     }
 }
