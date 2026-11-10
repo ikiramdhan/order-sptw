@@ -13,7 +13,7 @@
 </div>
 <form method="POST" action="{{ route('items.import.apply') }}" id="impform" class="card" novalidate>@csrf
     <input type="hidden" name="payload" id="payload">
-    <div class="tbl-wrap"><table class="tbl editable" id="imptbl">
+    <div class="tbl-wrap imp"><table class="tbl editable" id="imptbl">
         <thead><tr><th>Status</th><th>Kode</th><th>Kategori</th><th>Nama</th><th>Satuan</th><th>Harga CS</th><th>Harga CK</th><th>Stok min</th><th>Stok awal</th><th>Satuan besar</th><th>Isi</th><th>Catatan</th><th></th></tr></thead>
         <tbody>@foreach ($rows as $r)
             @php $raw = $r['raw'] ?? []; @endphp
