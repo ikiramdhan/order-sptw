@@ -103,8 +103,8 @@ class ItemImportTest extends TestCase
         $rows = \App\Services\SheetReader::read($tmp, 'contoh.xlsx');
         @unlink($tmp);
         $this->assertSame(ItemImportService::HEADERS, $rows[0]);
-        $this->assertSame(['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', '2000', '1000', '50', '200', 'Dus', '40'], $rows[1]);
-        $this->assertSame('Bumbu Seblak', $rows[3][1]);
+        $this->assertSame(['KR01', 'Bahan Baku', 'Kerupuk Seblak', 'PCS', '2000', '1000', '50', '200', 'Dus', '40'], $rows[1]);
+        $this->assertSame('Bumbu Seblak', $rows[3][2]);
 
         $this->actingAs($this->admin('gudang'))->get(route('items.import'))->assertForbidden();
         $this->assertStringContainsString('Nama Barang', ItemImportService::templateCsv());
