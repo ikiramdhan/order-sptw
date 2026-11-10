@@ -24,6 +24,11 @@ class User extends Authenticatable
         self::ROLE_OUTLET => 'Outlet',
     ];
 
+    /** Peran yang bisa dipilih saat membuat akun baru (hanya Super Admin yang membuka menu ini). */
+    public const CREATABLE_ROLES = [
+        self::ROLE_SUPER_ADMIN => 'Super Admin',
+    ] + self::ASSIGNABLE_ROLES;
+
     protected $fillable = [
         'name', 'email', 'password', 'role', 'outlet_id', 'is_active', 'must_change_password', 'last_login_at',
     ];

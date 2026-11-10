@@ -30,13 +30,14 @@
         <h3 class="sect">Peran dan akses</h3>
         <div class="field">Peran
             <div class="seg" role="radiogroup" aria-label="Peran">
-                @foreach (\App\Models\User::ASSIGNABLE_ROLES as $key => $label)
+                @foreach ($user->exists ? \App\Models\User::ASSIGNABLE_ROLES : \App\Models\User::CREATABLE_ROLES as $key => $label)
                     <label><input type="radio" name="role" value="{{ $key }}" {{ $roleNow === $key ? 'checked' : '' }}><span>{{ $label }}</span></label>
                 @endforeach
             </div>
             @error('role')<span class="err">{{ $message }}</span>@enderror
         </div>
 
+        <div class="alert info" id="superNote" style="display:none">Super Admin punya akses penuh: semua modul, Pengaturan, dan kelola pengguna. Berikan hanya kepada pemilik atau orang yang sangat dipercaya.</div>
         <label class="field"><span class="lbl">Outlet <span class="hint">(khusus peran Outlet)</span></span>
             <select name="outlet_id">
                 <option value="">Pilih outlet</option>
@@ -53,4 +54,11 @@
         <button type="submit" class="btn primary">{{ $user->exists ? 'Simpan perubahan' : 'Simpan pengguna' }}</button>
     </div>
 </form>
+<script>
+(function(){
+  var radios=document.querySelectorAll('input[name=role]'), note=document.getElementById('superNote');
+  function sync(){var v=document.querySelector('input[name=role]:checked');if(note)note.style.display=v&&v.value==='super_admin'?'block':'none';}
+  radios.forEach(function(r){r.addEventListener('change',sync)});sync();
+})();
+</script>
 @endsection

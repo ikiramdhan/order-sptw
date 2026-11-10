@@ -32,9 +32,9 @@
             <div class="who"><b>{{ $u->name }}</b><small>{{ $u->email }}</small></div>
             <div class="col"><b>{{ $u->roleLabel() }}</b><small>{{ $u->outlet?->name ?? ($u->isSuperAdmin() ? 'Semua modul' : 'Central Kitchen') }}</small></div>
             <span class="badge {{ $u->is_active ? 'ok' : 'bad' }}">{{ $u->is_active ? 'Aktif' : 'Nonaktif' }}</span>
-            @unless ($u->isSuperAdmin())
+            @if ($u->id !== auth()->id())
                 <div class="actions">
-                    <a class="btn sm" href="{{ route('users.edit', $u) }}">Ubah</a>
+                    @unless ($u->isSuperAdmin())<a class="btn sm" href="{{ route('users.edit', $u) }}">Ubah</a>@endunless
                     <form method="POST" action="{{ route('users.reset', $u) }}" data-confirm="Reset password {{ $u->name }}? Password lama tidak berlaku lagi dan semua perangkatnya keluar.">@csrf
                         <button class="btn sm" type="submit">Reset password</button>
                     </form>
@@ -42,7 +42,7 @@
                         <button class="btn sm {{ $u->is_active ? 'danger' : 'ok' }}" type="submit">{{ $u->is_active ? 'Nonaktifkan' : 'Aktifkan' }}</button>
                     </form>
                 </div>
-            @endunless
+            @endif
         </div>
     @empty
         <div class="empty">Belum ada pengguna yang cocok.</div>

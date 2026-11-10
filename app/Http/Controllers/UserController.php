@@ -81,7 +81,7 @@ class UserController extends Controller
 
     public function resetPassword(User $user): RedirectResponse
     {
-        abort_if($user->isSuperAdmin(), 403);
+        abort_if($user->id === auth()->id(), 403, 'Ganti password sendiri lewat menu Akun.');
 
         $temp = $this->tempPassword();
         $user->forceFill([
@@ -100,7 +100,7 @@ class UserController extends Controller
 
     public function toggle(User $user): RedirectResponse
     {
-        abort_if($user->isSuperAdmin() || $user->id === auth()->id(), 403, 'Akun ini tidak bisa dinonaktifkan.');
+        abort_if($user->id === auth()->id(), 403, 'Akun sendiri tidak bisa dinonaktifkan.');
 
         $user->update(['is_active' => ! $user->is_active]);
 
@@ -118,7 +118,7 @@ class UserController extends Controller
         $data = $request->validate([
             'name' => ['required', 'string', 'max:100'],
             'email' => ['required', 'email', 'max:150', Rule::unique('users', 'email')->ignore($user?->id)],
-            'role' => ['required', Rule::in(array_keys(User::ASSIGNABLE_ROLES))],
+            'role' => ['required', Rule::in(array_keys($user ? User::ASSIGNABLE_ROLES : User::CREATABLE_ROLES))],
             'outlet_id' => ['nullable', 'required_if:role,'.User::ROLE_OUTLET, 'exists:outlets,id'],
         ], [
             'name.required' => 'Nama wajib diisi.',
