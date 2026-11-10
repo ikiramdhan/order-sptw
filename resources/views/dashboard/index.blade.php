@@ -5,18 +5,18 @@
 <header class="page-head">
     <div><h1>Dashboard</h1><p>Ringkasan Central Kitchen · {{ $monthLabel }}</p></div>
 </header>
-<div class="stats">
-    <div class="stat"><small>Penjualan bulan ini</small><b>{{ Fmt::rp($sales) }}</b></div>
-    <div class="stat"><small>Uang masuk bulan ini</small><b style="color:var(--ok)">{{ Fmt::rp($collected) }}</b></div>
-    <div class="stat"><small>Piutang outlet</small><b>{{ Fmt::rp($receivable) }}</b></div>
-    <div class="stat warn"><small>Piutang lewat tempo</small><b>{{ Fmt::rp($receivableOverdue) }}</b></div>
-    <div class="stat"><small>Hutang supplier</small><b>{{ Fmt::rp($payable) }}</b></div>
-</div>
-<div class="chips">
-    <a class="chip" href="{{ route('orders.index') }}">PO menunggu: {{ $poWaiting }}</a>
-    <a class="chip" href="{{ route('orders.index', ['status' => 'menunggu_backorder']) }}">Backorder: {{ $backorder }}</a>
-    <a class="chip" href="{{ route('returns.index', ['status' => 'diajukan']) }}">Retur menunggu: {{ $returnsWaiting }}</a>
-    <a class="chip" href="{{ route('stock.index', ['menipis' => 1]) }}">Stok menipis: {{ $lowStock->count() }}</a>
+<div class="bento">
+    <section class="tile hero w2 h2" aria-label="Sorotan">
+        <div><small>Penjualan bulan ini</small><div class="big">{{ Fmt::rp($sales) }}</div></div>
+        <div><small>Uang masuk bulan ini</small><div class="mid">{{ Fmt::rp($collected) }}</div></div>
+    </section>
+    <div class="tile"><small>Piutang outlet</small><b>{{ Fmt::rp($receivable) }}</b></div>
+    <div class="tile warn"><small>Piutang lewat tempo</small><b>{{ Fmt::rp($receivableOverdue) }}</b></div>
+    <div class="tile w2"><small>Hutang supplier</small><b>{{ Fmt::rp($payable) }}</b></div>
+    <a class="tile link" href="{{ route('orders.index') }}"><small>PO menunggu</small><b>{{ $poWaiting }}</b></a>
+    <a class="tile link" href="{{ route('orders.index', ['status' => 'menunggu_backorder']) }}"><small>Backorder</small><b>{{ $backorder }}</b></a>
+    <a class="tile link" href="{{ route('returns.index', ['status' => 'diajukan']) }}"><small>Retur menunggu</small><b>{{ $returnsWaiting }}</b></a>
+    <a class="tile link" href="{{ route('stock.index', ['menipis' => 1]) }}"><small>Stok menipis</small><b>{{ $lowStock->count() }}</b></a>
 </div>
 <div class="two-col">
 <div class="grow stack">

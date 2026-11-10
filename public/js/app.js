@@ -15,6 +15,28 @@ document.addEventListener('submit', function (e) {
   if (msg && !window.confirm(msg)) e.preventDefault();
 });
 
+// Menu "Lainnya" (lembar bawah di HP/tablet)
+(function () {
+  var sheet = document.getElementById('more');
+  if (!sheet) return;
+  var openers = document.querySelectorAll('[data-more-open]');
+  function setOpen(on) {
+    sheet.classList.toggle('open', on);
+    document.documentElement.style.overflow = on ? 'hidden' : '';
+    openers.forEach(function (b) { b.setAttribute('aria-expanded', on ? 'true' : 'false'); });
+  }
+  document.addEventListener('click', function (e) {
+    if (e.target.closest('[data-more-open]')) { setOpen(!sheet.classList.contains('open')); return; }
+    if (e.target.closest('[data-more-close]')) setOpen(false);
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') setOpen(false); });
+})();
+
+// Kunci zoom (iOS mengabaikan user-scalable=no, jadi cegah gesture cubit)
+['gesturestart', 'gesturechange', 'gestureend'].forEach(function (t) {
+  document.addEventListener(t, function (e) { e.preventDefault(); });
+});
+
 // Service worker (PWA)
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function () {
