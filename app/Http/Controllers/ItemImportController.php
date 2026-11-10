@@ -18,9 +18,9 @@ class ItemImportController extends Controller
 
     public function template()
     {
-        return response(ItemImportService::templateCsv(), 200, [
-            'Content-Type' => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="contoh-impor-barang.csv"',
+        return response(\App\Services\ItemTemplateXlsx::build(), 200, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            'Content-Disposition' => 'attachment; filename="contoh-impor-barang.xlsx"',
         ]);
     }
 

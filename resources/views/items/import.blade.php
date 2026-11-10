@@ -18,7 +18,7 @@
 <div class="side">
     <div class="card">
         <h3 class="sect">Format kolom</h3>
-        <p style="margin:0 0 8px;color:var(--muted)">Baris pertama adalah judul kolom. Urutan kolom bebas.</p>
+        <p style="margin:0 0 8px;color:var(--muted)">Unduh file contoh (.xlsx), lalu isi per kolom. Baris pertama adalah judul kolom. Petunjuk ada di lembar kedua.</p>
         <ul style="margin:0 0 12px;padding-left:18px;line-height:1.7">
             <li><b>Nama Barang</b> (wajib)</li>
             <li><b>Satuan Dasar</b> (wajib), mis. PCS, Kg</li>
@@ -27,7 +27,7 @@
             <li>Satuan Besar + Isi per Satuan Besar (opsional), mis. Dus dan 40</li>
         </ul>
         <p style="margin:0 0 12px;color:var(--muted)">Barang dengan nama yang sudah ada akan diperbarui harganya. Stok awal hanya berlaku untuk barang baru. Satuan yang belum ada dibuat otomatis.</p>
-        <a class="btn block" href="{{ route('items.import.template') }}">Unduh file contoh</a>
+        <a class="btn block" href="{{ route('items.import.template') }}">Unduh template Excel (.xlsx)</a>
     </div>
 </div>
 </div>

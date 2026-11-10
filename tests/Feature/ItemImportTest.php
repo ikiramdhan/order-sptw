@@ -95,7 +95,16 @@ class ItemImportTest extends TestCase
     {
         $admin = $this->admin();
         $this->actingAs($admin)->post(route('items.import.preview'), ['file' => UploadedFile::fake()->createWithContent('c.csv', "Nama;Kategori\nA;B\n")])->assertSessionHasErrors('file');
-        $this->get(route('items.import.template'))->assertOk();
+        $this->get(route('items.import.template'))->assertOk()->assertHeader('content-disposition', 'attachment; filename="contoh-impor-barang.xlsx"');
+
+        // template .xlsx bisa dibaca balik oleh pengimpor, tiap isian di kolomnya sendiri
+        $tmp = tempnam(sys_get_temp_dir(), 'tpl');
+        file_put_contents($tmp, \App\Services\ItemTemplateXlsx::build());
+        $rows = \App\Services\SheetReader::read($tmp, 'contoh.xlsx');
+        @unlink($tmp);
+        $this->assertSame(ItemImportService::HEADERS, $rows[0]);
+        $this->assertSame(['Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '50', '200', 'Dus', '40'], $rows[1]);
+        $this->assertSame('Bumbu Seblak', $rows[3][0]);
 
         $this->actingAs($this->admin('gudang'))->get(route('items.import'))->assertForbidden();
         $this->assertStringContainsString('Nama Barang', ItemImportService::templateCsv());
