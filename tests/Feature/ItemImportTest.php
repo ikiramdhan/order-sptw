@@ -149,4 +149,15 @@ class ItemImportTest extends TestCase
         $this->assertSame(3000, \App\Models\Item::where('name', 'UDANG SEBLAK')->value('price'));
         $this->assertSame(500, \App\Models\Item::where('name', 'ES BATU')->value('price'));
     }
+
+    public function test_check_endpoint_returns_row_statuses_as_json(): void
+    {
+        $this->actingAs($this->admin());
+        $rows = [
+            ['code' => '', 'category' => 'A', 'name' => 'X1', 'base_unit' => 'PCS', 'retail_price' => '', 'price' => '500', 'min_stock' => '', 'stock' => '', 'big_unit' => '', 'factor' => ''],
+            ['code' => '', 'category' => 'A', 'name' => 'X2', 'base_unit' => '', 'retail_price' => '', 'price' => '', 'min_stock' => '', 'stock' => '', 'big_unit' => '', 'factor' => ''],
+        ];
+        $this->postJson(route('items.import.check'), ['payload' => json_encode($rows)])
+            ->assertOk()->assertJsonPath('new', 1)->assertJsonPath('errors', 1)->assertJsonPath('rows.1.status', 'error');
+    }
 }

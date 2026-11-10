@@ -64,6 +64,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::get('/barang/impor/contoh', [ItemImportController::class, 'template'])->name('items.import.template');
         Route::post('/barang/impor', [ItemImportController::class, 'preview'])->name('items.import.preview');
         Route::post('/barang/impor/simpan', [ItemImportController::class, 'apply'])->name('items.import.apply');
+        Route::post('/barang/impor/periksa', [ItemImportController::class, 'check'])->name('items.import.check');
         Route::get('/barang/baru', [ItemController::class, 'create'])->name('items.create');
         Route::post('/barang', [ItemController::class, 'store'])->name('items.store');
         Route::get('/barang/{item}/ubah', [ItemController::class, 'edit'])->name('items.edit');

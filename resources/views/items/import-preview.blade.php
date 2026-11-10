@@ -7,9 +7,9 @@
     <a class="btn" href="{{ route('items.import') }}"><x-icon name="back" :size="18" /> Unggah ulang</a>
 </header>
 <div class="stats">
-    <div class="stat"><small>Barang baru</small><b style="color:var(--ok)">{{ $new }}</b></div>
-    <div class="stat"><small>Diperbarui</small><b>{{ $update }}</b></div>
-    <div class="stat warn"><small>Error (dilewati)</small><b>{{ $errors }}</b></div>
+    <div class="stat"><small>Barang baru</small><b id="s-new" style="color:var(--ok)">{{ $new }}</b></div>
+    <div class="stat"><small>Diperbarui</small><b id="s-upd">{{ $update }}</b></div>
+    <div class="stat warn"><small>Error (dilewati)</small><b id="s-err">{{ $errors }}</b></div>
 </div>
 <form method="POST" action="{{ route('items.import.apply') }}" id="impform" class="card" novalidate>@csrf
     <input type="hidden" name="payload" id="payload">
@@ -36,24 +36,53 @@
     </table></div>
     <div class="impbar">
         <button class="btn" type="submit" name="action" value="recheck">Periksa ulang</button>
-        @if ($new + $update > 0)
-            <button class="btn primary" type="submit" name="action" value="save" data-save="{{ $new + $update }}">Simpan {{ $new + $update }} barang</button>
-        @else
-            <span class="err">Belum ada baris yang valid untuk disimpan.</span>
-        @endif
+        <button class="btn primary" type="submit" name="action" value="save" id="save-btn" @if ($new + $update === 0) hidden @endif>Simpan {{ $new + $update }} barang</button>
+        <span class="err" id="save-none" @if ($new + $update > 0) hidden @endif>Belum ada baris yang valid untuk disimpan.</span>
+        <span id="chk-state" style="color:var(--muted);font-size:12px;align-self:center"></span>
     </div>
 </form>
 <script>
 (function () {
-    var form = document.getElementById('impform'), tb = document.querySelector('#imptbl tbody');
-    tb.addEventListener('click', function (e) { var b = e.target.closest('.rm'); if (b) b.closest('tr').remove(); });
-    form.addEventListener('submit', function (e) {
+    var form = document.getElementById('impform'), tb = document.querySelector('#imptbl tbody'), state = document.getElementById('chk-state');
+    var url = @json(route('items.import.check')), token = document.querySelector('meta[name=csrf-token]').content, timer = null, seq = 0;
+    function collect() {
         var rows = [];
         tb.querySelectorAll('tr').forEach(function (tr) {
             var o = {}; tr.querySelectorAll('[data-f]').forEach(function (i) { o[i.getAttribute('data-f')] = i.value; }); rows.push(o);
         });
-        document.getElementById('payload').value = JSON.stringify(rows);
-    });
+        return rows;
+    }
+    function esc(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+    function apply(res) {
+        var trs = tb.querySelectorAll('tr');
+        res.rows.forEach(function (r, i) {
+            var tr = trs[i]; if (!tr) return;
+            tr.classList.toggle('rowerr', r.status === 'error');
+            var b = tr.querySelector('.badge');
+            b.className = 'badge ' + (r.status === 'error' ? 'bad' : (r.status === 'baru' ? 'ok' : 'info'));
+            b.textContent = r.status.charAt(0).toUpperCase() + r.status.slice(1);
+            var note = tr.querySelector('td[data-label=Catatan]');
+            note.innerHTML = r.errors.map(function (e) { return '<div class="err">' + esc(e) + '</div>'; }).join('') + r.notes.map(function (n) { return '<div style="color:var(--muted);font-size:12px">' + esc(n) + '</div>'; }).join('');
+        });
+        document.getElementById('s-new').textContent = res.new;
+        document.getElementById('s-upd').textContent = res.update;
+        document.getElementById('s-err').textContent = res.errors;
+        var n = res.new + res.update, btn = document.getElementById('save-btn');
+        btn.textContent = 'Simpan ' + n + ' barang'; btn.hidden = n === 0; document.getElementById('save-none').hidden = n > 0;
+        state.textContent = 'Sudah diperiksa';
+    }
+    function check() {
+        var my = ++seq, fd = new FormData(); fd.append('payload', JSON.stringify(collect())); fd.append('_token', token);
+        state.textContent = 'Memeriksa…';
+        fetch(url, { method: 'POST', body: fd, headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }, credentials: 'same-origin' })
+            .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+            .then(function (res) { if (my === seq) apply(res); })
+            .catch(function () { if (my === seq) state.textContent = 'Gagal memeriksa, tekan Periksa ulang'; });
+    }
+    function later() { state.textContent = 'Diubah…'; clearTimeout(timer); timer = setTimeout(check, 600); }
+    tb.addEventListener('input', later);
+    tb.addEventListener('click', function (e) { var b = e.target.closest('.rm'); if (b) { b.closest('tr').remove(); later(); } });
+    form.addEventListener('submit', function () { document.getElementById('payload').value = JSON.stringify(collect()); });
 })();
 </script>
 @endsection

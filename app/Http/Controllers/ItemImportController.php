@@ -41,6 +41,27 @@ class ItemImportController extends Controller
         return view('items.import-preview', $parsed);
     }
 
+    /** Periksa ulang hasil sunting tanpa memuat ulang halaman (dipanggil otomatis saat sel diubah). */
+    public function check(Request $request): \Illuminate\Http\JsonResponse
+    {
+        $edited = json_decode((string) $request->input('payload'), true);
+
+        if (! is_array($edited) || $edited === []) {
+            return response()->json(['message' => 'Tidak ada baris.'], 422);
+        }
+
+        try {
+            $parsed = ItemImportService::parseEdited($edited);
+        } catch (\DomainException $e) {
+            return response()->json(['message' => $e->getMessage()], 422);
+        }
+
+        return response()->json([
+            'new' => $parsed['new'], 'update' => $parsed['update'], 'errors' => $parsed['errors'],
+            'rows' => array_map(fn ($r) => ['status' => $r['status'], 'errors' => $r['errors'], 'notes' => $r['notes']], $parsed['rows']),
+        ]);
+    }
+
     public function apply(Request $request): RedirectResponse|\Illuminate\Contracts\View\View
     {
         $payload = $request->input('payload');
