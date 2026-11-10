@@ -13,13 +13,15 @@ class ItemImportService
 {
     public const MAX_ROWS = 1000;
 
-    public const HEADERS = ['Nama Barang', 'Kategori', 'Satuan Dasar', 'Harga Jual', 'Stok Minimum', 'Stok Awal', 'Satuan Besar', 'Isi per Satuan Besar'];
+    public const HEADERS = ['Nama Barang', 'Kategori', 'Satuan Dasar', 'Harga Jual', 'Stok Minimum', 'Stok Awal', 'Satuan Besar', 'Isi per Satuan Besar', 'Kode', 'Harga CS'];
 
     private const ALIASES = [
+        'code' => ['kode', 'kodebarang', 'sku', 'kodeitem'],
+        'retail_price' => ['hargacs', 'hargakonsumen', 'hargaeceran', 'hargaoutlet', 'hargacustomer', 'hargacostumer'],
         'name' => ['namabarang', 'nama', 'barang', 'item', 'produk', 'namaproduk'],
         'category' => ['kategori', 'jenis', 'kelompok'],
         'base_unit' => ['satuandasar', 'satuan', 'unit', 'sat'],
-        'price' => ['hargajual', 'harga', 'hargasatuan', 'hargapcs'],
+        'price' => ['hargajual', 'harga', 'hargasatuan', 'hargapcs', 'hargack', 'hargajualck'],
         'min_stock' => ['stokminimum', 'stokmin', 'minstok', 'minimumstok', 'stokminimal'],
         'stock' => ['stokawal', 'stok', 'stock', 'saldoawal'],
         'big_unit' => ['satuanbesar', 'satuankonversi', 'satuan2', 'satuankedua', 'satuanbox'],
@@ -31,9 +33,9 @@ class ItemImportService
     {
         $rows = [
             self::HEADERS,
-            ['Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '50', '200', 'Dus', '40'],
-            ['Cuanki', 'Bahan Baku', 'PCS', '1500', '20', '0', 'Box', '24'],
-            ['Bumbu Seblak', 'Bumbu', 'Kg', '45000', '5', '10', '', ''],
+            ['Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '50', '200', 'Dus', '40', 'KR01', '2000'],
+            ['Cuanki', 'Bahan Baku', 'PCS', '1500', '20', '0', 'Box', '24', 'KR02', '3000'],
+            ['Bumbu Seblak', 'Bumbu', 'Kg', '45000', '5', '10', '', '', 'BB01', ''],
         ];
 
         return "\xEF\xBB\xBF".implode("\r\n", array_map(fn ($r) => implode(';', $r), $rows))."\r\n";
@@ -72,10 +74,12 @@ class ItemImportService
         foreach (array_slice($raw, 1) as $n => $r) {
             $row = [
                 'line' => $n + 2,
+                'code' => $get($r, 'code'),
                 'name' => $get($r, 'name'),
                 'category' => $get($r, 'category'),
                 'base_unit' => $get($r, 'base_unit'),
                 'price' => self::rupiah($get($r, 'price')),
+                'retail_price' => self::rupiah($get($r, 'retail_price')),
                 'min_stock' => self::number($get($r, 'min_stock')),
                 'stock' => self::number($get($r, 'stock')),
                 'big_unit' => $get($r, 'big_unit'),
@@ -99,6 +103,9 @@ class ItemImportService
             }
             if ($row['price'] === null) {
                 $row['errors'][] = 'Harga jual tidak valid';
+            }
+            if ($get($r, 'retail_price') !== '' && $row['retail_price'] === null) {
+                $row['errors'][] = 'Harga CS tidak valid';
             }
             if (($get($r, 'stock') !== '' && $row['stock'] === null) || ($get($r, 'min_stock') !== '' && $row['min_stock'] === null)) {
                 $row['errors'][] = 'Stok harus berupa angka';
@@ -166,6 +173,12 @@ class ItemImportService
 
                 if ($item) {
                     $data = ['price' => (int) $row['price'], 'is_active' => true];
+                    if (($row['code'] ?? '') !== '') {
+                        $data['code'] = $row['code'];
+                    }
+                    if (($row['retail_price'] ?? null) !== null) {
+                        $data['retail_price'] = (int) $row['retail_price'];
+                    }
                     if ($row['category'] !== '') {
                         $data['category'] = $row['category'];
                     }
@@ -179,6 +192,7 @@ class ItemImportService
                     $result['update']++;
                 } else {
                     $item = Item::create([
+                        'code' => ($row['code'] ?? '') !== '' ? $row['code'] : null, 'retail_price' => $row['retail_price'] ?? null,
                         'name' => $row['name'], 'category' => $row['category'] ?: null, 'base_unit_id' => $base->id,
                         'price' => (int) $row['price'], 'stock' => 0, 'min_stock' => $row['min_stock'] ?? 0, 'is_active' => true,
                     ]);

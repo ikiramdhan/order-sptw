@@ -22,8 +22,9 @@
         <ul style="margin:0 0 12px;padding-left:18px;line-height:1.7">
             <li><b>Nama Barang</b> (wajib)</li>
             <li><b>Satuan Dasar</b> (wajib), mis. PCS, Kg</li>
-            <li><b>Harga Jual</b> (wajib), per satuan dasar</li>
-            <li>Kategori, Stok Minimum, Stok Awal (opsional)</li>
+            <li><b>Harga Jual</b> / <b>Harga CK</b> (wajib), harga CK ke outlet per satuan dasar</li>
+            <li><b>Harga CS</b> (opsional), harga outlet ke konsumen, hanya sebagai info</li>
+            <li>Kode, Kategori, Stok Minimum, Stok Awal (opsional)</li>
             <li>Satuan Besar + Isi per Satuan Besar (opsional), mis. Dus dan 40</li>
         </ul>
         <p style="margin:0 0 12px;color:var(--muted)">Barang dengan nama yang sudah ada akan diperbarui harganya. Stok awal hanya berlaku untuk barang baru. Satuan yang belum ada dibuat otomatis.</p>

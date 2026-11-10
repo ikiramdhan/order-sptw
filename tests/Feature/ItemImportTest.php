@@ -103,10 +103,26 @@ class ItemImportTest extends TestCase
         $rows = \App\Services\SheetReader::read($tmp, 'contoh.xlsx');
         @unlink($tmp);
         $this->assertSame(ItemImportService::HEADERS, $rows[0]);
-        $this->assertSame(['Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '50', '200', 'Dus', '40'], $rows[1]);
+        $this->assertSame(['Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '50', '200', 'Dus', '40', 'KR01', '2000'], $rows[1]);
         $this->assertSame('Bumbu Seblak', $rows[3][0]);
 
         $this->actingAs($this->admin('gudang'))->get(route('items.import'))->assertForbidden();
         $this->assertStringContainsString('Nama Barang', ItemImportService::templateCsv());
+    }
+
+    public function test_sheet_with_kode_harga_cs_and_harga_ck_columns(): void
+    {
+        $admin = $this->admin();
+        $csv = "KODE;KATEGORI;NAMA BARANG;Satuan;HARGA CS;HARGA CK\nKR01;Kerupuk;CIKUR;PCS;Rp 1,000;Rp 500\nMI8;MIE;INDOMIE AYAM BAWANG;PCS;;Rp 3,000\n";
+        $this->actingAs($admin)->post(route('items.import.preview'), ['file' => UploadedFile::fake()->createWithContent('i.csv', $csv)])->assertOk();
+        $this->post(route('items.import.apply'))->assertSessionHasNoErrors();
+
+        $cikur = \App\Models\Item::where('name', 'CIKUR')->firstOrFail();
+        $this->assertSame('KR01', $cikur->code);
+        $this->assertSame(500, $cikur->price);
+        $this->assertSame(1000, $cikur->retail_price);
+        $mie = \App\Models\Item::where('name', 'INDOMIE AYAM BAWANG')->firstOrFail();
+        $this->assertSame(3000, $mie->price);
+        $this->assertNull($mie->retail_price);
     }
 }

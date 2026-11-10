@@ -15,10 +15,15 @@
         <h3 class="sect">Data barang</h3>
         @csrf
         @if ($item->exists) @method('PUT') @endif
-        <label class="field">Nama barang
-            <input type="text" name="name" value="{{ old('name', $item->name) }}" required>
-            @error('name')<span class="err">{{ $message }}</span>@enderror
-        </label>
+        <div class="row">
+            <label class="field"><span class="lbl">Kode <span class="hint">(opsional)</span></span>
+                <input type="text" name="code" value="{{ old('code', $item->code) }}" maxlength="30">
+            </label>
+            <label class="field">Nama barang
+                <input type="text" name="name" value="{{ old('name', $item->name) }}" required>
+                @error('name')<span class="err">{{ $message }}</span>@enderror
+            </label>
+        </div>
         <div class="row">
             <label class="field"><span class="lbl">Kategori <span class="hint">(opsional)</span></span>
                 <input type="text" name="category" value="{{ old('category', $item->category) }}">
@@ -34,9 +39,12 @@
             </label>
         </div>
         <div class="row">
-            <label class="field">Harga jual per satuan dasar (Rp)
+            <label class="field">Harga CK ke outlet per satuan dasar (Rp)
                 <input type="text" data-money name="price" value="{{ number_format((int) round((float) old('price', $item->price)), 0, ',', '.') }}" inputmode="numeric" autocomplete="off" required>
                 @error('price')<span class="err">{{ $message }}</span>@enderror
+            </label>
+            <label class="field"><span class="lbl">Harga CS <span class="hint">(outlet ke konsumen, info)</span></span>
+                <input type="text" data-money name="retail_price" value="{{ ($v = old('retail_price', $item->retail_price)) === null || $v === '' ? '' : number_format((int) $v, 0, ',', '.') }}" inputmode="numeric" autocomplete="off">
             </label>
             <label class="field"><span class="lbl">Stok minimum <span class="hint">(peringatan menipis)</span></span>
                 <input type="number" name="min_stock" value="{{ old('min_stock', $item->min_stock + 0) }}" min="0" step="any" inputmode="decimal">

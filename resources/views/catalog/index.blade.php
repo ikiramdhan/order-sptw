@@ -12,7 +12,7 @@
     @forelse ($items as $i)
         @php $units = $i->sellableUnits(); @endphp
         <div class="prod">
-            <div class="who"><b>{{ $i->name }}</b><small>{{ $i->category }}</small></div>
+            <div class="who"><b>{{ $i->name }}</b><small>{{ $i->category }}@if ($i->retail_price) · harga konsumen {{ Fmt::rp($i->retail_price) }}@endif</small></div>
             <form method="POST" action="{{ route('cart.add') }}">@csrf
                 <input type="hidden" name="item_id" value="{{ $i->id }}">
                 <select name="unit_id" aria-label="Satuan {{ $i->name }}">

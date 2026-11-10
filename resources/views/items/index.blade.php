@@ -21,10 +21,10 @@
 <section class="list">
     @forelse ($items as $i)
         <div class="item {{ $i->is_active ? '' : 'off' }}">
-            <div class="who"><b>{{ $i->name }}</b>
+            <div class="who"><b>{{ $i->code ? $i->code.' · ' : '' }}{{ $i->name }}</b>
                 <small>{{ $i->category ?: 'Tanpa kategori' }} · Satuan dasar {{ $i->baseUnit->name }}@if ($i->hasRecipe()) · Resep: {{ $i->recipe->map(fn ($r) => $r->ingredient->name.' '.Fmt::qty($r->qty_base).' '.$r->ingredient->baseUnit->name)->join(', ') }}@endif
                     @foreach ($i->itemUnits->where('factor', '>', 0) as $iu) · 1 {{ $iu->unit->name }} = {{ Fmt::qty($iu->factor) }} {{ $i->baseUnit->name }}@endforeach</small></div>
-            <div class="col"><b>{{ Fmt::rp($i->price) }}</b><small>per {{ $i->baseUnit->name }}</small></div>
+            <div class="col"><b>{{ Fmt::rp($i->price) }}</b><small>CK · per {{ $i->baseUnit->name }}{{ $i->retail_price ? ' · CS '.Fmt::rp($i->retail_price) : '' }}</small></div>
             <div class="col"><b class="{{ $i->isLow() ? 'low' : '' }}">{{ Fmt::qty($i->availableStock()) }} {{ $i->baseUnit->name }}</b><small>{{ $i->hasRecipe() ? 'stok dari bahan' : 'stok'.($i->isLow() ? ' menipis' : '') }}</small></div>
             <div class="actions">
                 <a class="btn sm" href="{{ route('items.edit', $i) }}">Ubah</a>

@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Item extends Model
 {
-    protected $fillable = ['name', 'category', 'base_unit_id', 'price', 'stock', 'min_stock', 'is_active'];
+    protected $fillable = ['code', 'name', 'category', 'base_unit_id', 'price', 'retail_price', 'stock', 'min_stock', 'is_active'];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean', 'price' => 'integer'];
+        return ['is_active' => 'boolean', 'price' => 'integer', 'retail_price' => 'integer'];
     }
 
     public function baseUnit(): BelongsTo

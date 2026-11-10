@@ -13,13 +13,14 @@
 </div>
 <div class="card">
     <div class="tbl-wrap"><table class="tbl">
-        <thead><tr><th>Baris</th><th>Status</th><th>Nama</th><th>Kategori</th><th>Satuan</th><th class="num">Harga</th><th class="num">Stok min</th><th class="num">Stok awal</th><th>Konversi</th><th>Catatan</th></tr></thead>
+        <thead><tr><th>Baris</th><th>Status</th><th>Kode</th><th>Nama</th><th>Kategori</th><th>Satuan</th><th class="num">Harga CK</th><th class="num">Harga CS</th><th class="num">Stok min</th><th class="num">Stok awal</th><th>Konversi</th><th>Catatan</th></tr></thead>
         <tbody>@foreach ($rows as $r)
             <tr>
                 <td>{{ $r['line'] }}</td>
                 <td><span class="badge {{ $r['status'] === 'error' ? 'bad' : ($r['status'] === 'baru' ? 'ok' : 'info') }}">{{ ucfirst($r['status']) }}</span></td>
-                <td>{{ $r['name'] }}</td><td>{{ $r['category'] }}</td><td>{{ $r['base_unit'] }}</td>
+                <td>{{ $r['code'] ?? '' }}</td><td>{{ $r['name'] }}</td><td>{{ $r['category'] }}</td><td>{{ $r['base_unit'] }}</td>
                 <td class="num">{{ $r['price'] !== null ? Fmt::rp($r['price']) : '-' }}</td>
+                <td class="num">{{ ($r['retail_price'] ?? null) !== null ? Fmt::rp($r['retail_price']) : '-' }}</td>
                 <td class="num">{{ $r['min_stock'] !== null ? Fmt::qty($r['min_stock']) : '-' }}</td>
                 <td class="num">{{ $r['stock'] !== null ? Fmt::qty($r['stock']) : '-' }}</td>
                 <td>{{ $r['big_unit'] !== '' ? '1 '.$r['big_unit'].' = '.Fmt::qty($r['factor']).' '.$r['base_unit'] : '-' }}</td>

@@ -8,7 +8,7 @@ namespace App\Services;
  */
 class ItemTemplateXlsx
 {
-    private const WIDTHS = [30, 18, 14, 14, 14, 12, 14, 20];
+    private const WIDTHS = [30, 18, 14, 14, 14, 12, 14, 20, 12, 14];
 
     /** @return string isi file .xlsx (biner) */
     public static function build(): string
@@ -91,9 +91,9 @@ class ItemTemplateXlsx
         $rows .= '</row>';
 
         $examples = [
-            ['Kerupuk Seblak', 'Bahan Baku', 'PCS', 1000, 50, 200, 'Dus', 40],
-            ['Cuanki', 'Bahan Baku', 'PCS', 1500, 20, 0, 'Box', 24],
-            ['Bumbu Seblak', 'Bumbu', 'Kg', 45000, 5, 10, '', ''],
+            ['Kerupuk Seblak', 'Bahan Baku', 'PCS', 1000, 50, 200, 'Dus', 40, 'KR01', 2000],
+            ['Cuanki', 'Bahan Baku', 'PCS', 1500, 20, 0, 'Box', 24, 'KR02', 3000],
+            ['Bumbu Seblak', 'Bumbu', 'Kg', 45000, 5, 10, '', '', 'BB01', ''],
         ];
         foreach ($examples as $n => $row) {
             $r = $n + 2;
@@ -123,7 +123,8 @@ class ItemTemplateXlsx
             ['4. Stok Minimum = batas peringatan stok menipis. Stok Awal = jumlah stok saat ini (hanya untuk barang baru).', 3],
             ['5. Satuan Besar + Isi per Satuan Besar dipakai kalau barang dijual per kemasan. Contoh: Dus dan 40 artinya 1 Dus = 40 PCS.', 3],
             ['6. Nama yang sudah ada di aplikasi akan diperbarui harganya, bukan dobel. Satuan yang belum ada dibuat otomatis.', 3],
-            ['7. Simpan sebagai .xlsx, lalu unggah di menu Barang → Impor Excel. Anda bisa melihat pratinjau sebelum disimpan.', 3],
+            ['7. Harga Jual = harga CK ke outlet (yang ditagihkan). Harga CS = harga outlet ke konsumen (hanya info, boleh kosong). Kode boleh kosong.', 3],
+            ['8. Simpan sebagai .xlsx, lalu unggah di menu Barang → Impor Excel. Anda bisa melihat pratinjau sebelum disimpan.', 3],
         ];
         $rows = '';
         foreach ($lines as $n => [$text, $style]) {

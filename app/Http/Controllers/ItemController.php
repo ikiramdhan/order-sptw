@@ -132,10 +132,12 @@ class ItemController extends Controller
     private function validated(Request $request, ?Item $item = null): array
     {
         $data = $request->validate([
+            'code' => ['nullable', 'string', 'max:30'],
             'name' => ['required', 'string', 'max:120'],
             'category' => ['nullable', 'string', 'max:60'],
             'base_unit_id' => ['required', 'exists:units,id'],
             'price' => ['required', 'integer', 'min:0'],
+            'retail_price' => ['nullable', 'integer', 'min:0'],
             'min_stock' => ['nullable', 'numeric', 'min:0'],
             'units' => ['nullable', 'array'],
             'units.*.unit_id' => ['nullable', 'exists:units,id'],
@@ -174,6 +176,8 @@ class ItemController extends Controller
         }
 
         $payload = [
+            'code' => ($data['code'] ?? '') !== '' ? $data['code'] : null,
+            'retail_price' => ($data['retail_price'] ?? '') !== '' ? (int) $data['retail_price'] : null,
             'name' => $data['name'],
             'category' => $data['category'] ?? null,
             'base_unit_id' => $baseUnit,
