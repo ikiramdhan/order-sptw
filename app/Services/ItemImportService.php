@@ -13,7 +13,7 @@ class ItemImportService
 {
     public const MAX_ROWS = 1000;
 
-    public const HEADERS = ['Kode', 'Nama Barang', 'Kategori', 'Satuan Dasar', 'Harga Jual', 'Harga CS', 'Stok Minimum', 'Stok Awal', 'Satuan Besar', 'Isi per Satuan Besar'];
+    public const HEADERS = ['Kode', 'Nama Barang', 'Kategori', 'Satuan Dasar', 'Harga CS', 'Harga CK', 'Stok Minimum', 'Stok Awal', 'Satuan Besar', 'Isi per Satuan Besar'];
 
     private const ALIASES = [
         'code' => ['kode', 'kodebarang', 'sku', 'kodeitem'],
@@ -33,9 +33,9 @@ class ItemImportService
     {
         $rows = [
             self::HEADERS,
-            ['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '2000', '50', '200', 'Dus', '40'],
-            ['KR02', 'Cuanki', 'Bahan Baku', 'PCS', '1500', '3000', '20', '0', 'Box', '24'],
-            ['BB01', 'Bumbu Seblak', 'Bumbu', 'Kg', '45000', '', '5', '10', '', ''],
+            ['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', '2000', '1000', '50', '200', 'Dus', '40'],
+            ['KR02', 'Cuanki', 'Bahan Baku', 'PCS', '3000', '1500', '20', '0', 'Box', '24'],
+            ['BB01', 'Bumbu Seblak', 'Bumbu', 'Kg', '', '45000', '5', '10', '', ''],
         ];
 
         return "\xEF\xBB\xBF".implode("\r\n", array_map(fn ($r) => implode(';', $r), $rows))."\r\n";
@@ -59,7 +59,7 @@ class ItemImportService
         $map = self::mapHeader($raw[0]);
         foreach (['name', 'base_unit', 'price'] as $need) {
             if (! isset($map[$need])) {
-                throw new \DomainException('Kolom wajib tidak ditemukan: '.['name' => 'Nama Barang', 'base_unit' => 'Satuan Dasar', 'price' => 'Harga Jual'][$need].'. Gunakan file contoh sebagai acuan.');
+                throw new \DomainException('Kolom wajib tidak ditemukan: '.['name' => 'Nama Barang', 'base_unit' => 'Satuan Dasar', 'price' => 'Harga CK'][$need].'. Gunakan file contoh sebagai acuan.');
             }
         }
 

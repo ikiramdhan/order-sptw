@@ -91,9 +91,9 @@ class ItemTemplateXlsx
         $rows .= '</row>';
 
         $examples = [
-            ['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', 1000, 2000, 50, 200, 'Dus', 40],
-            ['KR02', 'Cuanki', 'Bahan Baku', 'PCS', 1500, 3000, 20, 0, 'Box', 24],
-            ['BB01', 'Bumbu Seblak', 'Bumbu', 'Kg', 45000, '', 5, 10, '', ''],
+            ['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', 2000, 1000, 50, 200, 'Dus', 40],
+            ['KR02', 'Cuanki', 'Bahan Baku', 'PCS', 3000, 1500, 20, 0, 'Box', 24],
+            ['BB01', 'Bumbu Seblak', 'Bumbu', 'Kg', '', 45000, 5, 10, '', ''],
         ];
         foreach ($examples as $n => $row) {
             $r = $n + 2;
@@ -118,12 +118,12 @@ class ItemTemplateXlsx
         $lines = [
             ['Cara mengisi (isi per kolom di lembar "Barang")', 4],
             ['1. Hapus 3 baris contoh abu-abu, lalu isi barang Anda mulai dari baris 2. Satu barang = satu baris.', 3],
-            ['2. Nama Barang, Satuan Dasar, dan Harga Jual wajib diisi. Kolom lain boleh kosong.', 3],
-            ['3. Satuan Dasar = satuan terkecil untuk stok, mis. PCS atau Kg. Harga Jual per satuan dasar, angka saja tanpa titik atau "Rp".', 3],
+            ['2. Nama Barang, Satuan Dasar, dan Harga CK wajib diisi. Kolom lain boleh kosong.', 3],
+            ['3. Satuan Dasar = satuan terkecil untuk stok, mis. PCS atau Kg. Harga CK per satuan dasar, angka saja tanpa titik atau "Rp".', 3],
             ['4. Stok Minimum = batas peringatan stok menipis. Stok Awal = jumlah stok saat ini (hanya untuk barang baru).', 3],
             ['5. Satuan Besar + Isi per Satuan Besar dipakai kalau barang dijual per kemasan. Contoh: Dus dan 40 artinya 1 Dus = 40 PCS.', 3],
             ['6. Nama yang sudah ada di aplikasi akan diperbarui harganya, bukan dobel. Satuan yang belum ada dibuat otomatis.', 3],
-            ['7. Harga Jual = harga CK ke outlet (yang ditagihkan). Harga CS = harga outlet ke konsumen (hanya info, boleh kosong). Kode boleh kosong.', 3],
+            ['7. Harga CS = harga outlet ke konsumen (hanya info, boleh kosong). Harga CK = harga CK ke outlet (yang ditagihkan, wajib). Kode boleh kosong.', 3],
             ['8. Simpan sebagai .xlsx, lalu unggah di menu Barang → Impor Excel. Anda bisa melihat pratinjau sebelum disimpan.', 3],
         ];
         $rows = '';
