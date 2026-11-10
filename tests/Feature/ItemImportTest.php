@@ -125,4 +125,28 @@ class ItemImportTest extends TestCase
         $this->assertSame(3000, $mie->price);
         $this->assertNull($mie->retail_price);
     }
+
+    public function test_preview_rows_can_be_edited_then_rechecked_and_saved(): void
+    {
+        $admin = $this->admin();
+        $csv = "Kode;Kategori;Nama Barang;Satuan;Harga CS;Harga CK\nSG14;Bahan Seger;UDANG SEBLAK;PCS;;Rp 5,000\nDR02;Minuman;ES BATU;;;\n";
+        $this->actingAs($admin)->post(route('items.import.preview'), ['file' => UploadedFile::fake()->createWithContent('e.csv', $csv)])->assertOk();
+
+        $edited = [
+            ['code' => 'SG14', 'category' => 'Bahan Seger', 'name' => 'UDANG SEBLAK', 'base_unit' => 'PCS', 'retail_price' => '5000', 'price' => '3000', 'min_stock' => '', 'stock' => '', 'big_unit' => '', 'factor' => ''],
+            ['code' => 'DR02', 'category' => 'Minuman', 'name' => 'ES BATU', 'base_unit' => '', 'retail_price' => '', 'price' => '', 'min_stock' => '', 'stock' => '', 'big_unit' => '', 'factor' => ''],
+        ];
+
+        // periksa ulang: baris kedua masih error, belum ada yang tersimpan
+        $this->post(route('items.import.apply'), ['payload' => json_encode($edited), 'action' => 'recheck'])->assertOk()->assertSeeText('Satuan dasar kosong');
+        $this->assertSame(0, \App\Models\Item::count());
+
+        // perbaiki baris kedua lalu simpan
+        $edited[1]['base_unit'] = 'PCS';
+        $edited[1]['price'] = '500';
+        $this->post(route('items.import.apply'), ['payload' => json_encode($edited), 'action' => 'save'])->assertRedirect(route('items.index'));
+
+        $this->assertSame(3000, \App\Models\Item::where('name', 'UDANG SEBLAK')->value('price'));
+        $this->assertSame(500, \App\Models\Item::where('name', 'ES BATU')->value('price'));
+    }
 }

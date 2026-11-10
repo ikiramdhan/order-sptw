@@ -84,6 +84,10 @@ class ItemImportService
                 'stock' => self::number($get($r, 'stock')),
                 'big_unit' => $get($r, 'big_unit'),
                 'factor' => self::number($get($r, 'factor')),
+                'raw' => [
+                    'price' => $get($r, 'price'), 'retail_price' => $get($r, 'retail_price'), 'min_stock' => $get($r, 'min_stock'),
+                    'stock' => $get($r, 'stock'), 'factor' => $get($r, 'factor'),
+                ],
                 'errors' => [],
                 'notes' => [],
             ];
@@ -154,6 +158,20 @@ class ItemImportService
         }
 
         return ['rows' => $out] + $stats;
+    }
+
+    /**
+     * Baris hasil sunting di pratinjau (teks mentah per sel) -> diperiksa ulang dengan aturan yang sama.
+     * @param array<int, array<string, mixed>> $edited
+     */
+    public static function parseEdited(array $edited): array
+    {
+        $raw = [self::HEADERS];
+        foreach ($edited as $e) {
+            $raw[] = array_map(fn ($k) => trim((string) ($e[$k] ?? '')), ['code', 'category', 'name', 'base_unit', 'retail_price', 'price', 'min_stock', 'stock', 'big_unit', 'factor']);
+        }
+
+        return self::parse($raw);
     }
 
     /** Simpan baris yang valid. Baris error dilewati. */

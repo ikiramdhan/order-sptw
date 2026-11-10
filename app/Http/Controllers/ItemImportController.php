@@ -41,8 +41,31 @@ class ItemImportController extends Controller
         return view('items.import-preview', $parsed);
     }
 
-    public function apply(Request $request): RedirectResponse
+    public function apply(Request $request): RedirectResponse|\Illuminate\Contracts\View\View
     {
+        $payload = $request->input('payload');
+
+        // Baris yang disunting di pratinjau dikirim sebagai satu paket JSON (menghindari batas jumlah kolom form)
+        if (is_string($payload) && $payload !== '') {
+            $edited = json_decode($payload, true);
+
+            if (! is_array($edited) || $edited === []) {
+                return redirect()->route('items.import')->withErrors(['file' => 'Tidak ada baris untuk disimpan. Unggah file lagi.']);
+            }
+
+            try {
+                $parsed = ItemImportService::parseEdited($edited);
+            } catch (\DomainException $e) {
+                return redirect()->route('items.import')->withErrors(['file' => $e->getMessage()]);
+            }
+
+            session([self::KEY => $parsed['rows']]);
+
+            if ($request->input('action') !== 'save') {
+                return view('items.import-preview', $parsed);
+            }
+        }
+
         $rows = session(self::KEY);
 
         if (! is_array($rows) || $rows === []) {

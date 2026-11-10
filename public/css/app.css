@@ -539,3 +539,10 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .pfilter .seg{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr}
 .pfilter .seg span{display:flex;justify-content:center}
 @media (max-width:700px){.pfilter .dd:first-of-type{flex-basis:100%!important}}
+
+/* ================= v12: pratinjau impor yang bisa disunting ================= */
+.tbl.editable input{min-width:60px;width:100%}
+.tbl.editable tr.rowerr td{background:color-mix(in srgb,var(--bad-bg) 55%,transparent)}
+.tbl.editable tr.rowerr input{border-color:var(--bad)}
+.impbar{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;position:sticky;bottom:calc(86px + env(safe-area-inset-bottom));background:color-mix(in srgb,var(--card) 92%,transparent);padding:10px 0}
+@media (min-width:901px){.impbar{bottom:0}}
