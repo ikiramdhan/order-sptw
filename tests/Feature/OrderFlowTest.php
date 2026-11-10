@@ -87,6 +87,27 @@ class OrderFlowTest extends TestCase
         $this->assertSame('lunas', $purchase->fresh()->payment_status);
     }
 
+    public function test_purchases_grouped_by_supplier_for_due_date_range(): void
+    {
+        $a = Supplier::create(['name' => 'Toko A', 'bank_name' => 'BCA', 'account_name' => 'BUDI', 'account_number' => '123456', 'is_active' => true]);
+        $b = Supplier::create(['name' => 'Toko B', 'is_active' => true]);
+        $mk = fn ($sup, $due, $price) => $this->actingAs($this->admin)->post(route('purchases.store'), [
+            'supplier_id' => $sup->id, 'purchased_at' => today()->toDateString(), 'due_at' => $due,
+            'lines' => [['item_id' => $this->item->id, 'unit_id' => $this->dus->id, 'qty' => 1, 'unit_price' => $price]],
+        ])->assertSessionHasNoErrors();
+        $mk($a, '2026-11-12', 10000);
+        $mk($a, '2026-11-12', 5000);
+        $mk($b, '2026-11-12', 7000);
+        $mk($b, '2026-11-20', 99000);
+
+        $res = $this->get(route('purchases.index', ['dari' => '2026-11-12', 'sampai' => '2026-11-12']))->assertOk();
+        $res->assertSeeText('Toko A')->assertSeeText('BCA 123456 a.n. BUDI')->assertSeeText('Rp 15.000')->assertSeeText('Rp 22.000');
+        $res->assertDontSeeText('99.000');
+
+        $this->get(route('purchases.index', ['supplier' => $b->id, 'dari' => '2026-11-01', 'sampai' => '2026-11-30']))
+            ->assertSeeText('Rp 106.000')->assertSeeText('Total per tanggal jatuh tempo');
+    }
+
     public function test_full_flow_partial_shipment_receipt_invoice_payment_and_rekap(): void
     {
         $this->stockIn(2); // 20 PCS

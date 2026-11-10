@@ -510,3 +510,32 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
   .tbl.stackable tfoot tr{display:flex;justify-content:space-between;padding:6px 12px}
   .tbl.stackable tfoot td{display:block;flex:none;padding:0}
 }
+
+/* ================= v11: pembelian per supplier / jatuh tempo ================= */
+.pfilter{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.pfilter .dt{display:flex;flex-direction:column;gap:2px;flex:1 1 150px;min-width:0}
+.pfilter .dt span{font-size:11px;color:var(--muted);font-weight:600;padding-left:14px}
+.pfilter .dt input{min-height:44px;padding:0 14px;border-radius:22px;border:0;background:var(--card);width:100%}
+.bydate{padding:16px 18px}
+.bydate .r{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--bg-2)}
+.bydate .r:last-child{border:0}
+.groups{display:flex;flex-direction:column;gap:12px}
+.sgroup{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.sgroup header{display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.sgroup .who{display:flex;flex-direction:column;gap:4px;min-width:0}
+.sgroup .who b{font-size:17px;letter-spacing:-.3px}
+.sgroup .rek{font-size:13px;font-weight:700;color:var(--ink-2);background:var(--bg-2);padding:6px 10px;border-radius:10px;width:fit-content;max-width:100%;overflow-wrap:anywhere}
+.sgroup .rek.none{color:var(--muted);font-weight:500}
+.sgroup .tot{text-align:right;flex:none}
+.sgroup .tot small{display:block;color:var(--muted);font-size:11px}
+.sgroup .tot b{font-size:20px;font-weight:800;color:var(--accent);letter-spacing:-.4px}
+.sgroup ul{list-style:none;margin:0;padding:0}
+.sgroup li a{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px solid var(--bg-2);color:inherit;text-decoration:none}
+.sgroup li small{display:block;color:var(--muted);font-size:11.5px}
+.sgroup .btn{align-self:flex-start}
+@media (max-width:700px){.sgroup header{flex-direction:column}.sgroup .tot{text-align:left}}
+.pfilter .dd{flex:1 1 calc(50% - 4px)!important}
+.pfilter .dt{flex:1 1 calc(50% - 4px)}
+.pfilter .seg{flex:1 1 100%;display:grid;grid-template-columns:1fr 1fr}
+.pfilter .seg span{display:flex;justify-content:center}
+@media (max-width:700px){.pfilter .dd:first-of-type{flex-basis:100%!important}}

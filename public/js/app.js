@@ -257,3 +257,13 @@ window.addEventListener('pageshow', function () {
   scan();
   document.addEventListener('DOMContentLoaded', scan);
 })();
+
+// Tombol salin (info transfer supplier)
+document.addEventListener('click', function (e) {
+  var b = e.target.closest('[data-copy]'); if (!b) return;
+  var txt = b.getAttribute('data-copy'), old = b.textContent;
+  function done() { b.textContent = 'Tersalin ✓'; setTimeout(function () { b.textContent = old; }, 1600); }
+  if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(txt).then(done, function () {}); return; }
+  var t = document.createElement('textarea'); t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select();
+  try { document.execCommand('copy'); done(); } catch (_) {} t.remove();
+});

@@ -16,11 +16,22 @@ class PurchaseController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status', 'semua');
+        $date = fn ($v) => is_string($v) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $v) ? $v : null;
+        $dari = $date($request->query('dari'));
+        $sampai = $date($request->query('sampai'));
+        $supplierId = (int) $request->query('supplier') ?: null;
+        $filterDue = $dari || $sampai;
+        $tampil = $request->query('tampil', $filterDue ? 'supplier' : 'daftar');
+        $tampil = in_array($tampil, ['daftar', 'supplier'], true) ? $tampil : 'daftar';
+        $open = ['belum_dibayar', 'sebagian', 'jatuh_tempo'];
 
         $purchases = SupplierPurchase::with('supplier')
             ->when($status !== 'semua', fn ($q) => $q->where('payment_status', $status))
-            ->orderByDesc('purchased_at')->orderByDesc('id')
-            ->limit(200)->get();
+            ->when($dari, fn ($q) => $q->whereDate('due_at', '>=', $dari))
+            ->when($sampai, fn ($q) => $q->whereDate('due_at', '<=', $sampai))
+            ->when($supplierId, fn ($q) => $q->where('supplier_id', $supplierId))
+            ->orderBy($tampil === 'supplier' ? 'due_at' : 'purchased_at', $tampil === 'supplier' ? 'asc' : 'desc')->orderByDesc('id')
+            ->limit(500)->get();
 
         // status jatuh tempo ditampilkan live walau cron belum jalan
         $purchases->each(function ($p) {
@@ -29,11 +40,30 @@ class PurchaseController extends Controller
             }
         });
 
+        // Ringkasan "yang harus dibayar": hanya yang masih ada sisa
+        $payable = $purchases->filter(fn ($p) => in_array($p->payment_status, $open, true) && $p->remaining() > 0)->values();
+        $groups = $payable->groupBy('supplier_id')->map(fn ($rows) => [
+            'supplier' => $rows->first()->supplier,
+            'total' => $rows->sum(fn ($p) => $p->remaining()),
+            'rows' => $rows,
+        ])->sortBy(fn ($g) => mb_strtolower($g['supplier']->name))->values();
+        $byDate = $payable->groupBy(fn ($p) => $p->due_at->toDateString())->map(fn ($rows) => $rows->sum(fn ($p) => $p->remaining()))->sortKeys();
+
         return view('purchases.index', [
             'purchases' => $purchases,
             'status' => $status,
-            'unpaid' => SupplierPurchase::whereIn('payment_status', ['belum_dibayar', 'sebagian', 'jatuh_tempo'])->get()->sum(fn ($p) => $p->remaining()),
-            'overdue' => SupplierPurchase::whereIn('payment_status', ['belum_dibayar', 'sebagian', 'jatuh_tempo'])->whereDate('due_at', '<', today())->get()->sum(fn ($p) => $p->remaining()),
+            'dari' => $dari,
+            'sampai' => $sampai,
+            'supplierId' => $supplierId,
+            'suppliers' => Supplier::orderBy('name')->get(['id', 'name']),
+            'tampil' => $tampil,
+            'filterDue' => $filterDue,
+            'payable' => $payable,
+            'groups' => $groups,
+            'byDate' => $byDate,
+            'payableTotal' => $payable->sum(fn ($p) => $p->remaining()),
+            'unpaid' => SupplierPurchase::whereIn('payment_status', $open)->get()->sum(fn ($p) => $p->remaining()),
+            'overdue' => SupplierPurchase::whereIn('payment_status', $open)->whereDate('due_at', '<', today())->get()->sum(fn ($p) => $p->remaining()),
         ]);
     }
 
