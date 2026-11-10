@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ActivityLog;
 use App\Models\Item;
+use App\Services\StockService;
 use App\Models\ItemUnit;
 use App\Models\Unit;
 use Illuminate\Http\RedirectResponse;
@@ -37,8 +38,12 @@ class ItemController extends Controller
     {
         [$data, $conversions, $recipe] = $this->validated($request);
 
-        $item = DB::transaction(function () use ($data, $conversions, $recipe) {
+        $initial = $data['_stock']; unset($data['_stock']);
+        $item = DB::transaction(function () use ($data, $conversions, $recipe, $initial) {
             $item = Item::create($data + ['stock' => 0, 'is_active' => true]);
+            if ($initial) {
+                StockService::move($item, 'penyesuaian', $initial, null, auth()->id(), 'Stok awal');
+            }
             $this->syncConversions($item, $conversions);
             $this->syncRecipe($item, $recipe);
 
@@ -61,8 +66,12 @@ class ItemController extends Controller
     {
         [$data, $conversions, $recipe] = $this->validated($request, $item);
 
-        DB::transaction(function () use ($item, $data, $conversions, $recipe) {
+        $stock = $data['_stock']; unset($data['_stock']);
+        DB::transaction(function () use ($item, $data, $conversions, $recipe, $stock) {
             $item->update($data);
+            if ($stock !== null && ! $item->hasRecipe() && abs($stock - (float) $item->fresh()->stock) >= 0.0005) {
+                StockService::adjust($item, $stock, 'opname', 'Koreksi stok awal', auth()->id());
+            }
             $this->syncConversions($item, $conversions);
             $this->syncRecipe($item, $recipe);
         });
@@ -139,6 +148,7 @@ class ItemController extends Controller
             'price' => ['required', 'integer', 'min:0'],
             'retail_price' => ['nullable', 'integer', 'min:0'],
             'min_stock' => ['nullable', 'numeric', 'min:0'],
+            'stock' => ['nullable', 'numeric', 'min:0'],
             'units' => ['nullable', 'array'],
             'units.*.unit_id' => ['nullable', 'exists:units,id'],
             'units.*.factor' => ['nullable', 'numeric', 'gt:0'],
@@ -222,6 +232,8 @@ class ItemController extends Controller
                 throw ValidationException::withMessages(['recipe' => 'Barang masih punya stok sendiri. Nolkan dulu lewat Penyesuaian stok, baru beri resep.']);
             }
         }
+
+        $payload['_stock'] = ($data['stock'] ?? '') !== '' && $recipe === [] ? round((float) $data['stock'], 3) : null;
 
         return [$payload, $conversions, $recipe];
     }

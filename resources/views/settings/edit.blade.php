@@ -64,5 +64,17 @@
         <div style="font-size:12px;color:var(--muted)">@if ($smtp['last_test'])<span style="color:var(--ok)">Email tes terakhir terkirim {{ \Illuminate\Support\Carbon::parse($smtp['last_test'])->translatedFormat('j M Y, H:i') }}</span>@else Pastikan pengaturan sudah disimpan dulu.@endif</div></div>
     <button type="submit" class="btn">Kirim email tes ke {{ auth()->user()->email }}</button>
 </form>
+<form method="POST" action="{{ route('settings.reset') }}" class="card wide" style="border:1px solid var(--bad,#c0392b)" onsubmit="return confirm('Yakin hapus data? Tidak bisa dibatalkan.')">
+    @csrf
+    <h3 class="sect" style="color:var(--bad,#c0392b)">Reset data latihan</h3>
+    <p style="color:var(--muted);margin:0 0 10px">Untuk membersihkan data coba-coba sebelum dipakai sungguhan. Akun pengguna, pengaturan, dan satuan tidak ikut terhapus. Tidak bisa dibatalkan.</p>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px"><input type="radio" name="scope" value="transaksi" checked> <span><b>Hapus transaksi saja</b><br><span style="font-size:12px;color:var(--muted)">PO, surat jalan, invoice, pembayaran, retur, pembelian supplier, riwayat stok. Barang, outlet, supplier tetap ada, stok jadi 0.</span></span></label>
+    <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:10px"><input type="radio" name="scope" value="semua"> <span><b>Hapus semuanya</b><br><span style="font-size:12px;color:var(--muted)">Transaksi + barang, resep, outlet (beserta akun outlet), dan supplier.</span></span></label>
+    <label class="field">Ketik <b>HAPUS DATA</b> untuk konfirmasi
+        <input type="text" name="confirm" autocomplete="off" placeholder="HAPUS DATA">
+        @error('confirm')<span class="err">{{ $message }}</span>@enderror
+    </label>
+    <button type="submit" class="btn" style="align-self:flex-start;background:var(--bad,#c0392b);color:#fff">Hapus data</button>
+</form>
 </div>
 @endsection

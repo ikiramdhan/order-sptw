@@ -83,4 +83,23 @@ class SettingController extends Controller
 
         return back()->with('status', "Email tes terkirim ke {$to}.");
     }
+
+    /** Hapus data latihan (transaksi, atau semuanya termasuk master barang/outlet/supplier). */
+    public function reset(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'scope' => ['required', Rule::in([\App\Services\PracticeReset::TRANSACTIONS, \App\Services\PracticeReset::ALL])],
+            'confirm' => ['required', 'in:HAPUS DATA'],
+        ], [
+            'confirm.in' => 'Ketik persis HAPUS DATA untuk melanjutkan.',
+            'confirm.required' => 'Ketik persis HAPUS DATA untuk melanjutkan.',
+        ]);
+
+        \App\Services\PracticeReset::run($data['scope']);
+        ActivityLog::record('practice_reset', 'Reset data latihan: '.$data['scope']);
+
+        return redirect()->route('settings.edit')->with('status', $data['scope'] === \App\Services\PracticeReset::ALL
+            ? 'Semua data latihan dihapus (transaksi, barang, outlet, supplier).'
+            : 'Semua transaksi dihapus. Barang, outlet, dan supplier tetap ada; stok kembali 0.');
+    }
 }

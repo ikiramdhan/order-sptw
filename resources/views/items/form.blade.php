@@ -49,6 +49,10 @@
             <label class="field"><span class="lbl">Stok minimum <span class="hint">(peringatan menipis)</span></span>
                 <input type="number" name="min_stock" value="{{ old('min_stock', $item->min_stock + 0) }}" min="0" step="any" inputmode="decimal">
             </label>
+            <label class="field"><span class="lbl">{{ $item->exists ? 'Stok saat ini' : 'Stok awal' }} <span class="hint">(satuan dasar, boleh dikosongkan)</span></span>
+                <input type="number" name="stock" value="{{ old('stock', $item->exists ? $item->stock + 0 : '') }}" min="0" step="any" inputmode="decimal" @if ($item->exists && $item->hasRecipe()) disabled placeholder="dihitung dari bahan" @endif>
+                @error('stock')<span class="err">{{ $message }}</span>@enderror
+            </label>
         </div>
 
     </div>

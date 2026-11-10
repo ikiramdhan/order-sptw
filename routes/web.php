@@ -172,6 +172,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
 
         Route::get('/pengaturan', [SettingController::class, 'edit'])->name('settings.edit');
         Route::put('/pengaturan', [SettingController::class, 'update'])->name('settings.update');
+        Route::post('/pengaturan/reset-data', [SettingController::class, 'reset'])->name('settings.reset');
         Route::post('/pengaturan/tes-email', [SettingController::class, 'test'])->name('settings.test');
     });
 });
