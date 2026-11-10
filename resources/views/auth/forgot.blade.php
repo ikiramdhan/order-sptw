@@ -8,7 +8,7 @@
 
     @if (session('status'))<div class="alert ok" style="margin-bottom:14px" role="status">{{ session('status') }}</div>@endif
 
-    <form method="POST" action="{{ route('password.email') }}" novalidate>
+    <form method="POST" action="{{ route('password.email') }}" novalidate data-auth-form>
         @csrf
         <label class="field">Email
             <input type="email" name="email" value="{{ old('email') }}" autocomplete="username" autofocus required>

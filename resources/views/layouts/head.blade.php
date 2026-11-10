@@ -2,6 +2,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="theme-color" content="#CF3F16">
+<script>
+(function(){var r=document.documentElement,t='light';try{var s=localStorage.getItem('ck-theme');t=(s==='light'||s==='dark')?s:((window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches)?'dark':'light');}catch(e){}
+r.setAttribute('data-theme',t);var m=document.querySelector('meta[name=theme-color]');if(m)m.setAttribute('content',t==='dark'?'#121110':'#CF3F16');})();
+</script>
 <title>@yield('title', 'Central Kitchen') · Seblak Teh Wanti</title>
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" type="image/png" href="/icons/favicon.png">
@@ -14,4 +18,4 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/app.css?v=5">
+<link rel="stylesheet" href="/css/app.css?v=6">

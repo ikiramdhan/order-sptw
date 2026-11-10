@@ -68,6 +68,7 @@
             </a>
         @endforeach
         <div class="spacer"></div>
+        <x-theme-toggle class="nav" :label="true" />
         <form method="POST" action="{{ route('logout') }}" style="margin:0">
             @csrf
             <button type="submit" class="nav" aria-label="Keluar"><x-icon name="logout" />Keluar</button>
@@ -119,6 +120,7 @@
                     <span style="position:relative;display:inline-flex"><x-icon :name="$icon" />@if ($route === 'notifications.index' && $unread > 0)<i class="dot">{{ $unread > 9 ? '9+' : $unread }}</i>@endif</span>{{ $label }}
                 </a>
             @endforeach
+            <x-theme-toggle class="themebtn" :label="true" />
             <form method="POST" action="{{ route('logout') }}" style="margin:0;display:contents">
                 @csrf
                 <button type="submit" class="out"><x-icon name="logout" />Keluar</button>
@@ -126,6 +128,6 @@
         </div>
     </div>
 </div>
-<script src="/js/app.js?v=3" defer></script>
+<script src="/js/app.js?v=4" defer></script>
 </body>
 </html>

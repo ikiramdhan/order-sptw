@@ -1,13 +1,13 @@
 @extends('layouts.guest')
 @section('title', 'Masuk')
 @section('content')
-<div class="card">
-    <h1>Masuk</h1>
-    <p class="sub">Gunakan akun yang dibuat oleh Super Admin.</p>
+<div class="card {{ $errors->any() ? 'shake' : '' }}">
+    <h1>Selamat datang</h1>
+    <p class="sub">Masuk dengan akun yang dibuat oleh Super Admin.</p>
 
     @if (session('status'))<div class="alert ok" style="margin-bottom:14px" role="status">{{ session('status') }}</div>@endif
 
-    <form method="POST" action="{{ route('login') }}" novalidate>
+    <form method="POST" action="{{ route('login') }}" novalidate data-auth-form>
         @csrf
         <label class="field">Email
             <input type="email" name="email" value="{{ old('email') }}" autocomplete="username" autofocus required>

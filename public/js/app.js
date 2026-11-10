@@ -43,3 +43,43 @@ if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('/sw.js').catch(function () {});
   });
 }
+
+// Mode terang / gelap (tersimpan di perangkat; tanpa pilihan = ikut sistem)
+(function () {
+  var root = document.documentElement;
+  function apply(t, store) {
+    root.setAttribute('data-theme', t);
+    if (store) { try { localStorage.setItem('ck-theme', t); } catch (e) {} }
+    var m = document.querySelector('meta[name=theme-color]');
+    if (m) m.setAttribute('content', t === 'dark' ? '#121110' : '#CF3F16');
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (b) { b.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false'); });
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('[data-theme-toggle]')) return;
+    root.classList.add('theme-anim');
+    apply(root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark', true);
+    setTimeout(function () { root.classList.remove('theme-anim'); }, 400);
+  });
+  apply(root.getAttribute('data-theme') || 'light', false);
+  if (window.matchMedia) {
+    var mq = matchMedia('(prefers-color-scheme: dark)');
+    var onChange = function (e) {
+      var s = null; try { s = localStorage.getItem('ck-theme'); } catch (_) {}
+      if (s !== 'light' && s !== 'dark') apply(e.matches ? 'dark' : 'light', false);
+    };
+    if (mq.addEventListener) mq.addEventListener('change', onChange);
+  }
+})();
+
+// Tombol kirim di halaman masuk: tampilkan animasi memuat
+document.addEventListener('submit', function (e) {
+  var f = e.target;
+  if (!f.matches || !f.matches('[data-auth-form]')) return;
+  setTimeout(function () {
+    var b = f.querySelector('button[type=submit]');
+    if (b) { b.classList.add('loading'); b.setAttribute('aria-busy', 'true'); }
+  }, 0);
+});
+window.addEventListener('pageshow', function () {
+  document.querySelectorAll('button.loading').forEach(function (b) { b.classList.remove('loading'); b.removeAttribute('aria-busy'); });
+});

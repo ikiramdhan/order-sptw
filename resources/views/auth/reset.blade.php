@@ -5,7 +5,7 @@
     <h1>Buat password baru</h1>
     <p class="sub">Minimal 8 karakter dengan huruf dan angka.</p>
 
-    <form method="POST" action="{{ route('password.update') }}" novalidate>
+    <form method="POST" action="{{ route('password.update') }}" novalidate data-auth-form>
         @csrf
         <input type="hidden" name="token" value="{{ $token }}">
         <label class="field">Email
