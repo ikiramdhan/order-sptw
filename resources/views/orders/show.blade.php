@@ -19,7 +19,7 @@
         <tbody>@foreach ($po->items as $row)
             @php
                 $f = $row->factor(); $remBase = $row->remainingBase();
-                $stock = (float) $row->item->stock;
+                $stock = $row->item->availableStock();
                 $default = $remBase > 0 ? floor(min($remBase, $stock) / $f * 1000) / 1000 : 0;
             @endphp
             <tr>

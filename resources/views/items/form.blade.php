@@ -3,6 +3,7 @@
 @section('content')
 @php
     $rowsData = old('units') ?? $rows;
+    $recipeData = old('recipe') ?? $recipeRows;
 @endphp
 <header class="page-head">
     <div><h1>{{ $item->exists ? 'Ubah barang' : 'Tambah barang' }}</h1>
@@ -67,9 +68,48 @@
         </table>
         </div>
     </div>
+    <div class="card" style="grid-column:1/-1">
+        <h3 class="sect">Resep <span class="hint" style="font-weight:500">(opsional)</span></h3>
+        <p style="color:var(--muted);margin:0 0 10px">Isi kalau barang ini dibuat CK dari bahan lain, mis. Bumbu Seblak. Takaran dihitung per 1 satuan dasar barang ini. Saat barang dikirim ke outlet, stok bahan terpotong otomatis, dan stok barang ini dihitung dari bahan yang tersedia.</p>
+        @error('recipe')<div class="alert" role="alert">{{ $message }}</div>@enderror
+        <div class="tbl-wrap">
+        <table class="tbl" id="recipe-tbl">
+            <thead><tr><th>Bahan</th><th>Takaran per 1 satuan dasar</th></tr></thead>
+            <tbody>
+            @foreach ($recipeData as $n => $r)
+                <tr>
+                    <td data-label="Bahan" class="has-input"><select name="recipe[{{ $n }}][ingredient_id]" aria-label="Bahan">
+                        <option value="">-</option>
+                        @foreach ($ingredients as $g)<option value="{{ $g->id }}" @selected((string) ($r['ingredient_id'] ?? '') === (string) $g->id)>{{ $g->name }} ({{ $g->baseUnit->name }})</option>@endforeach
+                    </select>@error("recipe.$n.ingredient_id")<span class="err">{{ $message }}</span>@enderror</td>
+                    <td data-label="Takaran" class="has-input"><input type="text" name="recipe[{{ $n }}][qty]" value="{{ $r['qty'] ?? '' }}" inputmode="decimal" autocomplete="off" placeholder="mis. 0,05" aria-label="Takaran">@error("recipe.$n.qty")<span class="err">{{ $message }}</span>@enderror</td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+        </div>
+        <template id="recipe-tpl"><table><tbody><tr>
+            <td data-label="Bahan" class="has-input"><select name="recipe[__N__][ingredient_id]" data-recipe-ing aria-label="Bahan"><option value="">-</option>@foreach ($ingredients as $g)<option value="{{ $g->id }}">{{ $g->name }} ({{ $g->baseUnit->name }})</option>@endforeach</select></td>
+            <td data-label="Takaran" class="has-input"><input type="text" name="recipe[__N__][qty]" inputmode="decimal" autocomplete="off" placeholder="mis. 0,05" aria-label="Takaran"></td>
+        </tr></tbody></table></template>
+        <button type="button" class="btn" id="recipe-add" style="margin-top:8px;align-self:flex-start">+ Tambah bahan</button>
+    </div>
     <div class="formbar">
         <a class="btn" href="{{ route('items.index') }}">Batal</a>
         <button type="submit" class="btn primary">Simpan barang</button>
     </div>
 </form>
+<script>
+(function () {
+    var tb = document.querySelector('#recipe-tbl tbody'), idx = {{ count($recipeData) }};
+    function add() {
+        var html = document.getElementById('recipe-tpl').innerHTML.replace(/__N__/g, idx++).replace(/^\s*<table>\s*<tbody>|<\/tbody>\s*<\/table>\s*$/g, '');
+        var h = document.createElement('tbody'); h.innerHTML = html; var tr = h.firstElementChild; tb.appendChild(tr); return tr;
+    }
+    document.getElementById('recipe-add').addEventListener('click', function () { add(); });
+    tb.addEventListener('change', function (e) {
+        if (e.target.matches('select') && e.target.value && e.target.closest('tr') === tb.lastElementChild) add();
+    });
+})();
+</script>
 @endsection

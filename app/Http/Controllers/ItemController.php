@@ -18,7 +18,7 @@ class ItemController extends Controller
         $q = trim((string) $request->query('q'));
         $status = $request->query('status', 'aktif');
 
-        $items = Item::with(['baseUnit', 'itemUnits'])
+        $items = Item::with(['baseUnit', 'itemUnits', 'recipe'])
             ->when($q !== '', fn ($query) => $query->where('name', 'like', "%{$q}%"))
             ->when($status === 'aktif', fn ($query) => $query->where('is_active', true))
             ->when($status === 'nonaktif', fn ($query) => $query->where('is_active', false))
@@ -30,16 +30,17 @@ class ItemController extends Controller
 
     public function create()
     {
-        return view('items.form', ['item' => new Item(['is_active' => true, 'price' => 0, 'min_stock' => 0]), 'units' => Unit::orderBy('name')->get(), 'rows' => $this->rows(null)]);
+        return view('items.form', ['item' => new Item(['is_active' => true, 'price' => 0, 'min_stock' => 0]), 'units' => Unit::orderBy('name')->get(), 'rows' => $this->rows(null), 'ingredients' => $this->ingredientOptions(null), 'recipeRows' => $this->recipeRows(null)]);
     }
 
     public function store(Request $request): RedirectResponse
     {
-        [$data, $conversions] = $this->validated($request);
+        [$data, $conversions, $recipe] = $this->validated($request);
 
-        $item = DB::transaction(function () use ($data, $conversions) {
+        $item = DB::transaction(function () use ($data, $conversions, $recipe) {
             $item = Item::create($data + ['stock' => 0, 'is_active' => true]);
             $this->syncConversions($item, $conversions);
+            $this->syncRecipe($item, $recipe);
 
             return $item;
         });
@@ -51,18 +52,19 @@ class ItemController extends Controller
 
     public function edit(Item $item)
     {
-        $item->load(['baseUnit', 'itemUnits']);
+        $item->load(['baseUnit', 'itemUnits', 'recipe']);
 
-        return view('items.form', ['item' => $item, 'units' => Unit::orderBy('name')->get(), 'rows' => $this->rows($item)]);
+        return view('items.form', ['item' => $item, 'units' => Unit::orderBy('name')->get(), 'rows' => $this->rows($item), 'ingredients' => $this->ingredientOptions($item), 'recipeRows' => $this->recipeRows($item)]);
     }
 
     public function update(Request $request, Item $item): RedirectResponse
     {
-        [$data, $conversions] = $this->validated($request, $item);
+        [$data, $conversions, $recipe] = $this->validated($request, $item);
 
-        DB::transaction(function () use ($item, $data, $conversions) {
+        DB::transaction(function () use ($item, $data, $conversions, $recipe) {
             $item->update($data);
             $this->syncConversions($item, $conversions);
+            $this->syncRecipe($item, $recipe);
         });
 
         ActivityLog::record('item_updated', $item->name, $item);
@@ -76,6 +78,37 @@ class ItemController extends Controller
         ActivityLog::record($item->is_active ? 'item_activated' : 'item_deactivated', $item->name, $item);
 
         return back()->with('status', $item->is_active ? "{$item->name} dijual lagi." : "{$item->name} dinonaktifkan (tidak tampil di katalog).");
+    }
+
+    /** Bahan yang boleh dipakai di resep: barang aktif tanpa resep, bukan barang ini sendiri. */
+    private function ingredientOptions(?Item $item)
+    {
+        return Item::with('baseUnit')->where('is_active', true)->whereDoesntHave('recipe')
+            ->when($item?->exists, fn ($q) => $q->whereKeyNot($item->id))->orderBy('name')->get();
+    }
+
+    private function recipeRows(?Item $item): array
+    {
+        $rows = [];
+        if ($item?->exists) {
+            foreach ($item->recipe as $r) {
+                $rows[] = ['ingredient_id' => $r->ingredient_id, 'qty' => $r->qty_base + 0];
+            }
+        }
+        for ($i = 0; $i < 2; $i++) {
+            $rows[] = ['ingredient_id' => '', 'qty' => ''];
+        }
+
+        return $rows;
+    }
+
+    private function syncRecipe(Item $item, array $recipe): void
+    {
+        $item->recipe()->delete();
+        foreach ($recipe as $ingredientId => $qty) {
+            $item->recipe()->create(['ingredient_id' => $ingredientId, 'qty_base' => $qty]);
+        }
+        $item->unsetRelation('recipe');
     }
 
     /** Baris form konversi: yang sudah ada + 3 baris kosong. */
@@ -152,7 +185,41 @@ class ItemController extends Controller
             throw ValidationException::withMessages(['base_unit_id' => 'Satuan dasar tidak bisa diubah setelah barang punya stok.']);
         }
 
-        return [$payload, $conversions];
+        $recipe = [];
+        foreach ($request->input('recipe', []) as $i => $row) {
+            $ingId = (int) ($row['ingredient_id'] ?? 0);
+            $qty = str_replace(',', '.', trim((string) ($row['qty'] ?? '')));
+            if ($ingId === 0 && $qty === '') {
+                continue;
+            }
+            if ($ingId === 0) {
+                throw ValidationException::withMessages(["recipe.$i.ingredient_id" => 'Pilih bahannya.']);
+            }
+            if (! is_numeric($qty) || (float) $qty <= 0) {
+                throw ValidationException::withMessages(["recipe.$i.qty" => 'Isi takaran bahan dengan angka lebih dari 0.']);
+            }
+            if ($item && $ingId === $item->id) {
+                throw ValidationException::withMessages(["recipe.$i.ingredient_id" => 'Barang tidak bisa jadi bahan untuk dirinya sendiri.']);
+            }
+            if (isset($recipe[$ingId])) {
+                throw ValidationException::withMessages(["recipe.$i.ingredient_id" => 'Bahan ini diisi dua kali.']);
+            }
+            $ing = Item::with('recipe')->find($ingId);
+            if (! $ing || $ing->hasRecipe()) {
+                throw ValidationException::withMessages(["recipe.$i.ingredient_id" => 'Bahan harus barang biasa (bukan barang beresep).']);
+            }
+            $recipe[$ingId] = round((float) $qty, 4);
+        }
+        if ($recipe !== [] && $item) {
+            if (\App\Models\ItemRecipe::where('ingredient_id', $item->id)->exists()) {
+                throw ValidationException::withMessages(['recipe' => 'Barang ini dipakai sebagai bahan di resep lain, jadi tidak bisa diberi resep.']);
+            }
+            if (! $item->hasRecipe() && (float) $item->stock != 0.0) {
+                throw ValidationException::withMessages(['recipe' => 'Barang masih punya stok sendiri. Nolkan dulu lewat Penyesuaian stok, baru beri resep.']);
+            }
+        }
+
+        return [$payload, $conversions, $recipe];
     }
 
     /** Konversi tidak pernah dihapus (dokumen lama masih memakainya); yang dilepas hanya dinonaktifkan. */

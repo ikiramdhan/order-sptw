@@ -22,10 +22,10 @@
     @forelse ($items as $i)
         <div class="item {{ $i->is_active ? '' : 'off' }}">
             <div class="who"><b>{{ $i->name }}</b>
-                <small>{{ $i->category ?: 'Tanpa kategori' }} · Satuan dasar {{ $i->baseUnit->name }}
+                <small>{{ $i->category ?: 'Tanpa kategori' }} · Satuan dasar {{ $i->baseUnit->name }}@if ($i->hasRecipe()) · Resep: {{ $i->recipe->map(fn ($r) => $r->ingredient->name.' '.Fmt::qty($r->qty_base).' '.$r->ingredient->baseUnit->name)->join(', ') }}@endif
                     @foreach ($i->itemUnits->where('factor', '>', 0) as $iu) · 1 {{ $iu->unit->name }} = {{ Fmt::qty($iu->factor) }} {{ $i->baseUnit->name }}@endforeach</small></div>
             <div class="col"><b>{{ Fmt::rp($i->price) }}</b><small>per {{ $i->baseUnit->name }}</small></div>
-            <div class="col"><b class="{{ $i->isLow() ? 'low' : '' }}">{{ Fmt::qty($i->stock) }} {{ $i->baseUnit->name }}</b><small>stok{{ $i->isLow() ? ' menipis' : '' }}</small></div>
+            <div class="col"><b class="{{ $i->isLow() ? 'low' : '' }}">{{ Fmt::qty($i->availableStock()) }} {{ $i->baseUnit->name }}</b><small>{{ $i->hasRecipe() ? 'stok dari bahan' : 'stok'.($i->isLow() ? ' menipis' : '') }}</small></div>
             <div class="actions">
                 <a class="btn sm" href="{{ route('items.edit', $i) }}">Ubah</a>
                 <form method="POST" action="{{ route('items.toggle', $i) }}" data-confirm="{{ $i->is_active ? 'Nonaktifkan' : 'Aktifkan' }} {{ $i->name }}?">@csrf

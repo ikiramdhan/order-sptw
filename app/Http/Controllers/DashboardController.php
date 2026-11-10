@@ -63,7 +63,7 @@ class DashboardController extends Controller
             'poWaiting' => PurchaseOrder::where('status', 'diajukan')->count(),
             'backorder' => PurchaseOrder::whereIn('status', ['menunggu_backorder', 'dikirim_sebagian'])->count(),
             'returnsWaiting' => ReturnRequest::where('status', 'diajukan')->count(),
-            'lowStock' => Item::with('baseUnit')->where('is_active', true)->where('min_stock', '>', 0)->whereColumn('stock', '<=', 'min_stock')->orderBy('name')->limit(8)->get(),
+            'lowStock' => Item::with('baseUnit')->where('is_active', true)->whereDoesntHave('recipe')->where('min_stock', '>', 0)->whereColumn('stock', '<=', 'min_stock')->orderBy('name')->limit(8)->get(),
             'perOutlet' => $perOutlet,
             'top' => $top,
             'monthLabel' => today()->locale('id')->translatedFormat('F Y'),

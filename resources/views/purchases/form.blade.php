@@ -60,7 +60,7 @@
                     <td data-label="Qty" class="has-input"><input type="number" name="lines[__N__][qty]" value="" step="any" min="0" inputmode="decimal" aria-label="Qty"></td>
                     <td data-label="Harga / satuan (Rp)" class="has-input"><input type="text" data-money name="lines[__N__][unit_price]" value="" inputmode="numeric" autocomplete="off" aria-label="Harga"></td>
                 </tr></tbody></table></template>
-        <button type="button" class="btn" id="add-row" style="margin-top:8px">+ Tambah baris</button>
+        <button type="button" class="btn" id="add-row" style="margin-top:8px;align-self:flex-start">+ Tambah baris</button>
 
         <label class="field" style="margin-top:14px">Catatan <span class="hint">(opsional)</span>
             <input type="text" name="notes" value="{{ old('notes') }}" maxlength="500">

@@ -125,7 +125,7 @@ class OrderService
                 ]);
 
                 foreach ($lines as [$poItem, $baseQty]) {
-                    StockService::move($poItem->item, 'penjualan', -$baseQty, $note, $user->id, $note->number);
+                    StockService::moveSale($poItem->item, 'penjualan', -$baseQty, $note, $user->id, $note->number);
 
                     DeliveryNoteItem::create([
                         'delivery_note_id' => $note->id,

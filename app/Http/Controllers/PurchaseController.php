@@ -69,7 +69,7 @@ class PurchaseController extends Controller
 
     public function create()
     {
-        $items = Item::with(['baseUnit', 'itemUnits'])->where('is_active', true)->orderBy('name')->get();
+        $items = Item::with(['baseUnit', 'itemUnits'])->where('is_active', true)->whereDoesntHave('recipe')->orderBy('name')->get();
 
         return view('purchases.form', [
             'suppliers' => Supplier::where('is_active', true)->orderBy('name')->get(),

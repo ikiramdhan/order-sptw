@@ -25,8 +25,43 @@ class Item extends Model
         return $this->hasMany(ItemUnit::class)->with('unit')->orderBy('factor');
     }
 
+    public function recipe(): HasMany
+    {
+        return $this->hasMany(ItemRecipe::class)->with('ingredient.baseUnit');
+    }
+
+    /** Barang beresep: stoknya dihitung dari bahan, tidak disimpan sendiri. */
+    public function hasRecipe(): bool
+    {
+        return $this->recipe->isNotEmpty();
+    }
+
+    /** Stok yang bisa dipenuhi (satuan dasar). Barang beresep = bahan yang paling cepat habis. */
+    public function availableStock(): float
+    {
+        if (! $this->hasRecipe()) {
+            return (float) $this->stock;
+        }
+
+        $min = null;
+        foreach ($this->recipe as $r) {
+            $per = (float) $r->qty_base;
+            if ($per <= 0) {
+                continue;
+            }
+            $can = (float) $r->ingredient->stock / $per;
+            $min = $min === null ? $can : min($min, $can);
+        }
+
+        return floor(max(0, (float) $min) * 1000 + 1e-6) / 1000;
+    }
+
     public function isLow(): bool
     {
+        if ($this->hasRecipe()) {
+            return false;
+        }
+
         return (float) $this->stock <= (float) $this->min_stock && (float) $this->min_stock > 0;
     }
 

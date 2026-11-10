@@ -144,7 +144,7 @@ class ReturnService
                 $total += (int) $row->value;
 
                 if ($disp === 'masuk_stok') {
-                    StockService::move($row->item, 'retur_masuk', (float) $row->qty_base, $ret, $user->id, $ret->number);
+                    StockService::moveSale($row->item, 'retur_masuk', (float) $row->qty_base, $ret, $user->id, $ret->number);
                 }
             }
 
@@ -228,7 +228,7 @@ class ReturnService
         ]);
 
         foreach ($ret->items as $row) {
-            StockService::move($row->item, 'retur_pengganti', -(float) $row->qty_base, $note, $user->id, $note->number);
+            StockService::moveSale($row->item, 'retur_pengganti', -(float) $row->qty_base, $note, $user->id, $note->number);
 
             DeliveryNoteItem::create([
                 'delivery_note_id' => $note->id,

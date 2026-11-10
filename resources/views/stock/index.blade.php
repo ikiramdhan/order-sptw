@@ -19,8 +19,8 @@
         @php $big = $i->itemUnits->where('factor', '>', 1)->sortByDesc('factor')->first(); @endphp
         <div class="item">
             <div class="who"><b>{{ $i->name }}</b><small>Minimum {{ Fmt::qty($i->min_stock) }} {{ $i->baseUnit->name }}</small></div>
-            <div class="col"><b class="{{ $i->isLow() ? 'low' : '' }}">{{ Fmt::qty($i->stock) }} {{ $i->baseUnit->name }}</b>
-                @if ($big && $i->stock >= $big->factor)<small>≈ {{ Fmt::qty(floor($i->stock / $big->factor)) }} {{ $big->unit->name }} + {{ Fmt::qty(fmod((float) $i->stock, (float) $big->factor)) }} {{ $i->baseUnit->name }}</small>@endif</div>
+            <div class="col"><b class="{{ $i->isLow() ? 'low' : '' }}">{{ Fmt::qty($i->availableStock()) }} {{ $i->baseUnit->name }}</b>@if ($i->hasRecipe())<small>dari bahan (resep)</small>@endif
+                @if ($big && $i->availableStock() >= $big->factor)<small>≈ {{ Fmt::qty(floor($i->availableStock() / $big->factor)) }} {{ $big->unit->name }} + {{ Fmt::qty(fmod((float) $i->availableStock(), (float) $big->factor)) }} {{ $i->baseUnit->name }}</small>@endif</div>
             @if ($i->isLow())<span class="badge bad">Menipis</span>@endif
         </div>
     @empty

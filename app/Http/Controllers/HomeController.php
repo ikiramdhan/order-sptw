@@ -23,7 +23,7 @@ class HomeController extends Controller
         if ($user->hasRole('admin_ck', 'gudang')) {
             $stats['po_baru'] = PurchaseOrder::where('status', 'diajukan')->count();
             $stats['backorder'] = PurchaseOrder::whereIn('status', ['menunggu_backorder', 'dikirim_sebagian'])->count();
-            $stats['stok_menipis'] = Item::where('is_active', true)->where('min_stock', '>', 0)->whereColumn('stock', '<=', 'min_stock')->count();
+            $stats['stok_menipis'] = Item::where('is_active', true)->whereDoesntHave('recipe')->where('min_stock', '>', 0)->whereColumn('stock', '<=', 'min_stock')->count();
         }
 
         if ($user->hasRole('admin_ck')) {

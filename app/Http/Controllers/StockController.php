@@ -17,7 +17,7 @@ class StockController extends Controller
         $q = trim((string) $request->query('q'));
         $low = $request->boolean('menipis');
 
-        $items = Item::with(['baseUnit', 'itemUnits'])
+        $items = Item::with(['baseUnit', 'itemUnits', 'recipe'])
             ->where('is_active', true)
             ->when($q !== '', fn ($query) => $query->where('name', 'like', "%{$q}%"))
             ->orderBy('name')->get();
@@ -39,7 +39,7 @@ class StockController extends Controller
     public function adjustForm()
     {
         return view('stock.adjust', [
-            'items' => Item::with('baseUnit')->where('is_active', true)->orderBy('name')->get(),
+            'items' => Item::with('baseUnit')->where('is_active', true)->whereDoesntHave('recipe')->orderBy('name')->get(),
             'reasons' => StockAdjustment::REASONS,
         ]);
     }
