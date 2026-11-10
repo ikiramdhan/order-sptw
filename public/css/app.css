@@ -450,3 +450,42 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
   .auth-hero{min-height:170px;padding-bottom:56px} .logo-wrap{width:72px;height:72px} .fl{display:none}
 }
 .logo-wrap .ring,.logo-wrap::after{display:none!important}
+
+/* ================= v9: dropdown kustom ================= */
+.dd{position:relative;display:block;min-width:0;width:100%}
+.toolbar .dd{flex:1 1 200px;width:auto}
+.dd-native{position:absolute!important;inset:0;width:100%!important;height:100%!important;min-width:0!important;opacity:0;pointer-events:none}
+.dd-btn{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;min-height:48px;padding:0 14px 0 16px;border-radius:16px;border:1px solid var(--line);background:var(--field);color:var(--ink);font-weight:500;text-align:left;cursor:pointer;transition:border-color .2s,box-shadow .2s,background-color .2s}
+.dd-btn svg{flex:none;color:var(--muted);transition:transform .25s ease}
+.dd.open .dd-btn svg{transform:rotate(180deg)}
+.dd-btn:hover{border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.dd-btn:focus-visible,.dd.open .dd-btn{outline:none;border-color:var(--accent);box-shadow:0 0 0 4px rgba(207,63,22,.16)}
+.dd-btn:disabled{opacity:.55;cursor:not-allowed}
+.dd-txt{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dd-txt.ph{color:var(--muted)}
+.toolbar .dd-btn{min-height:44px;border-radius:22px;border:0;background:var(--card)}
+.tbl .dd-btn{min-height:40px;padding:0 8px 0 10px;border-radius:12px;min-width:72px}
+.prod .dd-btn{min-height:44px;border-radius:14px}
+.dd-panel{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:60;min-width:180px;background:var(--card);border:1px solid var(--line);border-radius:18px;box-shadow:0 18px 44px rgba(28,27,25,.18);padding:6px;transform-origin:top;animation:ddin .16s ease-out both}
+:root[data-theme=dark] .dd-panel{box-shadow:0 18px 44px rgba(0,0,0,.6)}
+.dd-panel.up{top:auto;bottom:calc(100% + 6px);transform-origin:bottom}
+@keyframes ddin{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.dd-opts{list-style:none;margin:0;padding:0;max-height:280px;overflow:auto;overscroll-behavior:contain}
+.dd-opts li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 12px;border-radius:12px;cursor:pointer;font-weight:500;color:var(--ink)}
+.dd-opts li.hl{background:var(--bg-2)}
+.dd-opts li.sel{color:var(--accent);font-weight:700;background:var(--tint)}
+.dd-opts li.dis{opacity:.4;cursor:not-allowed}
+.dd-opts li.hide{display:none}
+.dd-search{padding:4px 4px 6px}
+.dd-search input{width:100%;min-height:40px;padding:0 14px;border-radius:12px;border:1px solid var(--line);background:var(--field)}
+.dd-search input:focus{outline:2px solid var(--accent);outline-offset:0}
+.dd-backdrop{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);animation:fade .2s both}
+@keyframes fade{from{opacity:0}to{opacity:1}}
+.dd-panel.sheet-m{position:fixed;left:0;right:0;top:auto;bottom:0;z-index:91;border-radius:26px 26px 0 0;border:0;padding:8px 10px calc(14px + env(safe-area-inset-bottom));animation:ddsheet .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes ddsheet{from{transform:translateY(100%)}to{transform:none}}
+.dd-handle{width:42px;height:5px;border-radius:3px;background:var(--line);margin:2px auto 8px}
+.dd-panel.sheet-m .dd-opts{max-height:52dvh}
+.dd-panel.sheet-m .dd-opts li{padding:15px 14px;font-size:16px}
+.dd-lock{overflow:hidden}
+.field .dd-btn:active,.dd-btn:active{transform:none}
+@media (prefers-reduced-motion:reduce){.dd-panel,.dd-backdrop{animation:none}}
