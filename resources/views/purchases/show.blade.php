@@ -47,7 +47,7 @@
         @if ($isAdmin && $purchase->remaining() > 0)
             <form method="POST" action="{{ route('purchases.pay', $purchase) }}" style="margin-top:14px" novalidate>@csrf
                 <label class="field">Jumlah bayar (Rp)
-                    <input type="number" name="amount" value="{{ old('amount', $purchase->remaining()) }}" min="1" step="1" inputmode="numeric" required>
+                    <input type="text" data-money name="amount" value="{{ number_format((int) round((float) old('amount', $purchase->remaining())), 0, ',', '.') }}" inputmode="numeric" autocomplete="off" required>
                     @error('amount')<span class="err">{{ $message }}</span>@enderror
                 </label>
                 <div class="row">

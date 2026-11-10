@@ -44,7 +44,7 @@
                     <td><select name="lines[{{ $n }}][unit_id]" data-unit data-selected="{{ $l['unit_id'] ?? '' }}" aria-label="Satuan"><option value="">-</option></select></td>
                     <td><input type="number" name="lines[{{ $n }}][qty]" value="{{ $l['qty'] ?? '' }}" step="any" min="0" inputmode="decimal" aria-label="Qty">
                         @error("lines.$n.qty")<span class="err">{{ $message }}</span>@enderror</td>
-                    <td><input type="number" name="lines[{{ $n }}][unit_price]" value="{{ $l['unit_price'] ?? '' }}" step="1" min="0" inputmode="numeric" aria-label="Harga">
+                    <td><input type="text" data-money name="lines[{{ $n }}][unit_price]" value="{{ ($l['unit_price'] ?? '') === '' ? '' : number_format((int) round((float) $l['unit_price']), 0, ',', '.') }}" inputmode="numeric" autocomplete="off" aria-label="Harga">
                         @error("lines.$n.unit_price")<span class="err">{{ $message }}</span>@enderror</td>
                 </tr>
             @endforeach

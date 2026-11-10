@@ -34,7 +34,7 @@
         </div>
         <div class="row">
             <label class="field">Harga jual per satuan dasar (Rp)
-                <input type="number" name="price" value="{{ old('price', $item->price) }}" min="0" step="1" inputmode="numeric" required>
+                <input type="text" data-money name="price" value="{{ number_format((int) round((float) old('price', $item->price)), 0, ',', '.') }}" inputmode="numeric" autocomplete="off" required>
                 @error('price')<span class="err">{{ $message }}</span>@enderror
             </label>
             <label class="field"><span class="lbl">Stok minimum <span class="hint">(peringatan menipis)</span></span>

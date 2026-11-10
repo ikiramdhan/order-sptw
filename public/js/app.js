@@ -98,3 +98,22 @@ window.addEventListener('pageshow', function () {
   document.addEventListener('submit', function (e) { if (!e.defaultPrevented) bar.className = 'navbar-progress go'; });
   window.addEventListener('pageshow', function () { bar.className = 'navbar-progress'; });
 })();
+
+// Kolom uang: tampil dengan titik ribuan (1.500.000), dikirim sebagai angka biasa
+(function () {
+  function fmt(v) { var d = String(v).replace(/\D/g, ''); return d ? d.replace(/\B(?=(\d{3})+(?!\d))/g, '.') : ''; }
+  document.addEventListener('input', function (e) {
+    var el = e.target;
+    if (!el.matches || !el.matches('[data-money]')) return;
+    var pos = el.selectionStart, before = el.value.length;
+    el.value = fmt(el.value);
+    var np = Math.max(0, pos + el.value.length - before);
+    try { el.setSelectionRange(np, np); } catch (_) {}
+  });
+  document.addEventListener('submit', function (e) {
+    e.target.querySelectorAll && e.target.querySelectorAll('[data-money]').forEach(function (el) { el.value = String(el.value).replace(/\D/g, ''); });
+  }, true);
+  window.addEventListener('pageshow', function () {
+    document.querySelectorAll('[data-money]').forEach(function (el) { el.value = fmt(el.value); });
+  });
+})();

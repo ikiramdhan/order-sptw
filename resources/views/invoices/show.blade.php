@@ -51,7 +51,7 @@
         @if (! $isOutlet && $invoice->remaining() > 0 && $invoice->status !== 'dibatalkan')
             <form method="POST" action="{{ route('invoices.pay', $invoice) }}" style="margin-top:14px" novalidate>@csrf
                 <label class="field">Jumlah diterima (Rp)
-                    <input type="number" name="amount" value="{{ old('amount', $invoice->remaining()) }}" min="1" step="1" inputmode="numeric" required>
+                    <input type="text" data-money name="amount" value="{{ number_format((int) round((float) old('amount', $invoice->remaining())), 0, ',', '.') }}" inputmode="numeric" autocomplete="off" required>
                     @error('amount')<span class="err">{{ $message }}</span>@enderror
                 </label>
                 <div class="row">
