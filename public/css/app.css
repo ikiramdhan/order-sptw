@@ -252,3 +252,21 @@ a.tile:active{transform:scale(.98)}
   .shell{align-items:stretch}
   .main{width:100%}
 }
+
+/* ---- v4: form bento ---- */
+.fbento{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:stretch}
+.fbento.cols-5-6{grid-template-columns:minmax(0,5fr) minmax(0,6fr)}
+.fbento.cols-7-5{grid-template-columns:minmax(0,7fr) minmax(0,5fr)}
+.fbento .card{display:flex;flex-direction:column}
+.fbento .wide,.fbento .formbar{grid-column:1/-1}
+.fbento .card>.sect{font-size:16px;margin-bottom:14px}
+.fbento .field:last-child{margin-bottom:0}
+.lbl{display:block}
+.lbl .hint{font-weight:500;color:var(--muted)}
+.formbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;align-items:center}
+@media (max-width:860px){
+  .fbento,.fbento.cols-5-6,.fbento.cols-7-5{grid-template-columns:minmax(0,1fr)}
+  .formbar{position:sticky;bottom:calc(92px + env(safe-area-inset-bottom));z-index:5;background:var(--card);padding:10px;border-radius:24px;box-shadow:0 6px 20px rgba(28,27,25,.12)}
+  .formbar .btn{flex:1}
+}
+.row{row-gap:0;column-gap:12px}

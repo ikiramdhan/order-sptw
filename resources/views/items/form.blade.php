@@ -9,8 +9,9 @@
         <p>Stok selalu dihitung dalam satuan dasar. Satuan lain (mis. Dus) dikonversi ke satuan dasar.</p></div>
     <a class="btn" href="{{ route('items.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>
-<div class="card" style="max-width:720px">
-    <form method="POST" action="{{ $item->exists ? route('items.update', $item) : route('items.store') }}" novalidate>
+<form method="POST" class="fbento cols-5-6" action="{{ $item->exists ? route('items.update', $item) : route('items.store') }}" novalidate>
+    <div class="card">
+        <h3 class="sect">Data barang</h3>
         @csrf
         @if ($item->exists) @method('PUT') @endif
         <label class="field">Nama barang
@@ -18,7 +19,7 @@
             @error('name')<span class="err">{{ $message }}</span>@enderror
         </label>
         <div class="row">
-            <label class="field">Kategori <span class="hint">(opsional)</span>
+            <label class="field"><span class="lbl">Kategori <span class="hint">(opsional)</span></span>
                 <input type="text" name="category" value="{{ old('category', $item->category) }}">
             </label>
             <label class="field">Satuan dasar
@@ -36,12 +37,14 @@
                 <input type="number" name="price" value="{{ old('price', $item->price) }}" min="0" step="1" inputmode="numeric" required>
                 @error('price')<span class="err">{{ $message }}</span>@enderror
             </label>
-            <label class="field">Stok minimum <span class="hint">(peringatan stok menipis)</span>
+            <label class="field"><span class="lbl">Stok minimum <span class="hint">(peringatan menipis)</span></span>
                 <input type="number" name="min_stock" value="{{ old('min_stock', $item->min_stock + 0) }}" min="0" step="any" inputmode="decimal">
             </label>
         </div>
 
-        <h3 class="sect" style="margin-top:8px">Konversi satuan</h3>
+    </div>
+    <div class="card">
+        <h3 class="sect">Konversi satuan</h3>
         <p style="color:var(--muted);margin:0 0 10px">Contoh: Dus, jumlah per satuan dasar = 48 artinya 1 Dus = 48 satuan dasar. Kosongkan baris yang tidak dipakai.</p>
         <div class="tbl-wrap">
         <table class="tbl">
@@ -63,10 +66,10 @@
             </tbody>
         </table>
         </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
-            <a class="btn" href="{{ route('items.index') }}">Batal</a>
-            <button type="submit" class="btn primary">Simpan barang</button>
-        </div>
-    </form>
-</div>
+    </div>
+    <div class="formbar">
+        <a class="btn" href="{{ route('items.index') }}">Batal</a>
+        <button type="submit" class="btn primary">Simpan barang</button>
+    </div>
+</form>
 @endsection

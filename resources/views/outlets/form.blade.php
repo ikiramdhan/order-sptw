@@ -10,10 +10,11 @@
     <a class="btn" href="{{ route('outlets.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>
 
-<div class="card" style="max-width:560px">
-    <form method="POST" action="{{ $outlet->exists ? route('outlets.update', $outlet) : route('outlets.store') }}" novalidate>
-        @csrf
-        @if ($outlet->exists) @method('PUT') @endif
+<form method="POST" class="fbento cols-7-5" action="{{ $outlet->exists ? route('outlets.update', $outlet) : route('outlets.store') }}" novalidate>
+    @csrf
+    @if ($outlet->exists) @method('PUT') @endif
+    <div class="card">
+        <h3 class="sect">Data outlet</h3>
 
         <label class="field">Nama outlet
             <input type="text" name="name" value="{{ old('name', $outlet->name) }}" placeholder="Outlet Bintaro" required>
@@ -27,12 +28,16 @@
             <label class="field">Penanggung jawab
                 <input type="text" name="pic_name" value="{{ old('pic_name', $outlet->pic_name) }}">
             </label>
-            <label class="field">No. WhatsApp <span class="hint">(untuk kirim invoice)</span>
+            <label class="field"><span class="lbl">No. WhatsApp <span class="hint">(untuk kirim invoice)</span></span>
                 <input type="text" name="phone" value="{{ old('phone', $outlet->phone) }}" inputmode="tel" placeholder="08xx-xxxx-xxxx">
             </label>
         </div>
 
-        <div class="field">Termin tempo
+    </div>
+    <div class="card">
+        <h3 class="sect">Termin tempo</h3>
+        <p style="color:var(--muted);margin:0 0 12px">Jatuh tempo invoice outlet ini mengikuti termin yang dipilih.</p>
+        <div class="field">
             <div class="seg" role="radiogroup" aria-label="Termin tempo">
                 @foreach (\App\Models\Outlet::TERMS as $days => $label)
                     <label><input type="radio" name="payment_term_days" value="{{ $days }}" {{ $term === (string) $days ? 'checked' : '' }}><span>{{ $days === 0 ? 'Tunai' : $days.' hari' }}</span></label>
@@ -40,11 +45,19 @@
             </div>
             @error('payment_term_days')<span class="err">{{ $message }}</span>@enderror
         </div>
-
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a class="btn" href="{{ route('outlets.index') }}">Batal</a>
-            <button type="submit" class="btn primary">Simpan outlet</button>
+        <div class="hint-box" style="margin-top:auto">
+            <b>Contoh jika barang diterima hari ini ({{ now('Asia/Jakarta')->translatedFormat('j M Y') }})</b>
+            <ul style="margin:6px 0 0;padding-left:18px;line-height:1.7">
+                @foreach (\App\Models\Outlet::TERMS as $days => $label)
+                    <li>{{ $days === 0 ? 'Tunai' : $days.' hari' }}: jatuh tempo {{ now('Asia/Jakarta')->addDays($days)->translatedFormat('j M Y') }}</li>
+                @endforeach
+            </ul>
         </div>
-    </form>
-</div>
+
+    </div>
+    <div class="formbar">
+        <a class="btn" href="{{ route('outlets.index') }}">Batal</a>
+        <button type="submit" class="btn primary">Simpan outlet</button>
+    </div>
+</form>
 @endsection

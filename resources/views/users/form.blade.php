@@ -10,10 +10,11 @@
     <a class="btn" href="{{ route('users.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>
 
-<div class="card" style="max-width:560px">
-    <form method="POST" action="{{ $user->exists ? route('users.update', $user) : route('users.store') }}" novalidate>
-        @csrf
-        @if ($user->exists) @method('PUT') @endif
+<form method="POST" class="fbento" action="{{ $user->exists ? route('users.update', $user) : route('users.store') }}" novalidate>
+    @csrf
+    @if ($user->exists) @method('PUT') @endif
+    <div class="card">
+        <h3 class="sect">Akun</h3>
 
         <label class="field">Nama lengkap
             <input type="text" name="name" value="{{ old('name', $user->name) }}" required>
@@ -24,6 +25,9 @@
             @error('email')<span class="err">{{ $message }}</span>@enderror
         </label>
 
+    </div>
+    <div class="card">
+        <h3 class="sect">Peran dan akses</h3>
         <div class="field">Peran
             <div class="seg" role="radiogroup" aria-label="Peran">
                 @foreach (\App\Models\User::ASSIGNABLE_ROLES as $key => $label)
@@ -33,7 +37,7 @@
             @error('role')<span class="err">{{ $message }}</span>@enderror
         </div>
 
-        <label class="field">Outlet <span class="hint">(khusus peran Outlet)</span>
+        <label class="field"><span class="lbl">Outlet <span class="hint">(khusus peran Outlet)</span></span>
             <select name="outlet_id">
                 <option value="">Pilih outlet</option>
                 @foreach ($outlets as $o)
@@ -43,10 +47,10 @@
             @error('outlet_id')<span class="err">{{ $message }}</span>@enderror
         </label>
 
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a class="btn" href="{{ route('users.index') }}">Batal</a>
-            <button type="submit" class="btn primary">{{ $user->exists ? 'Simpan perubahan' : 'Simpan pengguna' }}</button>
-        </div>
-    </form>
-</div>
+    </div>
+    <div class="formbar">
+        <a class="btn" href="{{ route('users.index') }}">Batal</a>
+        <button type="submit" class="btn primary">{{ $user->exists ? 'Simpan perubahan' : 'Simpan pengguna' }}</button>
+    </div>
+</form>
 @endsection

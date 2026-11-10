@@ -5,7 +5,9 @@
     <div><h1>Satuan</h1><p>Daftar satuan (PCS, Dus, Kg, ...). Konversi per barang diatur di menu Barang.</p></div>
     <a class="btn" href="{{ route('items.index') }}"><x-icon name="back" :size="18" /> Barang</a>
 </header>
-<div class="card" style="max-width:560px">
+<div class="fbento cols-5-6" style="align-items:start">
+<div class="card">
+        <h3 class="sect">Tambah satuan</h3>
     <form method="POST" action="{{ route('units.store') }}" class="row" style="align-items:flex-end">
         @csrf
         <label class="field" style="margin:0">Satuan baru
@@ -28,4 +30,5 @@
         </div>
     @endforeach
 </section>
+</div>
 @endsection
