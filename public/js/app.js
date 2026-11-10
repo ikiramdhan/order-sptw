@@ -236,3 +236,24 @@ window.addEventListener('pageshow', function () {
     ms.forEach(function (m) { m.addedNodes.forEach(function (n) { if (n.nodeType === 1) { if (n.tagName === 'SELECT') build(n); else scan(n); } }); });
   }).observe(document.body, { childList: true, subtree: true });
 })();
+
+// Tabel jadi kartu di HP: beri label tiap sel dari judul kolom
+(function () {
+  function label(tbl) {
+    if (tbl.closest('.sheet') || tbl.__lbl) return; tbl.__lbl = true;
+    var ths = Array.prototype.map.call(tbl.querySelectorAll('thead th'), function (t) { return t.textContent.trim(); });
+    if (!ths.length) return;
+    tbl.querySelectorAll('tbody tr').forEach(function (tr) {
+      var tds = tr.children, plain = Array.prototype.some.call(tds, function (td) { return td.colSpan > 1; });
+      if (plain) return;
+      Array.prototype.forEach.call(tds, function (td, i) {
+        if (ths[i]) td.setAttribute('data-label', ths[i]);
+        if (td.querySelector('input:not([type=hidden]),select,textarea')) td.classList.add('has-input');
+      });
+    });
+    tbl.classList.add('stackable');
+  }
+  function scan() { document.querySelectorAll('table.tbl').forEach(label); }
+  scan();
+  document.addEventListener('DOMContentLoaded', scan);
+})();

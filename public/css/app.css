@@ -489,3 +489,24 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .dd-lock{overflow:hidden}
 .field .dd-btn:active,.dd-btn:active{transform:none}
 @media (prefers-reduced-motion:reduce){.dd-panel,.dd-backdrop{animation:none}}
+
+/* ================= v10: tabel jadi kartu di HP (tanpa geser) ================= */
+@media (max-width:700px){
+  .tbl-wrap{overflow:visible}
+  .tbl.stackable,.tbl.stackable tbody{display:block;width:100%}
+  .tbl.stackable thead{display:none}
+  .tbl.stackable tbody tr{display:flex;flex-wrap:wrap;gap:8px 10px;padding:12px;margin-bottom:10px;border-radius:18px;background:var(--bg-2);border:1px solid var(--line)}
+  .tbl.stackable td{display:flex;justify-content:space-between;align-items:center;gap:10px;flex:1 1 100%;min-width:0;padding:0;border:0;text-align:left}
+  .tbl.stackable td[data-label]::before{content:attr(data-label);color:var(--muted);font-size:12px;font-weight:600;flex:none}
+  .tbl.stackable td:first-child{font-weight:800;font-size:15px}
+  .tbl.stackable td:first-child[data-label]::before{display:none}
+  .tbl.stackable td.has-input{flex-direction:column;align-items:stretch;gap:4px;flex:1 1 calc(50% - 6px)}
+  .tbl.stackable td.has-input:first-child{flex:1 1 100%}
+  .tbl.stackable td.has-input[data-label]::before{display:block}
+  .tbl.stackable td.has-input .err{display:block}
+  .tbl.stackable td .dd,.tbl.stackable td input,.tbl.stackable td select{width:100%;min-width:0}
+  .tbl.stackable td.num{white-space:normal}
+  .tbl.stackable tfoot,.tbl.stackable tfoot tr{display:block}
+  .tbl.stackable tfoot tr{display:flex;justify-content:space-between;padding:6px 12px}
+  .tbl.stackable tfoot td{display:block;flex:none;padding:0}
+}
