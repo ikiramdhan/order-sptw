@@ -449,3 +449,4 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 @media (max-width:860px) and (max-height:640px){
   .auth-hero{min-height:170px;padding-bottom:56px} .logo-wrap{width:72px;height:72px} .fl{display:none}
 }
+.logo-wrap .ring,.logo-wrap::after{display:none!important}

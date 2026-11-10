@@ -9,7 +9,7 @@
     <aside class="auth-hero">
         <span class="blob b1" aria-hidden="true"></span><span class="blob b2" aria-hidden="true"></span><span class="blob b3" aria-hidden="true"></span>
         <div class="hero-in">
-            <div class="logo-wrap" style="--i:0"><span class="ring" aria-hidden="true"></span><img src="/icons/logo.png" alt="Logo Seblak Teh Wanti"></div>
+            <div class="logo-wrap" style="--i:0"><img src="/icons/logo.png" alt="Logo Seblak Teh Wanti"></div>
             <p class="eyebrow" style="--i:1">Central Kitchen</p>
             <h2 style="--i:2">Seblak Teh Wanti</h2>
             <p class="lead" style="--i:3">Pesan bahan baku, pantau pengiriman, dan bereskan tagihan outlet dalam satu aplikasi.</p>
