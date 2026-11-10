@@ -1,0 +1,52 @@
+@extends('layouts.app')
+@section('title', $user->exists ? 'Ubah pengguna' : 'Tambah pengguna')
+@section('content')
+@php $roleNow = old('role', $user->role ?: 'outlet'); @endphp
+<header class="page-head">
+    <div>
+        <h1>{{ $user->exists ? 'Ubah pengguna' : 'Tambah pengguna' }}</h1>
+        <p>{{ $user->exists ? $user->email : 'Password sementara dibuat otomatis dan ditampilkan sekali setelah disimpan.' }}</p>
+    </div>
+    <a class="btn" href="{{ route('users.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
+</header>
+
+<div class="card" style="max-width:560px">
+    <form method="POST" action="{{ $user->exists ? route('users.update', $user) : route('users.store') }}" novalidate>
+        @csrf
+        @if ($user->exists) @method('PUT') @endif
+
+        <label class="field">Nama lengkap
+            <input type="text" name="name" value="{{ old('name', $user->name) }}" required>
+            @error('name')<span class="err">{{ $message }}</span>@enderror
+        </label>
+        <label class="field">Email (untuk login)
+            <input type="email" name="email" value="{{ old('email', $user->email) }}" required>
+            @error('email')<span class="err">{{ $message }}</span>@enderror
+        </label>
+
+        <div class="field">Peran
+            <div class="seg" role="radiogroup" aria-label="Peran">
+                @foreach (\App\Models\User::ASSIGNABLE_ROLES as $key => $label)
+                    <label><input type="radio" name="role" value="{{ $key }}" {{ $roleNow === $key ? 'checked' : '' }}><span>{{ $label }}</span></label>
+                @endforeach
+            </div>
+            @error('role')<span class="err">{{ $message }}</span>@enderror
+        </div>
+
+        <label class="field">Outlet <span class="hint">(khusus peran Outlet)</span>
+            <select name="outlet_id">
+                <option value="">Pilih outlet</option>
+                @foreach ($outlets as $o)
+                    <option value="{{ $o->id }}" {{ (string) old('outlet_id', $user->outlet_id) === (string) $o->id ? 'selected' : '' }}>{{ $o->name }}</option>
+                @endforeach
+            </select>
+            @error('outlet_id')<span class="err">{{ $message }}</span>@enderror
+        </label>
+
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a class="btn" href="{{ route('users.index') }}">Batal</a>
+            <button type="submit" class="btn primary">{{ $user->exists ? 'Simpan perubahan' : 'Simpan pengguna' }}</button>
+        </div>
+    </form>
+</div>
+@endsection

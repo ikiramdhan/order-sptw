@@ -1,0 +1,17 @@
+{
+  "name": "Central Kitchen Seblak Teh Wanti",
+  "short_name": "CK Wanti",
+  "description": "Aplikasi PO, surat jalan, dan invoice Central Kitchen Seblak Teh Wanti",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F4F4F2",
+  "theme_color": "#CF3F16",
+  "lang": "id",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -1,0 +1,20 @@
+# Tambahkan / sesuaikan di .env
+APP_NAME="Central Kitchen Seblak Teh Wanti"
+APP_TIMEZONE=Asia/Jakarta
+APP_LOCALE=id
+APP_URL=https://order.seblaktehwanti.com
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=720
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=isi_nama_database
+DB_USERNAME=isi_user_database
+DB_PASSWORD=isi_password_database
+
+# Akun Super Admin awal (dipakai oleh php artisan migrate --seed)
+SUPERADMIN_NAME="Super Admin"
+SUPERADMIN_EMAIL=superadmin@seblaktehwanti.com
+SUPERADMIN_PASSWORD=GantiSaya123
