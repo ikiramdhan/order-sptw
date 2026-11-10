@@ -8,7 +8,7 @@ namespace App\Services;
  */
 class ItemTemplateXlsx
 {
-    private const WIDTHS = [30, 18, 14, 14, 14, 12, 14, 20, 12, 14];
+    private const WIDTHS = [10, 30, 18, 14, 14, 14, 14, 12, 14, 20];
 
     /** @return string isi file .xlsx (biner) */
     public static function build(): string
@@ -91,9 +91,9 @@ class ItemTemplateXlsx
         $rows .= '</row>';
 
         $examples = [
-            ['Kerupuk Seblak', 'Bahan Baku', 'PCS', 1000, 50, 200, 'Dus', 40, 'KR01', 2000],
-            ['Cuanki', 'Bahan Baku', 'PCS', 1500, 20, 0, 'Box', 24, 'KR02', 3000],
-            ['Bumbu Seblak', 'Bumbu', 'Kg', 45000, 5, 10, '', '', 'BB01', ''],
+            ['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', 1000, 2000, 50, 200, 'Dus', 40],
+            ['KR02', 'Cuanki', 'Bahan Baku', 'PCS', 1500, 3000, 20, 0, 'Box', 24],
+            ['BB01', 'Bumbu Seblak', 'Bumbu', 'Kg', 45000, '', 5, 10, '', ''],
         ];
         foreach ($examples as $n => $row) {
             $r = $n + 2;

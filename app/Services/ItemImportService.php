@@ -13,7 +13,7 @@ class ItemImportService
 {
     public const MAX_ROWS = 1000;
 
-    public const HEADERS = ['Nama Barang', 'Kategori', 'Satuan Dasar', 'Harga Jual', 'Stok Minimum', 'Stok Awal', 'Satuan Besar', 'Isi per Satuan Besar', 'Kode', 'Harga CS'];
+    public const HEADERS = ['Kode', 'Nama Barang', 'Kategori', 'Satuan Dasar', 'Harga Jual', 'Harga CS', 'Stok Minimum', 'Stok Awal', 'Satuan Besar', 'Isi per Satuan Besar'];
 
     private const ALIASES = [
         'code' => ['kode', 'kodebarang', 'sku', 'kodeitem'],
@@ -33,9 +33,9 @@ class ItemImportService
     {
         $rows = [
             self::HEADERS,
-            ['Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '50', '200', 'Dus', '40', 'KR01', '2000'],
-            ['Cuanki', 'Bahan Baku', 'PCS', '1500', '20', '0', 'Box', '24', 'KR02', '3000'],
-            ['Bumbu Seblak', 'Bumbu', 'Kg', '45000', '5', '10', '', '', 'BB01', ''],
+            ['KR01', 'Kerupuk Seblak', 'Bahan Baku', 'PCS', '1000', '2000', '50', '200', 'Dus', '40'],
+            ['KR02', 'Cuanki', 'Bahan Baku', 'PCS', '1500', '3000', '20', '0', 'Box', '24'],
+            ['BB01', 'Bumbu Seblak', 'Bumbu', 'Kg', '45000', '', '5', '10', '', ''],
         ];
 
         return "\xEF\xBB\xBF".implode("\r\n", array_map(fn ($r) => implode(';', $r), $rows))."\r\n";
