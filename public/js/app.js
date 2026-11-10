@@ -152,6 +152,7 @@ window.addEventListener('pageshow', function () {
 
     function close() {
       if (!inst.panel) return;
+      if (inst.onScroll) { window.removeEventListener('scroll', inst.onScroll, true); window.removeEventListener('resize', inst.onScroll); inst.onScroll = null; }
       inst.panel.remove(); inst.panel = null; btn.setAttribute('aria-expanded', 'false'); wrap.classList.remove('open');
       if (backdrop) { backdrop.remove(); backdrop = null; }
       document.documentElement.classList.remove('dd-lock'); openDD = null;
@@ -182,9 +183,20 @@ window.addEventListener('pageshow', function () {
         var h = document.createElement('div'); h.className = 'dd-handle'; p.insertBefore(h, p.firstChild);
         document.body.appendChild(p);
       } else {
-        wrap.appendChild(p);
-        var r = btn.getBoundingClientRect(), below = window.innerHeight - r.bottom;
-        if (below < 280 && r.top > below) p.classList.add('up');
+        // dipasang di <body> dengan posisi fixed supaya tidak terpotong tabel/kartu yang bisa digulir
+        document.body.appendChild(p);
+        function place() {
+            var r = btn.getBoundingClientRect(), below = window.innerHeight - r.bottom - 12, above = r.top - 12;
+            var up = below < 260 && above > below, room = Math.max(160, up ? above : below);
+            p.classList.add('fx'); p.classList.toggle('up', up);
+            p.style.left = Math.max(8, Math.min(r.left, window.innerWidth - Math.max(r.width, 200) - 8)) + 'px';
+            p.style.width = Math.max(r.width, 200) + 'px';
+            if (up) { p.style.top = 'auto'; p.style.bottom = (window.innerHeight - r.top + 6) + 'px'; } else { p.style.bottom = 'auto'; p.style.top = (r.bottom + 6) + 'px'; }
+            p.querySelector('.dd-opts').style.maxHeight = Math.min(280, room - (p.querySelector('.dd-search') ? 56 : 12)) + 'px';
+        }
+        place();
+        inst.onScroll = function (ev) { if (!p.contains(ev.target)) place(); };
+        window.addEventListener('scroll', inst.onScroll, true); window.addEventListener('resize', inst.onScroll);
       }
       inst.panel = p; openDD = inst; wrap.classList.add('open'); btn.setAttribute('aria-expanded', 'true');
       var ul = p.querySelector('.dd-opts'), search = p.querySelector('.dd-search input');

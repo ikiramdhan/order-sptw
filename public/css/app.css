@@ -555,3 +555,5 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
   .tbl.editable thead th:first-child{z-index:4}
   .tbl.editable tr.rowerr td:first-child{background:color-mix(in srgb,var(--bad-bg) 85%,var(--card))}
 }
+.dd-panel.fx{position:fixed;right:auto;min-width:0;z-index:95}
+.dd-panel.fx.up{top:auto}
