@@ -2,7 +2,7 @@
 @section('title', 'Pratinjau impor')
 @section('content')
 @use('App\Support\Fmt')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Pratinjau impor</h1><p>Periksa dan sunting langsung di tabel. Tekan "Periksa ulang" setelah mengubah. Baris yang masih error dilewati.</p></div>
     <a class="btn" href="{{ route('items.import') }}"><x-icon name="back" :size="18" /> Unggah ulang</a>
 </header>

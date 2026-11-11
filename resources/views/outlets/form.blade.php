@@ -2,7 +2,7 @@
 @section('title', $outlet->exists ? 'Ubah outlet' : 'Tambah outlet')
 @section('content')
 @php $term = (string) old('payment_term_days', $outlet->payment_term_days ?? 7); @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div>
         <h1>{{ $outlet->exists ? 'Ubah outlet' : 'Tambah outlet' }}</h1>
         <p>{{ $outlet->exists ? $outlet->name : 'Setelah disimpan, buat akun login untuk outlet ini di menu Pengguna.' }}</p>

@@ -165,4 +165,23 @@ class OutletStockTest extends TestCase
         $this->assertFalse((bool) $req->fresh()->charged);
         $this->post(route('charges.store'), ['outlet' => $this->outlet->id, 'bulan' => now()->format('Y-m')])->assertSessionHasErrors('charge');
     }
+
+    public function test_backfill_marks_old_approved_shortages_as_chargeable(): void
+    {
+        $mk = fn ($type, $q, $sys, $reason) => StockRequest::create(['type' => $type, 'outlet_id' => $this->outlet->id, 'item_id' => $this->item->id, 'qty_base' => $q, 'qty_system' => $sys, 'reason' => $reason, 'status' => 'disetujui', 'charged' => false, 'created_by' => $this->admin->id, 'decided_at' => now()]);
+        $so = $mk('so', 8, 10, null);
+        $tumpah = $mk('waste', 2, null, 'tumpah');
+        $rusak = $mk('waste', 2, null, 'rusak');
+        $awal = $mk('so', 5, 10, 'awal');
+
+        (require base_path('database/migrations/2026_11_12_000003_backfill_charged_stock_requests.php'))->up();
+
+        $this->assertTrue((bool) $so->fresh()->charged);
+        $this->assertTrue((bool) $tumpah->fresh()->charged);
+        $this->assertFalse((bool) $rusak->fresh()->charged);
+        $this->assertFalse((bool) $awal->fresh()->charged);
+
+        $this->actingAs($this->admin)->post(route('charges.store'), ['outlet' => $this->outlet->id, 'bulan' => now()->format('Y-m')])->assertSessionHasNoErrors();
+        $this->assertEquals(4000, (int) \App\Models\OutletCharge::firstOrFail()->total);
+    }
 }

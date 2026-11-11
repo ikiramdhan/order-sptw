@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Impor supplier')
 @section('content')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Impor supplier</h1><p>Salin tabel dari Google Sheets atau Excel, tempel di sini. Anda bisa melihat pratinjau sebelum disimpan.</p></div>
     <a class="btn" href="{{ route('suppliers.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

@@ -4,7 +4,7 @@
 @php
     $oldLines = old('lines', array_fill(0, 3, ['item_id' => '', 'unit_id' => '', 'qty' => '', 'unit_price' => '']));
 @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Catat pembelian</h1><p>Harga beli dicatat per satuan yang dibeli. Stok bertambah saat barang ditandai diterima.</p></div>
     <a class="btn" href="{{ route('purchases.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Impor barang')
 @section('content')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Impor barang dari Excel</h1><p>Unggah daftar barang sekaligus. Anda bisa melihat pratinjau sebelum disimpan.</p></div>
     <a class="btn" href="{{ route('items.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

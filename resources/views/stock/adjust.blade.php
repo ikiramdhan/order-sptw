@@ -2,7 +2,7 @@
 @section('title', 'Penyesuaian stok')
 @section('content')
 @use('App\Support\Fmt')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Penyesuaian stok</h1><p>Isi stok fisik hasil hitung. Kolom kosong dilewati. Selisih dicatat otomatis.</p></div>
     <a class="btn" href="{{ route('stock.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

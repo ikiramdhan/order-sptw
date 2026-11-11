@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Satuan')
 @section('content')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Satuan</h1><p>Daftar satuan (PCS, Dus, Kg, ...). Konversi per barang diatur di menu Barang.</p></div>
     <a class="btn" href="{{ route('items.index') }}"><x-icon name="back" :size="18" /> Barang</a>
 </header>

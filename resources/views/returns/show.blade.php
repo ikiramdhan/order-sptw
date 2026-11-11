@@ -3,7 +3,7 @@
 @section('content')
 @use('App\Support\Fmt')
 @php [$sl, $sc] = $ret->statusLabel(); $pending = $ret->status === 'diajukan'; @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $ret->number }}</h1><p>{{ $ret->outlet->name }} · surat jalan {{ $ret->deliveryNote->number }}</p></div>
     <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
         <span class="badge {{ $sc }}">{{ $sl }}</span>

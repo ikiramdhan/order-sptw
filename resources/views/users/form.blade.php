@@ -2,7 +2,7 @@
 @section('title', $user->exists ? 'Ubah pengguna' : 'Tambah pengguna')
 @section('content')
 @php $roleNow = old('role', $user->role ?: 'outlet'); @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div>
         <h1>{{ $user->exists ? 'Ubah pengguna' : 'Tambah pengguna' }}</h1>
         <p>{{ $user->exists ? $user->email : 'Password sementara dibuat otomatis dan ditampilkan sekali setelah disimpan.' }}</p>

@@ -3,8 +3,8 @@
 @section('content')
 @use('App\Support\Fmt')
 @php $isCk = auth()->user()->hasRole('admin_ck'); @endphp
-<header class="page-head">
-    <div><h1>Rekap minusan{{ $outlet ? ' · '.$outlet->name : '' }}</h1><p>Ditanggung outlet: opname kurang dan waste tumpah. Rusak dan kadaluarsa tidak ditagih.</p></div>
+<header class="page-head compact">
+    <div><h1>Rekap minusan</h1><p>{{ $outlet?->name }}. Ditanggung outlet: opname kurang dan waste tumpah.</p></div>
     <a class="btn" href="{{ route('outletstock.index', ['outlet' => $outlet?->id]) }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>
 @if (! $outlet)<div class="empty">Belum ada outlet.</div>@else
@@ -24,6 +24,7 @@
     <form method="POST" action="{{ route('charges.store') }}" data-confirm="Buat tagihan minusan untuk {{ $outlet->name }}?">@csrf
         <input type="hidden" name="outlet" value="{{ $outlet->id }}"><input type="hidden" name="bulan" value="{{ $month }}">
         <button class="btn primary" type="submit" @disabled($pendingCount === 0)>Buat tagihan minusan</button></form>
+    @if ($pendingCount === 0)<div style="flex-basis:100%;font-size:12px;color:var(--muted)">Belum ada minusan yang bisa ditagih (atau sudah masuk tagihan).</div>@endif
 </div>
 @endif
 <section class="list">

@@ -601,3 +601,13 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .actrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
 .actrow .grow{flex:1 1 220px}
 @media (max-width:700px){.actrow form,.actrow .btn{width:100%}.actrow .btn{justify-content:center}}
+
+/* v18: kepala halaman ringkas di HP (judul kiri, tombol kembali kecil di kanan) + tombol nonaktif */
+@media (max-width:700px){
+  .page-head.compact{flex-wrap:nowrap;align-items:flex-start;gap:10px}
+  .page-head.compact>div:first-child{flex:1 1 0;min-width:0}
+  .page-head.compact h1{font-size:22px;line-height:1.2}
+  .page-head.compact p{font-size:13px}
+  .page-head.compact>.btn,.page-head.compact>div:last-child>.btn{flex:none;min-height:40px;padding:0 14px;font-size:13px}
+}
+.btn:disabled,.btn[disabled]{opacity:.45;cursor:not-allowed}

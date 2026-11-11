@@ -3,7 +3,7 @@
 @section('content')
 @use('App\Support\Fmt')
 @php [$sl, $sc] = $po->statusLabel(); $open = $po->isOpenForShipping(); @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $po->number }}</h1><p>{{ $po->outlet->name }} · diajukan {{ Fmt::date($po->submitted_at ?? $po->created_at, 'j M Y H:i') }}</p></div>
     <div style="display:flex;gap:8px;align-items:center"><span class="badge {{ $sc }}">{{ $sl }}</span><a class="btn" href="{{ route('orders.index') }}"><x-icon name="back" :size="18" /> Kembali</a></div>
 </header>

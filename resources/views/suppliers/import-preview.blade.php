@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Pratinjau impor supplier')
 @section('content')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Pratinjau impor supplier</h1><p>Periksa dulu. Baris yang error akan dilewati.</p></div>
     <a class="btn" href="{{ route('suppliers.import') }}"><x-icon name="back" :size="18" /> Ulangi</a>
 </header>

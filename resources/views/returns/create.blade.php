@@ -2,7 +2,7 @@
 @section('title', 'Ajukan retur')
 @section('content')
 @use('App\Support\Fmt')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Ajukan retur</h1><p>Surat jalan {{ $note->number }}</p></div>
     <a class="btn" href="{{ route('delivery.show', $note) }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

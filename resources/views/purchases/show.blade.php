@@ -6,7 +6,7 @@
     $isAdmin = auth()->user()->hasRole('admin_ck');
     [$sl, $sc] = $purchase->statusLabel();
 @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $purchase->number }}</h1><p>{{ $purchase->supplier->name }}@if ($purchase->supplier->bankLine()) · {{ $purchase->supplier->bankLine() }}@endif</p></div>
     <a class="btn" href="{{ route('purchases.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

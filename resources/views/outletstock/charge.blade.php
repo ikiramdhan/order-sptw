@@ -2,8 +2,8 @@
 @section('title', $charge->number)
 @section('content')
 @use('App\Support\Fmt')
-<header class="page-head">
-    <div><h1>{{ $charge->number }}</h1><p>Tagihan minusan · {{ $charge->outlet->name }} · periode {{ $charge->period }}</p></div>
+<header class="page-head compact">
+    <div><h1>{{ $charge->number }}</h1><p>Tagihan minusan · {{ $charge->outlet->name }} · {{ $charge->period }}</p></div>
     <div style="display:flex;gap:8px;align-items:center"><span class="badge {{ $charge->status === 'lunas' ? 'ok' : 'warn' }}">{{ $charge->status === 'lunas' ? 'Lunas' : 'Belum dibayar' }}</span>
         <a class="btn" href="{{ route('outletstock.recap', ['outlet' => $charge->outlet_id, 'bulan' => $charge->period]) }}"><x-icon name="back" :size="18" /> Kembali</a></div>
 </header>

@@ -2,7 +2,7 @@
 @section('title', $note->number)
 @section('content')
 @use('App\Support\Fmt')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $note->number }}</h1><p>{{ $note->outlet->name }} · {{ $note->purchaseOrder?->number }} @if ($note->type === 'pengganti_retur') · barang pengganti retur @endif</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
         @if ($isOutlet && $note->type === 'regular' && $note->status === 'diterima' && $note->invoice)<a class="btn" href="{{ route('returns.create', ['surat_jalan' => $note->id]) }}">Ajukan retur</a>@endif

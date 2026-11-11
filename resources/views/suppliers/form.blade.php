@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', $supplier->exists ? 'Ubah supplier' : 'Tambah supplier')
 @section('content')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $supplier->exists ? 'Ubah supplier' : 'Tambah supplier' }}</h1></div>
     <a class="btn" href="{{ route('suppliers.index') }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

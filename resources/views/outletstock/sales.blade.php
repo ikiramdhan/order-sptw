@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'Penjualan ESB')
 @section('content')
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>Upload penjualan ESB</h1><p>Unggah laporan barang terjual per hari. Stok outlet berkurang sesuai jumlah terjual.</p></div>
     <a class="btn" href="{{ route('outletstock.index', ['outlet' => $outlet?->id]) }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>

@@ -5,7 +5,7 @@
     $rowsData = old('units') ?? $rows;
     $recipeData = old('recipe') ?? $recipeRows;
 @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $item->exists ? 'Ubah barang' : 'Tambah barang' }}</h1>
         <p>Stok selalu dihitung dalam satuan dasar. Satuan lain (mis. Dus) dikonversi ke satuan dasar.</p></div>
     <a class="btn" href="{{ route('items.index') }}"><x-icon name="back" :size="18" /> Kembali</a>

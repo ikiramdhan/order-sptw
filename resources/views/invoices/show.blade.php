@@ -7,7 +7,7 @@
     if (in_array($st, ['belum_dibayar', 'sebagian'], true) && $invoice->due_at->lt(today())) $st = 'jatuh_tempo';
     [$sl, $sc] = \App\Models\Invoice::STATUS[$st] ?? [$st, 'info'];
 @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $invoice->number }}</h1><p>{{ $invoice->outlet->name }}</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
         <a class="btn" href="{{ route('invoices.print', $invoice) }}" target="_blank" rel="noopener"><x-icon name="print" :size="18" /> Cetak</a>

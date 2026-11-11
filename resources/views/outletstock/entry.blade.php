@@ -8,7 +8,7 @@
     $back = $isCk ? route('stock.index') : route('outletstock.index', ['outlet' => $outlet?->id]);
     $needsApproval = auth()->user()->role === 'outlet';
 @endphp
-<header class="page-head">
+<header class="page-head compact">
     <div><h1>{{ $isSo ? 'Stok opname outlet' : ($isCk ? 'Waste gudang CK' : 'Waste outlet'.($outlet ? ' · '.$outlet->name : '')) }}</h1>
         <p>{{ $isSo ? 'Isi hasil hitung fisik. Kolom kosong dilewati.' : 'Isi jumlah barang yang dibuang. Kolom kosong atau 0 dilewati.' }}@if (! $isCk && $needsApproval) Perlu persetujuan Admin CK.@endif</p></div>
     <a class="btn" href="{{ $back }}"><x-icon name="back" :size="18" /> Kembali</a>
