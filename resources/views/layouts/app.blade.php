@@ -132,6 +132,6 @@
         </div>
     </div>
 </div>
-<script src="/js/app.js?v=14" defer></script>
+<script src="/js/app.js?v=15" defer></script>
 </body>
 </html>

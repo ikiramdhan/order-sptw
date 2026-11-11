@@ -95,7 +95,7 @@ window.addEventListener('pageshow', function () {
     if (!u || u.charAt(0) === '#' || u.indexOf('javascript:') === 0) return;
     bar.className = 'navbar-progress go';
   });
-  document.addEventListener('submit', function (e) { if (!e.defaultPrevented) bar.className = 'navbar-progress go'; });
+  document.addEventListener('submit', function (e) { if (!e.defaultPrevented && !(e.target.matches && e.target.matches('form[data-addcart]'))) bar.className = 'navbar-progress go'; });
   window.addEventListener('pageshow', function () { bar.className = 'navbar-progress'; });
 })();
 
@@ -323,4 +323,10 @@ document.addEventListener('submit', function (e) {
   }).catch(function (err) {
     btn.textContent = old; btn.disabled = false; alert(err.message);
   });
+});
+
+/* Kolom jumlah: isi otomatis terpilih saat disentuh, jadi mengetik langsung menimpa angka lama */
+document.addEventListener('focusin', function (e) {
+  var i = e.target; if (!i.matches || !i.matches('input[type=number]')) return;
+  setTimeout(function () { try { i.select(); } catch (_) {} }, 0);
 });
