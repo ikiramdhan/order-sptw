@@ -14,34 +14,36 @@
 @php $pending = $note->status === 'dikirim'; @endphp
 @if ($note->courier_id && $note->status === 'dikirim' && auth()->user()->hasRole('admin_ck') && $note->outlet->lat === null)@include('partials.outlet-location', ['outlet' => $note->outlet])@endif
 @if ($note->courier_id || $canAssign)
-<section class="card" style="margin-bottom:12px" id="courierbox">
+<section class="card dlv" style="margin-bottom:12px" id="courierbox">
     <h3 class="sect">Pengantaran</h3>
     @if ($note->courier_id)
-        <div class="livechip">
-            <div class="who"><b>{{ $note->courier?->name ?? 'Kurir' }}</b><small id="cstatus">
+        @php($nm = $note->courier?->name ?? 'Kurir')
+        <div class="dlv-head">
+            <div class="dlv-av">{{ collect(explode(' ', $nm))->take(2)->map(fn ($w) => mb_strtoupper(mb_substr($w, 0, 1)))->implode('') }}</div>
+            <div class="dlv-who"><b>{{ $nm }}</b><small id="cstatus">
                 @if ($note->status !== 'dikirim' || $note->courier_status === 'sampai') Sudah sampai
                 @elseif ($note->courier_status === 'diantar') Sedang diantar
                 @else Menunggu kurir berangkat @endif
             </small></div>
-            @if ($note->status === 'dikirim' && $note->courier_status !== 'sampai')<span class="badge {{ $note->courier_status === 'diantar' ? 'ok' : 'warn' }}">{{ $note->courier_status === 'diantar' ? 'Live' : 'Ditugaskan' }}</span>@endif
+            @if ($note->status === 'dikirim' && $note->courier_status !== 'sampai')<span class="dlv-pill {{ $note->courier_status === 'diantar' ? 'live' : '' }}">@if ($note->courier_status === 'diantar')<i></i>LIVE @else Ditugaskan @endif</span>@endif
         </div>
         @if ($note->status === 'dikirim' && $note->courier_status === 'diantar')
-            <div class="motorhero"><span class="road"></span>
-                <div class="txt"><b>{{ $isOutlet ? 'Kurir menuju lokasi kamu' : 'Kurir menuju '.$note->outlet->name }}</b><small id="herosub">Pesanan sedang dalam perjalanan</small></div>
-                @include('partials.motor')
+            <div class="dlv-eta">
+                <div class="dlv-msg" id="herosub">{{ $isOutlet ? 'Kurir menuju lokasi kamu' : 'Kurir menuju '.$note->outlet->name }}</div>
+                @if ($note->outlet->lat !== null)
+                <div id="etabar" hidden>
+                    <div class="dlv-big"><b id="etamin">–</b><small id="etaunit"></small><span id="etadist"></span></div>
+                    <div class="dlv-ends"><span>Kurir</span><span>{{ $note->outlet->name }}</span></div>
+                    <div class="etatrack"><div class="etafill" id="etafill"></div><div class="etarider" id="etarider">@include('partials.motor')</div><i class="etapin"></i></div>
+                </div>
+                @else
+                <div class="dlv-road"><span class="road"></span>@include('partials.motor')</div>
+                @if (! $isOutlet)<small class="dlv-warn">Estimasi belum tersedia: titik lokasi outlet belum diisi.</small>@endif
+                @endif
             </div>
-            @if ($note->outlet->lat !== null)
-            <div class="etabar" id="etabar" hidden>
-                <div class="etaends"><span>Kurir</span><span>{{ $note->outlet->name }}</span></div>
-                <div class="etatrack"><i class="etadot"></i><div class="etafill" id="etafill"></div><div class="etarider" id="etarider">@include('partials.motor')</div><i class="etapin"></i></div>
-                <div class="etatxt"><b id="etamin">–</b><span id="etadist"></span></div>
-            </div>
-            @elseif (! $isOutlet)
-                <p style="margin:10px 0 0;color:var(--muted);font-size:13px">Estimasi waktu belum tersedia: titik lokasi outlet belum diisi (Super Admin: menu Outlet → Ubah).</p>
-            @endif
             <span id="livemap" data-url="{{ route('delivery.position', $note) }}" hidden></span>
-            <a class="btn primary block" style="margin-top:12px" href="{{ route('delivery.track', $note) }}"><x-icon name="search" :size="18" /> Lacak di peta</a>
-            <small id="mapago" style="display:block;margin-top:8px;color:var(--muted)">Menunggu lokasi kurir…</small>
+            <a class="btn primary block dlv-btn" href="{{ route('delivery.track', $note) }}"><x-icon name="search" :size="18" /> Lacak di peta</a>
+            <small id="mapago" class="dlv-ago">Menunggu lokasi kurir…</small>
         @endif
     @else
         <p style="margin:0 0 10px;color:var(--muted)">Belum ada kurir untuk surat jalan ini.</p>
@@ -95,8 +97,7 @@
   var el = document.getElementById('livemap'); if (!el) return;
   var ago = document.getElementById('mapago'), stat = document.getElementById('cstatus');
   var bar = document.getElementById('etabar'), fill = document.getElementById('etafill'), rider = document.getElementById('etarider');
-  var emin = document.getElementById('etamin'), edist = document.getElementById('etadist'), hero = document.getElementById('herosub');
-  function fmtEta(s) { var m = Math.max(1, Math.round(s / 60)); if (m < 60) return '±' + m + ' menit'; return '±' + Math.floor(m / 60) + ' jam ' + (m % 60) + ' menit'; }
+  var emin = document.getElementById('etamin'), eunit = document.getElementById('etaunit'), edist = document.getElementById('etadist'), hero = document.getElementById('herosub');
   function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m lagi' : (m / 1000).toFixed(1).replace('.', ',') + ' km lagi'; }
   function poll() {
     fetch(el.dataset.url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } }).then(function (r) { return r.json(); }).then(function (d) {
@@ -104,9 +105,13 @@
       if (bar && d.eta_s != null) {
         bar.hidden = false;
         var pct = Math.round((d.progress || 0) * 100);
-        fill.style.width = pct + '%'; rider.style.left = Math.max(4, Math.min(96, pct)) + '%';
-        emin.textContent = d.dist_m < 80 ? 'Hampir sampai' : fmtEta(d.eta_s); edist.textContent = fmtDist(d.dist_m);
-        if (hero) hero.textContent = d.dist_m < 80 ? 'Kurir sudah di depan' : 'Sampai sekitar ' + fmtEta(d.eta_s).replace('±', '') + ' lagi';
+        fill.style.width = pct + '%'; rider.style.left = Math.max(4, Math.min(88, pct)) + '%';
+        var m = Math.max(1, Math.round(d.eta_s / 60));
+        if (d.dist_m < 80) { emin.textContent = 'Tiba'; eunit.textContent = ''; }
+        else if (m < 60) { emin.textContent = m; eunit.textContent = 'menit'; }
+        else { emin.textContent = Math.floor(m / 60) + ':' + ('0' + (m % 60)).slice(-2); eunit.textContent = 'jam'; }
+        edist.textContent = fmtDist(d.dist_m);
+        if (hero) hero.textContent = d.dist_m < 80 ? 'Kurir sudah di depan' : 'Kurir dalam perjalanan';
       }
       ago.textContent = d.ago ? 'Terakhir update ' + d.ago : 'Menunggu lokasi kurir…';
     }).catch(function () {});
