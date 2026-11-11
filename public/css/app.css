@@ -572,3 +572,9 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
   .cancelrow .btn{width:100%;justify-content:center}
   .card .tbl.stackable+.savebar,.card .savebar{margin-top:14px}
 }
+
+/* v15: notifikasi belum dibaca = titik merah kecil + judul tebal, bukan blok warna */
+.item.unread{background:transparent}
+.item.unread .who b{font-weight:800}
+.item.unread .who b::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--accent);margin-right:8px;vertical-align:1px}
+.item:not(.unread) .who b{font-weight:600}

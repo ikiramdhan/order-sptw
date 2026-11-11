@@ -114,6 +114,6 @@ class CatalogController extends Controller
 
         session()->forget(self::CART);
 
-        return redirect()->route('orders.show', $po)->with('status', "PO {$po->number} terkirim. Menunggu persetujuan Central Kitchen.");
+        return redirect()->route('orders.show', $po)->with('status', "{$po->number} terkirim. Menunggu persetujuan Central Kitchen.");
     }
 }

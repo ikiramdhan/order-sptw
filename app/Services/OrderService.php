@@ -143,7 +143,7 @@ class OrderService
             $po->save();
             self::refreshStatus($po);
             if ($note) {
-                Notifier::outlet($po->outlet_id, "Barang dikirim: {$note->number}", "PO {$po->number}", '/surat-jalan/'.$note->id);
+                Notifier::outlet($po->outlet_id, "Barang dikirim: {$note->number}", "Untuk {$po->number}", '/surat-jalan/'.$note->id);
             }
             ActivityLog::record('po_shipped', $note ? "{$po->number}: surat jalan {$note->number}" : "{$po->number}: disetujui, menunggu backorder", $po, $user->id);
 

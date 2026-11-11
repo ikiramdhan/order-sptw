@@ -8,7 +8,7 @@
 <section class="list">
     @forelse ($notes as $n)
         <a class="item" href="{{ route('delivery.show', $n) }}" style="text-decoration:none">
-            <div class="who"><b>{{ $n->number }}@unless($isOutlet) · {{ $n->outlet->name }}@endunless</b><small>PO {{ $n->purchaseOrder?->number }} · dikirim {{ Fmt::date($n->shipped_at, 'j M Y H:i') }} · {{ $n->items->count() }} barang</small></div>
+            <div class="who"><b>{{ $n->number }}@unless($isOutlet) · {{ $n->outlet->name }}@endunless</b><small>{{ $n->purchaseOrder?->number }} · dikirim {{ Fmt::date($n->shipped_at, 'j M Y H:i') }} · {{ $n->items->count() }} barang</small></div>
             <span class="badge {{ $n->status === 'diterima' ? 'ok' : 'warn' }}">{{ $n->status === 'diterima' ? 'Diterima' : ($isOutlet ? 'Perlu dikonfirmasi' : 'Dalam pengiriman') }}</span>
         </a>
     @empty
