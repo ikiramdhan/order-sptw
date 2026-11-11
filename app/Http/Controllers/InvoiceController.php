@@ -29,7 +29,7 @@ class InvoiceController extends Controller
             ->when($outletId, fn ($q) => $q->where('outlet_id', $outletId))
             ->when($status === 'belum', fn ($q) => $q->whereIn('status', ['belum_dibayar', 'sebagian', 'jatuh_tempo']))
             ->when($status === 'lunas', fn ($q) => $q->where('status', 'lunas'))
-            ->orderBy('due_at')->orderByDesc('id')->limit(300)->get();
+            ->orderByDesc('issued_at')->orderByDesc('id')->limit(300)->get();
 
         // status jatuh tempo ditampilkan live, walau cron belum jalan
         $invoices->each(function (Invoice $i) {

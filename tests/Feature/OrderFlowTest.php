@@ -141,6 +141,9 @@ class OrderFlowTest extends TestCase
         $this->assertTrue($invoice->due_at->isSameDay(today()->addDays(7)));
         $this->assertSame('belum_dibayar', $invoice->status);
 
+        // daftar invoice dikelompokkan per tanggal terbit
+        $this->actingAs($this->admin)->get(route('invoices.index'))->assertOk()->assertSee('dayhead', false)->assertSee('1 invoice')->assertSee($invoice->number);
+
         // pembayaran bertahap
         $this->actingAs($this->admin)->post(route('invoices.pay', $invoice), ['amount' => 10000, 'paid_at' => today()->toDateString(), 'method' => 'tunai'])->assertSessionHasNoErrors();
         $this->assertSame('sebagian', $invoice->fresh()->status);

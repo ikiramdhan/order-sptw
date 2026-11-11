@@ -23,14 +23,18 @@
     </select>
     @endunless
 </form>
+@php $byDay = $invoices->groupBy(fn ($i) => $i->issued_at->toDateString()); @endphp
 <section class="list">
-    @forelse ($invoices as $i)
+    @forelse ($byDay as $day => $rows)
+        <div class="dayhead"><b>{{ \Illuminate\Support\Carbon::parse($day)->translatedFormat('l, j M Y') }}</b><span>{{ $rows->count() }} invoice · {{ Fmt::rp($rows->sum(fn ($r) => $r->remaining())) }} sisa</span></div>
+        @foreach ($rows as $i)
         @php [$sl, $sc] = \App\Models\Invoice::STATUS[$i->status] ?? [$i->status, 'info']; @endphp
         <a class="item" href="{{ route('invoices.show', $i) }}" style="text-decoration:none">
-            <div class="who"><b>{{ $i->number }}@unless($isOutlet) · {{ $i->outlet->name }}@endunless</b><small>Terbit {{ Fmt::date($i->issued_at) }} · jatuh tempo {{ Fmt::date($i->due_at) }}</small></div>
+            <div class="who"><b>{{ $i->number }}@unless($isOutlet) · {{ $i->outlet->name }}@endunless</b><small>Jatuh tempo {{ Fmt::date($i->due_at) }}</small></div>
             <div class="col"><b>{{ Fmt::rp($i->total - $i->credit_applied) }}</b><small>sisa {{ Fmt::rp($i->remaining()) }}</small></div>
             <span class="badge {{ $sc }}">{{ $sl }}</span>
         </a>
+        @endforeach
     @empty
         <div class="empty">Tidak ada invoice.</div>
     @endforelse
