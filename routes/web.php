@@ -136,7 +136,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
     });
     Route::middleware($ckGudang)->post('/surat-jalan/{note}/kurir', [CourierController::class, 'assign'])->name('delivery.courier');
 
-    Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->post('/outlet/{outlet}/lokasi', [OutletController::class, 'setLocation'])->name('outlet.location');
+    Route::middleware($ck)->post('/outlet/{outlet}/lokasi', [OutletController::class, 'setLocation'])->name('outlet.location');
 
     // Chat pengantaran (kurir, outlet tujuan, Admin CK/Gudang)
     Route::middleware(RoleMiddleware::class.':admin_ck,gudang,outlet,kurir')->group(function () {

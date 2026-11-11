@@ -4,12 +4,12 @@
     @if ($o->lat !== null)
         <p style="margin:0 0 10px;color:var(--muted)">Tersimpan. Perjalanan kurir ke {{ $o->name }} dihitung dari titik ini. <a class="link" href="https://www.google.com/maps?q={{ $o->lat }},{{ $o->lng }}" target="_blank" rel="noopener">Lihat di Google Maps</a></p>
     @else
-        <p style="margin:0 0 10px;color:var(--muted)">Supaya perjalanan kurir sampai ke {{ $o->name }} terlihat di peta lengkap dengan estimasi waktunya, tentukan titik outlet satu kali saja.</p>
+        <p style="margin:0 0 10px;color:var(--muted)">Titik {{ $o->name }} belum diatur, jadi estimasi kedatangan kurir belum bisa tampil. Cukup diisi satu kali untuk seterusnya. Atau Super Admin bisa mengisinya di menu Outlet.</p>
     @endif
     <form method="POST" action="{{ route('outlet.location', $o) }}" id="locform">@csrf
         <input type="hidden" name="lat" id="locLat"><input type="hidden" name="lng" id="locLng">
         <button type="button" class="btn {{ $o->lat !== null ? 'outline' : 'primary' }} block" id="locgps">{{ $o->lat !== null ? 'Perbarui dengan lokasi saya sekarang' : 'Pakai lokasi saya sekarang' }}</button>
-        <small style="display:block;margin:6px 0 10px;color:var(--muted)">Lakukan saat HP berada di outlet.</small>
+        <small style="display:block;margin:6px 0 10px;color:var(--muted)">Lakukan hanya bila HP berada di outlet.</small>
         <label class="field">Atau tempel link Google Maps / koordinat
             <input type="text" name="link" placeholder="https://maps.app.goo.gl/… atau -6.2088, 106.8456">
             @error('link')<span class="err">{{ $message }}</span>@enderror

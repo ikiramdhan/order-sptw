@@ -22,7 +22,7 @@
 </div>
 
 @if ($note->outlet->lat === null)
-<div class="tk-setloc"><b>Titik outlet belum diatur</b><small>Atur titik lokasi agar rute dan estimasi tampil.</small><a class="btn primary" href="{{ route('delivery.show', $note) }}#locform">Atur sekarang</a></div>
+<div class="tk-setloc"><b>Estimasi belum tersedia</b><small>Titik lokasi {{ $note->outlet->name }} belum diatur oleh admin.</small>@unless ($isOutlet)<a class="btn primary" href="{{ route('delivery.show', $note) }}#locform">Atur sekarang</a>@endunless</div>
 @endif
 <div class="tk-sheet">
     <div class="tk-banner" id="tkbanner">

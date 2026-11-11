@@ -12,7 +12,7 @@
 </div>
 @error('received')<div class="alert" role="alert">{{ $message }}</div>@enderror
 @php $pending = $note->status === 'dikirim'; @endphp
-@if ($note->courier_id && $note->status === 'dikirim' && ($isOutlet || auth()->user()->hasRole('admin_ck')) && $note->outlet->lat === null)@include('partials.outlet-location', ['outlet' => $note->outlet])@endif
+@if ($note->courier_id && $note->status === 'dikirim' && auth()->user()->hasRole('admin_ck') && $note->outlet->lat === null)@include('partials.outlet-location', ['outlet' => $note->outlet])@endif
 @if ($note->courier_id || $canAssign)
 <section class="card" style="margin-bottom:12px" id="courierbox">
     <h3 class="sect">Pengantaran</h3>

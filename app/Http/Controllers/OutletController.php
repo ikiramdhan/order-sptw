@@ -36,7 +36,7 @@ class OutletController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $outlet = Outlet::create($this->validated($request) + ['is_active' => true]);
+        $outlet = Outlet::create($this->withMapsLink($request, $this->validated($request)) + ['is_active' => true]);
         ActivityLog::record('outlet_created', "Menambah outlet {$outlet->name}", $outlet);
 
         return redirect()->route('outlets.index')
@@ -50,7 +50,7 @@ class OutletController extends Controller
 
     public function update(Request $request, Outlet $outlet): RedirectResponse
     {
-        $outlet->update($this->validated($request, $outlet));
+        $outlet->update($this->withMapsLink($request, $this->validated($request, $outlet)));
         ActivityLog::record('outlet_updated', "Mengubah outlet {$outlet->name}", $outlet);
 
         return redirect()->route('outlets.index')->with('status', "{$outlet->name} disimpan.");
@@ -63,6 +63,22 @@ class OutletController extends Controller
         ActivityLog::record($outlet->is_active ? 'outlet_activated' : 'outlet_deactivated', $outlet->name, $outlet);
 
         return back()->with('status', $outlet->is_active ? "{$outlet->name} diaktifkan." : "{$outlet->name} dinonaktifkan.");
+    }
+
+    /** Link Google Maps yang ditempel mengisi lat/lng otomatis. */
+    private function withMapsLink(Request $request, array $data): array
+    {
+        $link = trim((string) $request->input('maps_link'));
+        if ($link !== '') {
+            [$lat, $lng] = self::parseCoords($link);
+            if ($lat === null) {
+                throw \Illuminate\Validation\ValidationException::withMessages(['maps_link' => 'Link tidak berisi koordinat. Buka link Google Maps-nya dulu, lalu salin alamat panjang yang memuat angka seperti @-6.22,106.64 (atau tekan lama titik di peta dan salin koordinatnya).']);
+            }
+            $data['lat'] = $lat;
+            $data['lng'] = $lng;
+        }
+
+        return $data;
     }
 
     private function validated(Request $request, ?Outlet $outlet = null): array
@@ -83,11 +99,10 @@ class OutletController extends Controller
         ]);
     }
 
-    /** Outlet (miliknya sendiri) atau Admin CK: isi titik lokasi dari GPS, link Google Maps, atau koordinat. */
+    /** Admin CK / Super Admin: isi titik lokasi outlet dari GPS, link Google Maps, atau koordinat. */
     public function setLocation(Request $request, Outlet $outlet): RedirectResponse
     {
         $u = $request->user();
-        abort_if($u->role === 'outlet' && (int) $u->outlet_id !== (int) $outlet->id, 404);
 
         $d = $request->validate(['lat' => ['nullable', 'numeric', 'between:-90,90'], 'lng' => ['nullable', 'numeric', 'between:-180,180'], 'link' => ['nullable', 'string', 'max:500']]);
         $lat = $d['lat'] ?? null;

@@ -156,25 +156,30 @@ class CourierTest extends TestCase
         $this->actingAs($this->outletUser)->get(route('delivery.show', $this->note))->assertOk()->assertDontSee('livemap"></div>');
     }
 
-    public function test_outlet_sets_own_location_from_link_or_gps_and_not_others(): void
+    public function test_admin_sets_outlet_location_from_maps_link_and_outlet_cannot(): void
     {
         $o = $this->outletUser->outlet;
-        $this->actingAs($this->outletUser)->get(route('delivery.show', $this->note))->assertOk()->assertSee('Atur titik lokasi outlet');
+        $this->actingAs($this->outletUser)->get(route('delivery.show', $this->note))->assertOk()->assertDontSee('Atur titik lokasi outlet');
+        $this->post(route('outlet.location', $o), ['lat' => '-6.2', 'lng' => '106.6'])->assertForbidden();
 
+        $this->actingAs($this->admin)->get(route('delivery.show', $this->note))->assertOk()->assertSee('Atur titik lokasi outlet');
         $this->post(route('outlet.location', $o), ['link' => 'https://www.google.com/maps/place/X/@-6.2210,106.6420,17z/data=abc'])->assertSessionHasNoErrors();
         $this->assertEqualsWithDelta(-6.2210, $o->fresh()->lat, 0.0001);
         $this->assertEqualsWithDelta(106.642, $o->fresh()->lng, 0.0001);
-
         $this->post(route('outlet.location', $o), ['lat' => '-6.25', 'lng' => '106.7'])->assertSessionHasNoErrors();
-        $this->assertEqualsWithDelta(-6.25, $o->fresh()->lat, 0.0001);
-
         $this->post(route('outlet.location', $o), ['link' => 'bukan lokasi'])->assertSessionHasErrors('link');
         $this->post(route('outlet.location', $o), ['link' => '-6.3, 106.8'])->assertSessionHasNoErrors();
         $this->assertEqualsWithDelta(106.8, $o->fresh()->lng, 0.0001);
+        $this->get(route('delivery.show', $this->note))->assertOk()->assertDontSee('Atur titik lokasi outlet');
+    }
 
-        $other = $this->otherOutletUser->outlet;
-        $this->post(route('outlet.location', $other), ['lat' => '-6.1', 'lng' => '106.1'])->assertNotFound();
-        $this->actingAs($this->admin)->post(route('outlet.location', $other), ['lat' => '-6.1', 'lng' => '106.1'])->assertSessionHasNoErrors();
-        $this->assertEqualsWithDelta(-6.1, $other->fresh()->lat, 0.0001);
+    public function test_super_admin_outlet_form_accepts_maps_link(): void
+    {
+        $sa = $this->user('super_admin');
+        $o = $this->outletUser->outlet;
+        $this->actingAs($sa)->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'maps_link' => 'https://www.google.com/maps/place/Gerendeng/@-6.2105,106.6188,17z'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(-6.2105, $o->fresh()->lat, 0.0001);
+        $this->assertEqualsWithDelta(106.6188, $o->fresh()->lng, 0.0001);
+        $this->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'maps_link' => 'https://maps.app.goo.gl/abc'])->assertSessionHasErrors('maps_link');
     }
 }

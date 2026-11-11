@@ -32,8 +32,15 @@
                 <input type="text" name="phone" value="{{ old('phone', $outlet->phone) }}" inputmode="tel" placeholder="08xx-xxxx-xxxx">
             </label>
         </div>
+        <label class="field"><span class="lbl">Lokasi di Google Maps <span class="hint">(untuk pelacakan kurir)</span></span>
+            <input type="text" name="maps_link" value="{{ old('maps_link') }}" placeholder="Tempel link Google Maps outlet">
+            @error('maps_link')<span class="err">{{ $message }}</span>@enderror
+        </label>
+        @if ($outlet->lat !== null)
+            <p style="margin:-4px 0 10px;color:var(--muted);font-size:13px">Titik tersimpan: {{ $outlet->lat }}, {{ $outlet->lng }} · <a class="link" href="https://www.google.com/maps?q={{ $outlet->lat }},{{ $outlet->lng }}" target="_blank" rel="noopener">lihat di Maps</a></p>
+        @endif
         <div class="row">
-            <label class="field"><span class="lbl">Latitude <span class="hint">(titik lokasi untuk peta kurir)</span></span>
+            <label class="field"><span class="lbl">Latitude</span>
                 <input type="text" name="lat" id="olat" value="{{ old('lat', $outlet->lat) }}" inputmode="decimal" placeholder="-6.2088">
                 @error('lat')<span class="err">{{ $message }}</span>@enderror
             </label>
@@ -43,7 +50,7 @@
             </label>
         </div>
         <button type="button" class="btn outline" id="usegps">Pakai lokasi saya sekarang</button>
-        <small style="display:block;color:var(--muted);margin-top:6px">Buka form ini dari HP saat berada di depan outlet, lalu tekan tombol di atas. Atau salin koordinat dari Google Maps (tekan lama di titik outlet).</small>
+        <small style="display:block;color:var(--muted);margin-top:6px">Tempel link Google Maps outlet di atas (koordinat terisi otomatis), atau tekan tombol ini saat HP berada di outlet.</small>
         <script>
         document.getElementById('usegps').addEventListener('click', function () {
           var b = this; b.textContent = 'Mencari lokasi…';
