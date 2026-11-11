@@ -710,3 +710,8 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .nmeta time{font-size:12px;font-weight:600;color:var(--muted)}
 .ndot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px color-mix(in srgb,var(--accent) 20%,transparent)}
 @media (prefers-reduced-motion:reduce){.nitem{animation:none}}
+
+/* v27: chip nama cabang di notifikasi (warna beda tiap cabang) */
+.ochip{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;margin-bottom:3px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.1px;color:hsl(var(--h) 65% 28%);background:hsl(var(--h) 80% 90%)}
+.ochip i{width:8px;height:8px;border-radius:50%;background:hsl(var(--h) 70% 45%)}
+@media (prefers-color-scheme:dark){.ochip{color:hsl(var(--h) 80% 85%);background:hsl(var(--h) 40% 25%)}}

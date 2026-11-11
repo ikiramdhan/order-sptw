@@ -17,6 +17,11 @@
         if ($d->isYesterday()) return 'Kemarin';
         return $d->translatedFormat('l, j M Y');
     };
+    $outletNames = \App\Models\Outlet::pluck('name')->sortByDesc(fn ($x) => strlen($x))->values();
+    $outletOf = function ($n) use ($outletNames) {
+        foreach ($outletNames as $nm) { if (str_contains($n->title.' '.$n->body, $nm)) return $nm; }
+        return null;
+    };
     $unread = $items->whereNull('read_at')->count();
 @endphp
 <header class="page-head compact">
@@ -30,7 +35,8 @@
             @php [$tone, $ico] = $kind($n); @endphp
             <a class="nitem {{ $n->read_at ? '' : 'unread' }}" href="{{ route('notifications.open', $n) }}">
                 <span class="nico {{ $tone }}"><x-icon name="{{ $ico }}" :size="20" /></span>
-                <span class="ntxt"><b>{{ $n->title }}</b>@if ($n->body)<span class="nbody">{{ $n->body }}</span>@endif</span>
+                @php $on = $outletOf($n); $body = $on ? trim(preg_replace('/^\s*'.preg_quote($on, '/').'\s*[·\-:]?\s*/u', '', (string) $n->body)) : $n->body; @endphp
+                <span class="ntxt">@if ($on)<span class="ochip" style="--h:{{ crc32($on) % 360 }}"><i></i>{{ $on }}</span>@endif<b>{{ $n->title }}</b>@if ($body)<span class="nbody">{{ $body }}</span>@endif</span>
                 <span class="nmeta"><time>{{ $n->created_at->format('H:i') }}</time>@unless ($n->read_at)<i class="ndot" aria-label="Belum dibaca"></i>@endunless</span>
             </a>
         @endforeach
