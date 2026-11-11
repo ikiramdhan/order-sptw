@@ -1,4 +1,4 @@
-<svg class="motor" viewBox="0 0 130 84" role="img" aria-label="Kurir mengantar pesanan dengan motor roda tiga">
+<svg class="motor" viewBox="0 0 130 84" role="img" aria-label="Kurir mengantar pesanan dengan motor">
   <g class="speed"><path d="M2 30h14M0 42h20M5 54h12" /></g>
   <g class="bike">
     <!-- bak muatan -->

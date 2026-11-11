@@ -37,7 +37,7 @@
         <i class="tk-handle"></i>
         <div class="tk-row">
             <div class="tk-avatar">{{ $initials }}</div>
-            <div class="tk-who"><b>{{ $note->courier?->name }}</b><div class="tk-sub"><span class="tk-tag">Motor roda tiga</span><span>{{ $note->number }}</span></div></div>
+            <div class="tk-who"><b>{{ $note->courier?->name }}</b><div class="tk-sub"><span>{{ $note->number }}</span></div></div>
         </div>
         <div class="tk-stats">
             <div><small>Jarak</small><b id="tkdist">–</b></div>
