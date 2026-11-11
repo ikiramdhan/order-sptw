@@ -190,4 +190,15 @@ class CourierTest extends TestCase
         $this->assertEqualsWithDelta(-6.3111, $o->fresh()->lat, 0.0001);
         $this->assertEqualsWithDelta(106.7222, $o->fresh()->lng, 0.0001);
     }
+
+    public function test_short_link_resolves_via_page_body_when_redirect_has_no_coords(): void
+    {
+        \Illuminate\Support\Facades\Http::fake([
+            'maps.app.goo.gl/*' => \Illuminate\Support\Facades\Http::response('', 302, ['Location' => 'https://www.google.com/maps/place/Gerendeng/data=!4m2!3m1!1s0x2e69:0xabc']),
+            'www.google.com/maps/place/*' => \Illuminate\Support\Facades\Http::response('<meta itemprop="image" content="https://maps.google.com/maps/api/staticmap?center=-6.2105%2C106.6188&zoom=15">', 200),
+        ]);
+        [$lat, $lng] = \App\Services\MapsLink::resolve('https://maps.app.goo.gl/evVg1z83SQCVthLZ9?g_st=ic');
+        $this->assertEqualsWithDelta(-6.2105, $lat, 0.0001);
+        $this->assertEqualsWithDelta(106.6188, $lng, 0.0001);
+    }
 }

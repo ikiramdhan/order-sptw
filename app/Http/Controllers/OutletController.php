@@ -72,7 +72,7 @@ class OutletController extends Controller
         if ($link !== '') {
             [$lat, $lng] = \App\Services\MapsLink::resolve($link);
             if ($lat === null) {
-                throw \Illuminate\Validation\ValidationException::withMessages(['maps_link' => 'Titik tidak terbaca dari link itu. Pastikan link Google Maps outlet (boleh link pendek), atau tempel koordinat seperti -6.2105, 106.6188.']);
+                throw \Illuminate\Validation\ValidationException::withMessages(['maps_link' => 'Titik tidak terbaca dari link itu. Tempel koordinat seperti -6.2105, 106.6188 (tekan lama titik outlet di Google Maps lalu salin angkanya).'.(\App\Services\MapsLink::$trace ? ' [Diagnosa: '.\App\Services\MapsLink::$trace.']' : '')]);
             }
             $data['lat'] = $lat;
             $data['lng'] = $lng;
