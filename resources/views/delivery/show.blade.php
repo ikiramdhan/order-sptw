@@ -34,7 +34,7 @@
                 <div id="etabar" hidden>
                     <div class="dlv-big"><b id="etamin">–</b><small id="etaunit"></small><span id="etadist"></span></div>
                     <div class="etatrack"><div class="etafill" id="etafill"></div><div class="etarider" id="etarider">@include('partials.motor')</div><i class="etapin"></i></div>
-                    <div class="dlv-ends"><span>Kurir</span><span>{{ $note->outlet->name }}</span></div>
+                    <div class="dlv-ends"><span class="dlv-end a"><i></i><em>Kurir</em><b>{{ \Illuminate\Support\Str::before($nm, ' ') }}</b></span><span class="dlv-end b"><i></i><em>Tujuan</em><b>{{ $note->outlet->name }}</b></span></div>
                 </div>
                 @else
                 <div class="dlv-road"><span class="road"></span>@include('partials.motor')</div>
