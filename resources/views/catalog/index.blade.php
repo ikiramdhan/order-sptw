@@ -4,10 +4,12 @@
 @use('App\Support\Fmt')
 <header class="page-head">
     <div><h1>Katalog</h1><p>Pilih barang dan jumlahnya, lalu kirim PO ke Central Kitchen</p></div>
-    <a class="btn primary" href="{{ route('cart.show') }}"><x-icon name="cart" :size="18" /> Keranjang @if($cartCount)({{ $cartCount }})@endif</a>
 </header>
 @error('qty')<div class="alert" role="alert">{{ $message }}</div>@enderror
-<form method="GET" class="toolbar"><input type="search" name="q" value="{{ $q }}" placeholder="Cari barang" aria-label="Cari barang"></form>
+<div class="stick-top toolbar catbar">
+    <form method="GET"><input type="search" name="q" value="{{ $q }}" placeholder="Cari barang" aria-label="Cari barang"></form>
+    <a class="btn primary" href="{{ route('cart.show') }}"><x-icon name="cart" :size="18" /> Keranjang @if($cartCount)({{ $cartCount }})@endif</a>
+</div>
 <section class="card">
     @forelse ($items as $i)
         @php $units = $i->sellableUnits(); @endphp

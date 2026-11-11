@@ -13,14 +13,18 @@
         @foreach (\App\Models\PurchaseOrder::STATUS as $k => [$label])<option value="{{ $k }}" @selected($filter===$k)>{{ $label }}</option>@endforeach
     </select>
 </form>
+@php $byDay = $orders->groupBy(fn ($o) => ($o->submitted_at ?? $o->created_at)->toDateString()); @endphp
 <section class="list">
-    @forelse ($orders as $o)
+    @forelse ($byDay as $day => $rows)
+        <div class="dayhead"><b>{{ \Illuminate\Support\Carbon::parse($day)->translatedFormat('l, j M Y') }}</b><span>{{ $rows->count() }} PO</span></div>
+        @foreach ($rows as $o)
         @php [$sl, $sc] = $o->statusLabel(); @endphp
         <a class="item" href="{{ route('orders.show', $o) }}" style="text-decoration:none">
-            <div class="who"><b>{{ $o->number }}@unless($isOutlet) · {{ $o->outlet->name }}@endunless</b><small>Diajukan {{ Fmt::date($o->submitted_at ?? $o->created_at, 'j M Y H:i') }} · {{ $o->items->count() }} barang</small></div>
+            <div class="who"><b>{{ $o->number }}@unless($isOutlet) · {{ $o->outlet->name }}@endunless</b><small>{{ ($o->submitted_at ?? $o->created_at)->format('H:i') }} · {{ $o->items->count() }} barang</small></div>
             <div class="col"><b>{{ Fmt::rp($o->totalValue()) }}</b><small>nilai pesanan</small></div>
             <span class="badge {{ $sc }}">{{ $sl }}</span>
         </a>
+        @endforeach
     @empty
         <div class="empty">Tidak ada PO.</div>
     @endforelse

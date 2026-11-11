@@ -611,3 +611,21 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
   .page-head.compact>.btn,.page-head.compact>div:last-child>.btn{flex:none;min-height:40px;padding:0 14px;font-size:13px}
 }
 .btn:disabled,.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* v19: bilah menempel di bawah topbar HP; kartu angka datar; tombol aksi grid; baris stok */
+.stick-top{z-index:19}
+@media (max-width:900px){.stick-top{top:calc(70px + env(safe-area-inset-top))}}
+.stick-top.catbar{display:flex;gap:8px;align-items:center;flex-wrap:nowrap}
+.stick-top.catbar form{flex:1 1 auto;min-width:0;margin:0}
+.stick-top.catbar input[type=search]{width:100%;min-width:0}
+.stick-top.catbar .btn{flex:none;min-height:44px;white-space:nowrap}
+.stats.flat{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.stats.flat>.stat,.stats.flat>.stat:first-child:not(.warn){grid-column:auto;background:var(--card);padding:12px 14px;border-radius:20px;display:block}
+.stats.flat>.stat.warn{background:var(--warn-bg)}
+.stats.flat>.stat small,.stats.flat>.stat:first-child:not(.warn) small{color:var(--muted);font-size:11.5px}
+.stats.flat>.stat.warn small{color:var(--warn)}
+.stats.flat>.stat b,.stats.flat>.stat:first-child:not(.warn) b{color:var(--ink);font-size:18px;letter-spacing:-.3px}
+.stats.flat>.stat.warn b{color:var(--warn)}
+.actgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.actgrid .btn{justify-content:center;padding:0 8px;font-size:13px;text-align:center}
+.actgrid .btn.wide{grid-column:1/-1;font-size:14px}
