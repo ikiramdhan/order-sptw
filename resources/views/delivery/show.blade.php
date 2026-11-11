@@ -3,7 +3,7 @@
 @section('content')
 @use('App\Support\Fmt')
 <header class="page-head">
-    <div><h1>{{ $note->number }}</h1><p>{{ $note->outlet->name }} · PO {{ $note->purchaseOrder?->number }}@if($note->type === 'pengganti_retur') · barang pengganti retur@endif</p></div>
+    <div><h1>{{ $note->number }}</h1><p>{{ $note->outlet->name }} · PO {{ $note->purchaseOrder?->number }} @if ($note->type === 'pengganti_retur') · barang pengganti retur @endif</p></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
         @if ($isOutlet && $note->type === 'regular' && $note->status === 'diterima' && $note->invoice)<a class="btn" href="{{ route('returns.create', ['surat_jalan' => $note->id]) }}">Ajukan retur</a>@endif
         <a class="btn" href="{{ route('delivery.print', $note) }}" target="_blank" rel="noopener"><x-icon name="print" :size="18" /> Cetak</a>

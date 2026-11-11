@@ -125,6 +125,9 @@ class OrderFlowTest extends TestCase
 
         $note = \App\Models\DeliveryNote::firstOrFail();
 
+        $this->actingAs($this->gudang)->get(route('delivery.show', $note))->assertOk()->assertSee($note->number);
+        $this->actingAs($this->outletUser)->get(route('delivery.show', $note))->assertOk()->assertSee('Terima');
+
         // surat jalan tidak memuat harga
         $this->actingAs($this->gudang)->get(route('delivery.print', $note))->assertOk()->assertDontSeeText('Rp');
 
