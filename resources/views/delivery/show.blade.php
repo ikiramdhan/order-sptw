@@ -28,13 +28,13 @@
             @if ($note->status === 'dikirim' && $note->courier_status !== 'sampai')<span class="dlv-pill {{ $note->courier_status === 'diantar' ? 'live' : '' }}">@if ($note->courier_status === 'diantar')<i></i>LIVE @else Ditugaskan @endif</span>@endif
         </div>
         @if ($note->status === 'dikirim' && $note->courier_status === 'diantar')
-            <div class="dlv-eta">
+            <div class="dlv-eta"><div class="wind"><i></i><i></i><i></i><i></i><i></i></div>
                 <div class="dlv-msg" id="herosub">{{ $isOutlet ? 'Kurir menuju lokasi kamu' : 'Kurir menuju '.$note->outlet->name }}</div>
                 @if ($note->outlet->lat !== null)
                 <div id="etabar" hidden>
                     <div class="dlv-big"><b id="etamin">–</b><small id="etaunit"></small><span id="etadist"></span></div>
-                    <div class="dlv-ends"><span>Kurir</span><span>{{ $note->outlet->name }}</span></div>
                     <div class="etatrack"><div class="etafill" id="etafill"></div><div class="etarider" id="etarider">@include('partials.motor')</div><i class="etapin"></i></div>
+                    <div class="dlv-ends"><span>Kurir</span><span>{{ $note->outlet->name }}</span></div>
                 </div>
                 @else
                 <div class="dlv-road"><span class="road"></span>@include('partials.motor')</div>

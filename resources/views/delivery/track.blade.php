@@ -28,7 +28,7 @@
 @endif
 
 <div class="tk-sheet">
-    <div class="tk-eta" id="tkbanner">
+    <div class="tk-eta" id="tkbanner"><div class="wind"><i></i><i></i><i></i><i></i><i></i></div>
         <div class="tk-etatop"><span class="tk-live"><i></i>LIVE</span><span id="tkmsg">Menunggu kurir berangkat</span></div>
         <div class="tk-etabig"><b id="tkbig">–</b><small id="tkunit"></small><span class="tk-arr" id="tkarr"></span></div>
         <div class="tk-prog"><i id="tkfill"></i><span id="tkbike">@include('partials.motor')</span><em class="tk-flag"></em></div>
