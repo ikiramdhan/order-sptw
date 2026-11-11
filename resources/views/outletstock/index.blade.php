@@ -43,7 +43,7 @@
         <div class="dayhead"><b>{{ \Illuminate\Support\Carbon::parse($day)->translatedFormat('l, j M Y') }}</b><span>{{ $ms->count() }} pergerakan</span></div>
         @foreach ($ms as $m)
         <div class="mrow"><div class="who"><b>{{ $m->item_name }}</b>
-            <small>{{ \App\Services\OutletStockService::LABELS[$m->type] ?? $m->type }}@if ($m->notes && $m->notes !== (\App\Services\OutletStockService::LABELS[$m->type] ?? '') && $m->notes !== 'Stok opname') · {{ $m->notes }}@endif@if ($m->user_name) · {{ $m->user_name }}@endif</small></div>
+            <small>{{ \App\Services\OutletStockService::LABELS[$m->type] ?? $m->type }}@if ($m->notes && $m->notes !== (\App\Services\OutletStockService::LABELS[$m->type] ?? '') && $m->notes !== 'Stok opname') · {{ $m->notes }} @endif @if ($m->user_name) · {{ $m->user_name }} @endif</small></div>
             <div class="val"><b style="color:{{ $m->qty_base < 0 ? 'var(--bad)' : 'var(--ok)' }}">{{ $m->qty_base > 0 ? '+' : '' }}{{ Fmt::qty($m->qty_base) }}</b><small>saldo {{ Fmt::qty($m->balance_after) }}</small></div></div>
         @endforeach
     @empty
