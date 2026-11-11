@@ -585,3 +585,19 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .dayhead b{font-size:14px;font-weight:800}
 .dayhead span{font-size:12px;color:var(--muted)}
 .list>.dayhead+.item{padding-top:10px}
+
+/* v17: rekap minusan rapi (3 kartu angka, baris rincian 2 kolom, input bulan) */
+.stats.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:860px){.stats.s3{grid-template-columns:repeat(2,minmax(0,1fr))}.stats.s3>.stat:first-child{grid-column:1/-1}}
+.toolbar input[type=month]{-webkit-appearance:none;appearance:none;text-align:left;text-align-last:left;display:block;line-height:44px;color:var(--ink)}
+.toolbar input[type=month]::-webkit-date-and-time-value{text-align:left}
+.mrow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 14px;padding:12px 0;border-bottom:1px solid var(--bg-2);align-items:start}
+.mrow:last-child{border-bottom:0}
+.mrow .who b{display:block;font-size:14px}
+.mrow .who small{display:block;color:var(--muted);font-size:12px;margin-top:2px;word-break:break-word}
+.mrow .val{text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.mrow .val b{font-size:14px}
+.mrow .val small{color:var(--muted);font-size:12px}
+.actrow{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.actrow .grow{flex:1 1 220px}
+@media (max-width:700px){.actrow form,.actrow .btn{width:100%}.actrow .btn{justify-content:center}}
