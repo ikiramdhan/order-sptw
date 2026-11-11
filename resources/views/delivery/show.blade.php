@@ -7,8 +7,8 @@
     <div><h1>{{ $note->number }}</h1><p>{{ $note->outlet->name }} · {{ $note->purchaseOrder?->number }}@if ($note->type === 'pengganti_retur') · barang pengganti retur @endif</p></div>
 </header>
 <div class="actgrid2">
-    <a class="btn" href="{{ route('delivery.print', $note) }}" target="_blank" rel="noopener"><x-icon name="print" :size="18" /> Cetak surat jalan</a>
-    @if ($isOutlet && $note->type === 'regular' && $note->status === 'diterima' && $note->invoice)<a class="btn" href="{{ route('returns.create', ['surat_jalan' => $note->id]) }}">Ajukan retur</a>@endif
+    <a class="btn primary" href="{{ route('delivery.print', $note) }}" target="_blank" rel="noopener"><x-icon name="print" :size="18" /> Cetak surat jalan</a>
+    @if ($isOutlet && $note->type === 'regular' && $note->status === 'diterima' && $note->invoice)<a class="btn outline" href="{{ route('returns.create', ['surat_jalan' => $note->id]) }}">Ajukan retur</a>@endif
 </div>
 @error('received')<div class="alert" role="alert">{{ $message }}</div>@enderror
 @php $pending = $note->status === 'dikirim'; @endphp
