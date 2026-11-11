@@ -114,7 +114,7 @@ class OutletStockTest extends TestCase
         // stok awal (tidak dihitung)
         $fresh = Outlet::create(['name' => 'Baru', 'payment_term_days' => 7, 'credit_balance' => 0, 'is_active' => true]);
         $this->actingAs($this->admin)->post(route('outletstock.count.store'), ['outlet' => $fresh->id, 'initial' => 1, 'qty' => [$this->item->id => 30]]);
-        $this->get(route('outletstock.recap', ['outlet' => $fresh->id]))->assertOk()->assertSee('Belum ada selisih');
+        $this->get(route('outletstock.recap', ['outlet' => $fresh->id]))->assertOk()->assertSee('Belum ada minusan');
 
         // opname outlet A: sistem 50, fisik 42 -> kurang 8 x Rp1.000
         $this->post(route('outletstock.count.store'), ['outlet' => $this->outlet->id, 'qty' => [$this->item->id => 42]])->assertSessionHasNoErrors();
@@ -123,5 +123,46 @@ class OutletStockTest extends TestCase
 
         $this->get(route('outletstock.recap', ['outlet' => $this->outlet->id]))->assertOk()->assertSee('Rp 8.000')->assertSee('Bumbu');
         $this->actingAs($this->ou)->get(route('outletstock.recap'))->assertOk()->assertSee('Rp 8.000');
+    }
+
+    public function test_charge_covers_opname_shortage_and_tumpah_waste_but_not_rusak_or_kadaluarsa(): void
+    {
+        $this->actingAs($this->admin);
+        // SO kurang 8 (sistem 50 -> fisik 42) => Rp 8.000 ditagih
+        $this->post(route('outletstock.count.store'), ['outlet' => $this->outlet->id, 'qty' => [$this->item->id => 42]]);
+        // waste tumpah 3 => Rp 3.000 ditagih; rusak 5 & kadaluarsa 2 => tidak ditagih
+        foreach ([['tumpah', 3], ['rusak', 5], ['kadaluarsa', 2]] as [$reason, $qty]) {
+            $this->post(route('outletstock.waste.store'), ['outlet' => $this->outlet->id, 'reason' => $reason, 'qty' => [$this->item->id => $qty]])->assertSessionHasNoErrors();
+        }
+        $month = now()->format('Y-m');
+        $this->get(route('outletstock.recap', ['outlet' => $this->outlet->id]))->assertOk()->assertSee('Rp 11.000')->assertSee('Rp 7.000');
+
+        $this->post(route('charges.store'), ['outlet' => $this->outlet->id, 'bulan' => $month])->assertSessionHasNoErrors();
+        $charge = \App\Models\OutletCharge::firstOrFail();
+        $this->assertEquals(11000, (int) $charge->total);
+        $this->assertSame(2, $charge->items()->count());
+        $this->assertStringStartsWith('TM-', $charge->number);
+
+        // tidak bisa ditagih dua kali
+        $this->post(route('charges.store'), ['outlet' => $this->outlet->id, 'bulan' => $month])->assertSessionHasErrors('charge');
+        $this->assertSame(1, \App\Models\OutletCharge::count());
+
+        // outlet melihat tagihannya, outlet lain tidak
+        $this->actingAs($this->ou)->get(route('charges.show', $charge))->assertOk()->assertSee('Rp 11.000');
+        $other = User::create(['name' => 'o2', 'email' => 'o2@example.com', 'password' => 'Password123', 'role' => 'outlet', 'outlet_id' => Outlet::create(['name' => 'B', 'payment_term_days' => 7, 'credit_balance' => 0, 'is_active' => true])->id, 'is_active' => true, 'must_change_password' => false]);
+        $this->actingAs($other)->get(route('charges.show', $charge))->assertNotFound();
+        $this->actingAs($this->ou)->post(route('charges.paid', $charge))->assertForbidden();
+
+        $this->actingAs($this->admin)->post(route('charges.paid', $charge))->assertSessionHasNoErrors();
+        $this->assertSame('lunas', $charge->fresh()->status);
+    }
+
+    public function test_admin_can_decline_to_charge_tumpah_waste_on_approval(): void
+    {
+        $this->actingAs($this->ou)->post(route('outletstock.waste.store'), ['reason' => 'tumpah', 'qty' => [$this->item->id => 4]]);
+        $req = StockRequest::firstOrFail();
+        $this->actingAs($this->admin)->post(route('approvals.approve', $req), ['charge' => 0])->assertSessionHasNoErrors();
+        $this->assertFalse((bool) $req->fresh()->charged);
+        $this->post(route('charges.store'), ['outlet' => $this->outlet->id, 'bulan' => now()->format('Y-m')])->assertSessionHasErrors('charge');
     }
 }

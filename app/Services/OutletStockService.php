@@ -90,14 +90,14 @@ class OutletStockService
         });
     }
 
-    public static function approve(StockRequest $req, User $user): void
+    public static function approve(StockRequest $req, User $user, ?bool $charge = null): void
     {
-        DB::transaction(function () use ($req, $user) {
+        DB::transaction(function () use ($req, $user, $charge) {
             $req = StockRequest::whereKey($req->id)->lockForUpdate()->firstOrFail();
             if ($req->status !== 'menunggu') {
                 throw new \DomainException('Pengajuan ini sudah diputuskan.');
             }
-            self::apply($req, $user);
+            self::apply($req, $user, $charge);
             if ($req->outlet_id) {
                 Notifier::outlet($req->outlet_id, ($req->type === 'waste' ? 'Waste' : 'Stok opname').' disetujui', $req->item->name, '/stok-outlet');
             }
@@ -118,7 +118,7 @@ class OutletStockService
     }
 
     /** Terapkan pengajuan ke stok (CK atau outlet) dan tandai disetujui. */
-    private static function apply(StockRequest $req, User $user): void
+    private static function apply(StockRequest $req, User $user, ?bool $charge = null): void
     {
         $item = $req->item;
         $label = $req->type === 'waste' ? 'Waste: '.(StockRequest::REASONS[$req->reason] ?? $req->reason).($req->notes ? ' · '.$req->notes : '') : ($req->reason === 'awal' ? 'Stok awal' : ($req->notes ?: 'Stok opname'));
@@ -136,7 +136,15 @@ class OutletStockService
             }
         }
 
-        $req->update(['status' => 'disetujui', 'decided_by' => $user->id, 'decided_at' => now(), 'qty_system' => $req->qty_system, 'unit_price' => (int) round((float) $item->price)]);
+        // Dibebankan ke outlet: selisih opname kurang, dan waste karena kelalaian (tumpah/salah olah) kecuali Admin CK menolak membebankan.
+        $charged = false;
+        if ($req->outlet_id !== null) {
+            $charged = $req->type === 'so'
+                ? (float) $req->qty_base < (float) $req->qty_system - 0.0005 && $req->reason !== 'awal'
+                : $req->reason === 'tumpah' && ($charge ?? true);
+        }
+
+        $req->update(['status' => 'disetujui', 'decided_by' => $user->id, 'decided_at' => now(), 'qty_system' => $req->qty_system, 'unit_price' => (int) round((float) $item->price), 'charged' => $charged]);
         ActivityLog::record('stock_request_approved', "{$req->type} {$item->name} ".\App\Support\Fmt::qty($req->qty_base), $req, $user->id);
     }
 

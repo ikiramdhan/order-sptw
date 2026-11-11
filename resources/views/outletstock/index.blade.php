@@ -16,7 +16,7 @@
     <a class="btn primary" href="{{ route('outletstock.sales', ['outlet' => $outlet->id]) }}">Upload penjualan ESB</a>
     <a class="btn" href="{{ route('outletstock.count', ['outlet' => $outlet->id]) }}">Stok opname</a>
     <a class="btn" href="{{ route('outletstock.waste', ['outlet' => $outlet->id]) }}">Catat waste</a>
-    <a class="btn" href="{{ route('outletstock.recap', ['outlet' => $outlet->id]) }}">Rekap opname</a>
+    <a class="btn" href="{{ route('outletstock.recap', ['outlet' => $outlet->id]) }}">Rekap minusan</a>
 </div>
 @endif
 @if (session('skipped') && count(session('skipped')))

@@ -15,7 +15,10 @@
                 <td class="num" data-label="Detail">@if ($r->type === 'waste')-{{ Fmt::qty($r->qty_base) }} {{ $r->item->baseUnit->name }}<br><small>{{ \App\Models\StockRequest::REASONS[$r->reason] ?? $r->reason }}</small>@else Sistem {{ Fmt::qty($r->qty_system) }} → fisik {{ Fmt::qty($r->qty_base) }}@endif</td>
                 <td data-label="Catatan">{{ $r->notes ?? '-' }}</td>
                 <td>
-                    <form method="POST" action="{{ route('approvals.approve', $r) }}" style="display:inline">@csrf<button class="btn primary" type="submit">Setujui</button></form>
+                    <form method="POST" action="{{ route('approvals.approve', $r) }}" style="display:inline">@csrf
+                        @if ($r->type === 'waste' && $r->reason === 'tumpah' && $r->outlet_id)<label style="display:flex;gap:6px;align-items:center;font-size:12px;margin-bottom:6px"><input type="hidden" name="charge" value="0"><input type="checkbox" name="charge" value="1" checked> Bebankan ke outlet</label>@endif
+                        @if ($r->type === 'so')<div style="font-size:12px;color:var(--muted);margin-bottom:6px">Selisih kurang akan ditagihkan ke outlet.</div>@endif
+                        <button class="btn primary" type="submit">Setujui</button></form>
                     <form method="POST" action="{{ route('approvals.reject', $r) }}" style="display:inline-flex;gap:4px;margin-top:6px">@csrf<input type="text" name="note" placeholder="Alasan tolak" maxlength="200" required style="min-width:120px"><button class="btn" type="submit">Tolak</button></form>
                 </td></tr>
         @empty<tr><td colspan="6" class="empty">Tidak ada yang menunggu.</td></tr>@endforelse</tbody>

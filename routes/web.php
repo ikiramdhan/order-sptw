@@ -114,7 +114,10 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::get('/stok-outlet/waste', [OutletStockController::class, 'wasteForm'])->name('outletstock.waste');
         Route::post('/stok-outlet/waste', [OutletStockController::class, 'wasteStore'])->name('outletstock.waste.store');
     });
+    Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->get('/tagihan-minusan/{charge}', [OutletStockController::class, 'chargeShow'])->name('charges.show');
     Route::middleware($ck)->group(function () {
+        Route::post('/tagihan-minusan', [OutletStockController::class, 'chargeStore'])->name('charges.store');
+        Route::post('/tagihan-minusan/{charge}/lunas', [OutletStockController::class, 'chargePaid'])->name('charges.paid');
         Route::get('/persetujuan-stok', [OutletStockController::class, 'approvals'])->name('approvals.index');
         Route::post('/persetujuan-stok/{req}/setujui', [OutletStockController::class, 'approve'])->name('approvals.approve');
         Route::post('/persetujuan-stok/{req}/tolak', [OutletStockController::class, 'reject'])->name('approvals.reject');

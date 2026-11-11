@@ -231,7 +231,7 @@ class OutletStockController extends Controller
     public function approve(Request $request, StockRequest $req): RedirectResponse
     {
         try {
-            OutletStockService::approve($req, $request->user());
+            OutletStockService::approve($req, $request->user(), $request->has('charge') ? $request->boolean('charge') : null);
         } catch (\DomainException $e) {
             return back()->withErrors(['req' => $e->getMessage()]);
         }
@@ -251,32 +251,77 @@ class OutletStockController extends Controller
         return back()->with('status', 'Pengajuan ditolak.');
     }
 
-    // ---- Rekap stok opname: selisih kurang/lebih dalam rupiah ----
+    // ---- Rekap minusan: selisih opname + waste, dalam rupiah ----
     public function recap(Request $request)
     {
-        $u = $request->user();
         $outlet = $this->outlet($request);
         $month = preg_match('/^\d{4}-\d{2}$/', (string) $request->query('bulan')) ? $request->query('bulan') : now()->format('Y-m');
         $start = \Illuminate\Support\Carbon::parse($month.'-01')->startOfMonth();
 
-        $rows = $outlet ? StockRequest::with('item.baseUnit')->where('type', 'so')->where('status', 'disetujui')->where('outlet_id', $outlet->id)->where(fn ($q) => $q->whereNull('reason')->orWhere('reason', '!=', 'awal'))
+        $rows = $outlet ? StockRequest::with('item.baseUnit')->where('status', 'disetujui')->where('outlet_id', $outlet->id)
+            ->where(fn ($q) => $q->whereNull('reason')->orWhere('reason', '!=', 'awal'))
             ->whereBetween('decided_at', [$start, $start->copy()->endOfMonth()])->orderByDesc('decided_at')->orderBy('id')->get()
             ->map(function ($r) {
-                $diff = round((float) $r->qty_base - (float) $r->qty_system, 3);
                 $price = (int) ($r->unit_price ?? round((float) $r->item->price));
-                $r->diff = $diff;
-                $r->value = (int) round($diff * $price);
+                if ($r->type === 'so') {
+                    $r->diff = round((float) $r->qty_base - (float) $r->qty_system, 3);
+                    $r->value = (int) round($r->diff * $price);          // bertanda: minus = kurang
+                    $r->bill = $r->diff < 0;
+                } else {
+                    $r->diff = -(float) $r->qty_base;
+                    $r->value = -(int) round((float) $r->qty_base * $price);
+                    $r->bill = (bool) $r->charged || ($r->charged === null && $r->reason === 'tumpah');
+                }
 
                 return $r;
             })->filter(fn ($r) => abs($r->diff) >= 0.0005)->values() : collect();
 
-        $short = (int) $rows->where('value', '<', 0)->sum('value');
-        $over = (int) $rows->where('value', '>', 0)->sum('value');
+        $billed = abs((int) $rows->where('bill', true)->sum('value'));
+        $over = (int) $rows->where('type', 'so')->where('value', '>', 0)->sum('value');
+        $notBilled = abs((int) $rows->where('type', 'waste')->where('bill', false)->sum('value'));
+        $pending = $outlet ? \App\Services\OutletChargeService::pending($outlet->id, $month) : collect();
 
         return view('outletstock.recap', [
-            'outlet' => $outlet, 'outlets' => $this->outlets($request), 'month' => $month, 'start' => $start,
+            'outlet' => $outlet, 'outlets' => $this->outlets($request), 'month' => $month,
             'byDay' => $rows->groupBy(fn ($r) => $r->decided_at->toDateString()),
-            'short' => abs($short), 'over' => $over, 'net' => abs($short) - $over,
+            'billed' => $billed, 'over' => $over, 'notBilled' => $notBilled,
+            'pendingTotal' => (int) $pending->sum(fn ($r) => \App\Services\OutletChargeService::valueOf($r)), 'pendingCount' => $pending->count(),
+            'charges' => $outlet ? \App\Models\OutletCharge::where('outlet_id', $outlet->id)->latest('id')->limit(10)->get() : collect(),
         ]);
+    }
+
+    // ---- Tagihan minusan ----
+    public function chargeStore(Request $request): RedirectResponse
+    {
+        $request->validate(['outlet' => ['required', 'integer', 'exists:outlets,id'], 'bulan' => ['required', 'regex:/^\d{4}-\d{2}$/']]);
+        try {
+            $charge = \App\Services\OutletChargeService::create((int) $request->input('outlet'), $request->input('bulan'), $request->user());
+        } catch (\DomainException $e) {
+            return back()->withErrors(['charge' => $e->getMessage()]);
+        }
+
+        return redirect()->route('charges.show', $charge)->with('status', "Tagihan {$charge->number} dibuat.");
+    }
+
+    public function chargeShow(Request $request, \App\Models\OutletCharge $charge)
+    {
+        $u = $request->user();
+        if ($u->role === 'outlet' && (int) $charge->outlet_id !== (int) $u->outlet_id) {
+            abort(404);
+        }
+        $charge->load(['outlet', 'items.item.baseUnit']);
+
+        return view('outletstock.charge', ['charge' => $charge]);
+    }
+
+    public function chargePaid(Request $request, \App\Models\OutletCharge $charge): RedirectResponse
+    {
+        try {
+            \App\Services\OutletChargeService::markPaid($charge, $request->user());
+        } catch (\DomainException $e) {
+            return back()->withErrors(['charge' => $e->getMessage()]);
+        }
+
+        return back()->with('status', 'Ditandai lunas.');
     }
 }

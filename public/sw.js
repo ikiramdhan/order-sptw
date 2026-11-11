@@ -1,6 +1,6 @@
 // Service worker minimal: aplikasi bisa dipasang (PWA) tapi TIDAK ada transaksi offline.
 // Saat tanpa koneksi, tampilkan halaman "tidak ada koneksi" (stok dan harga harus terbaru).
-const CACHE = 'ck-shell-v23';
+const CACHE = 'ck-shell-v24';
 const SHELL = ['/offline.html', '/css/app.css', '/icons/logo.png'];
 
 self.addEventListener('install', (event) => {
