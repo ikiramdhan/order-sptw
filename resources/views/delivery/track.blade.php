@@ -17,31 +17,35 @@
 <button class="tk-round tk-locate" id="recenter" type="button" aria-label="Pusatkan peta"><x-icon name="search" :size="20" /></button>
 
 <div class="tk-top">
-    <div class="tk-rt"><i class="tk-a"></i><span id="tkfrom">Kurir · {{ $note->courier?->name }}</span></div>
-    <div class="tk-rt"><i class="tk-b"></i><span>{{ $note->outlet->name }}@if ($note->outlet->address) <small>· {{ $note->outlet->address }}</small>@endif</span></div>
+    <div class="tk-route"><i class="tk-rline"></i>
+        <div class="tk-rt"><i class="tk-a"></i><div><small>Posisi kurir</small><b>{{ $note->courier?->name }}</b></div></div>
+        <div class="tk-rt"><i class="tk-b"></i><div><small>Tujuan</small><b>{{ $note->outlet->name }}</b>@if ($note->outlet->address)<em>{{ $note->outlet->address }}</em>@endif</div></div>
+    </div>
 </div>
 
 @if ($note->outlet->lat === null)
 <div class="tk-setloc"><b>Estimasi belum tersedia</b><small>Titik lokasi {{ $note->outlet->name }} belum diatur oleh admin.</small>@unless ($isOutlet)<a class="btn primary" href="{{ route('delivery.show', $note) }}#locform">Atur sekarang</a>@endunless</div>
 @endif
+
 <div class="tk-sheet">
-    <div class="tk-banner" id="tkbanner">
-        <span class="tk-bico"><x-icon name="truck" :size="22" /></span>
-        <span id="tkmsg">Menunggu kurir berangkat</span>
-        <b class="tk-pill" id="tkpill" hidden></b>
+    <div class="tk-eta" id="tkbanner">
+        <div class="tk-etatop"><span class="tk-live"><i></i>LIVE</span><span id="tkmsg">Menunggu kurir berangkat</span></div>
+        <div class="tk-etabig"><b id="tkbig">–</b><small id="tkunit"></small><span class="tk-arr" id="tkarr"></span></div>
+        <div class="tk-prog"><i id="tkfill"></i><span id="tkbike">@include('partials.motor')</span><em class="tk-flag"></em></div>
     </div>
     <div class="tk-card">
         <i class="tk-handle"></i>
         <div class="tk-row">
-            <div>
-                <b class="tk-num">{{ $note->number }}</b>
-                <div class="tk-sub">{{ $note->courier?->name }} <span class="tk-tag">Motor</span></div>
-            </div>
             <div class="tk-avatar">{{ $initials }}</div>
+            <div class="tk-who"><b>{{ $note->courier?->name }}</b><div class="tk-sub"><span class="tk-tag">Motor roda tiga</span><span>{{ $note->number }}</span></div></div>
         </div>
-        <div class="tk-meta"><span>{{ $note->items->count() }} barang · {{ $note->outlet->name }}</span><span id="tkago"></span></div>
+        <div class="tk-stats">
+            <div><small>Jarak</small><b id="tkdist">–</b></div>
+            <div><small>Tiba sekitar</small><b id="tkat">–</b></div>
+            <div><small>Barang</small><b>{{ $note->items->count() }}</b></div>
+        </div>
         <div class="tk-actions">
-            <button type="button" class="btn primary" id="openchat"><x-icon name="bell" :size="18" /> Chat kurir <i class="tk-dot" id="chatdot" hidden></i></button>
+            <button type="button" class="btn primary" id="openchat"><x-icon name="bell" :size="18" /> Chat kurir</button>
             <a class="btn outline" href="{{ route('delivery.show', $note) }}">Detail</a>
         </div>
     </div>
@@ -60,48 +64,59 @@
   var map = L.map(el, { zoomControl: false, attributionControl: true }).setView(hasB ? [olat, olng] : [-6.2, 106.65], 15);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
   var tpl = document.getElementById('motortpl').innerHTML;
-  function kicon(flip) { return L.divIcon({ className: 'kbike' + (flip ? ' flip' : ''), html: tpl, iconSize: [64, 42], iconAnchor: [32, 30] }); }
-  var bicon = L.divIcon({ className: '', html: '<div class="tk-pin"><i></i></div>', iconSize: [34, 34], iconAnchor: [17, 17] });
-  var kmark = null, bmark = hasB ? L.marker([olat, olng], { icon: bicon }).addTo(map) : null, casing = null, line = null, first = true, prev = null, flip = false;
-  var msg = document.getElementById('tkmsg'), pill = document.getElementById('tkpill'), ago = document.getElementById('tkago'), banner = document.getElementById('tkbanner');
+  function kicon(flip) { return L.divIcon({ className: 'kbike' + (flip ? ' flip' : ''), html: '<div class="khalo"></div>' + tpl, iconSize: [72, 48], iconAnchor: [36, 34] }); }
+  var bicon = L.divIcon({ className: '', html: '<div class="tk-drop"><i></i></div>', iconSize: [38, 48], iconAnchor: [19, 46] });
+  var kmark = null, bmark = hasB ? L.marker([olat, olng], { icon: bicon }).addTo(map) : null, casing = null, line = null, flow = null, first = true, prev = null, flip = false;
+  var $ = function (id) { return document.getElementById(id); };
+  var msg = $('tkmsg'), big = $('tkbig'), unit = $('tkunit'), arr = $('tkarr'), fill = $('tkfill'), bike = $('tkbike'), dist = $('tkdist'), at = $('tkat'), panel = $('tkbanner');
 
-  function fmt(s) { var m = Math.max(1, Math.round(s / 60)); return m < 60 ? m + ' mnt' : Math.floor(m / 60) + ' j ' + (m % 60) + ' mnt'; }
+  function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km'; }
+  function clock(sec) { var d = new Date(Date.now() + sec * 1000); return ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
+  function progress(p) { var v = Math.max(0, Math.min(1, p || 0)) * 100; fill.style.width = v + '%'; bike.style.left = Math.max(6, Math.min(94, v)) + '%'; }
   function fit() {
-    if (kmark && bmark) map.fitBounds(L.latLngBounds([kmark.getLatLng(), bmark.getLatLng()]), { paddingTopLeft: [40, 150], paddingBottomRight: [40, 300] });
+    if (kmark && bmark) map.fitBounds(L.latLngBounds([kmark.getLatLng(), bmark.getLatLng()]), { paddingTopLeft: [40, 170], paddingBottomRight: [40, 380] });
     else if (kmark) map.setView(kmark.getLatLng(), 16);
   }
-  document.getElementById('recenter').addEventListener('click', fit);
+  $('recenter').addEventListener('click', fit);
 
   function poll() {
     fetch(el.dataset.url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } }).then(function (r) { return r.json(); }).then(function (d) {
       if (d.status === 'sampai' || d.delivered) {
-        banner.classList.add('done'); msg.textContent = 'Kurir sudah sampai'; pill.hidden = false; pill.textContent = '✓';
-        ago.textContent = ''; return;
+        panel.classList.add('done'); msg.textContent = 'Kurir sudah sampai'; big.textContent = '✓'; unit.textContent = ''; arr.textContent = ''; dist.textContent = '0 m'; at.textContent = 'Sampai'; progress(1); return;
       }
-      if (d.status !== 'diantar') { msg.textContent = 'Menunggu kurir berangkat'; pill.hidden = true; return; }
-      if (d.lat == null) { msg.textContent = 'Mencari posisi kurir…'; pill.hidden = true; return; }
+      if (d.status !== 'diantar') { msg.textContent = 'Menunggu kurir berangkat'; return; }
+      if (d.lat == null) { msg.textContent = 'Mencari posisi kurir…'; return; }
       var ll = [d.lat, d.lng];
       if (prev && Math.abs(ll[1] - prev[1]) > 0.00005) flip = ll[1] < prev[1];
       prev = ll;
       if (!kmark) kmark = L.marker(ll, { icon: kicon(flip), zIndexOffset: 800 }).addTo(map); else { kmark.setLatLng(ll); kmark.setIcon(kicon(flip)); }
       var pts = (d.route && d.route.length > 1) ? d.route : (bmark ? [ll, [olat, olng]] : null);
       if (pts) {
-        if (casing) { casing.setLatLngs(pts); line.setLatLngs(pts); }
-        else { casing = L.polyline(pts, { color: '#fff', weight: 10, opacity: .95, lineCap: 'round' }).addTo(map); line = L.polyline(pts, { color: '#1E9E4A', weight: 5, lineCap: 'round', dashArray: d.route && d.route.length > 1 ? null : '2 10' }).addTo(map); }
+        if (casing) { casing.setLatLngs(pts); line.setLatLngs(pts); flow.setLatLngs(pts); }
+        else {
+          casing = L.polyline(pts, { color: '#fff', weight: 12, opacity: .96, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+          line = L.polyline(pts, { color: '#D43C14', weight: 7, lineCap: 'round', lineJoin: 'round' }).addTo(map);
+          flow = L.polyline(pts, { color: '#fff', weight: 2.5, opacity: .9, className: 'tk-flow', lineCap: 'round' }).addTo(map);
+        }
       }
       if (first) { fit(); first = false; } else if (!map.getBounds().pad(-0.12).contains(ll)) { map.panTo(ll); }
       if (d.eta_s != null) {
-        if (d.dist_m < 80) { msg.textContent = 'Kurir sudah di depan'; pill.hidden = true; }
-        else { msg.textContent = 'Kurir akan sampai dalam'; pill.hidden = false; pill.textContent = fmt(d.eta_s); }
-      } else { msg.textContent = 'Kurir sedang dalam perjalanan'; pill.hidden = true; }
-      ago.textContent = d.ago || '';
+        progress(d.progress); dist.textContent = fmtDist(d.dist_m); at.textContent = clock(d.eta_s);
+        if (d.dist_m < 80) { msg.textContent = 'Kurir sudah di depan'; big.textContent = 'Tiba'; unit.textContent = ''; arr.textContent = ''; }
+        else {
+          var m = Math.max(1, Math.round(d.eta_s / 60));
+          msg.textContent = 'Kurir sedang dalam perjalanan';
+          if (m < 60) { big.textContent = m; unit.textContent = 'menit'; } else { big.textContent = Math.floor(m / 60) + ':' + ('0' + (m % 60)).slice(-2); unit.textContent = 'jam'; }
+          arr.textContent = 'Tiba ± ' + clock(d.eta_s);
+        }
+      } else { msg.textContent = 'Kurir sedang dalam perjalanan'; }
     }).catch(function () {});
   }
   poll(); setInterval(poll, 5000);
 
-  var chat = document.getElementById('tkchat');
-  document.getElementById('openchat').addEventListener('click', function () { chat.hidden = false; document.getElementById('chatdot').hidden = true; var l = document.getElementById('chatlog'); if (l) l.scrollTop = l.scrollHeight; });
-  document.getElementById('closechat').addEventListener('click', function () { chat.hidden = true; });
+  var chat = $('tkchat');
+  $('openchat').addEventListener('click', function () { chat.hidden = false; var l = $('chatlog'); if (l) l.scrollTop = l.scrollHeight; });
+  $('closechat').addEventListener('click', function () { chat.hidden = true; });
 })();
 </script>
 </body>

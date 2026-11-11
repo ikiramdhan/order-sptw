@@ -150,7 +150,7 @@ class CourierTest extends TestCase
 
     public function test_track_page_for_outlet_admin_and_blocked_for_others(): void
     {
-        $this->actingAs($this->outletUser)->get(route('delivery.track', $this->note))->assertOk()->assertSee('tk-banner')->assertSee($this->note->number);
+        $this->actingAs($this->outletUser)->get(route('delivery.track', $this->note))->assertOk()->assertSee('tkbanner')->assertSee($this->note->number);
         $this->actingAs($this->admin)->get(route('delivery.track', $this->note))->assertOk();
         $this->actingAs($this->otherOutletUser)->get(route('delivery.track', $this->note))->assertNotFound();
         $this->actingAs($this->outletUser)->get(route('delivery.show', $this->note))->assertOk()->assertDontSee('livemap"></div>');

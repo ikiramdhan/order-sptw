@@ -777,41 +777,64 @@ html.is-app .web-only{display:none}
 .chatform input{min-height:46px;padding:0 14px;border-radius:23px;border:1px solid var(--line);background:var(--field);font-size:16px}
 @media (prefers-reduced-motion:reduce){.motor .wheel,.motor .bike,.motor .speed path,.motorhero .road{animation:none}}
 
-/* v30: layar pelacakan penuh (gaya ojek online) */
+/* v31: layar pelacakan (warna merek: merah-oranye + arang) */
+@keyframes tkflow{to{stroke-dashoffset:-28}}
+@keyframes tkhalo{0%{transform:scale(.4);opacity:.55}100%{transform:scale(1.5);opacity:0}}
+@keyframes tklive{0%,100%{opacity:1}50%{opacity:.35}}
 body.trackpage{margin:0;overflow:hidden;background:#E9E7E2;height:100dvh;padding:0}
 #gmap{position:fixed;inset:0;z-index:0}
 .trackpage .leaflet-control-attribution{font-size:9px;margin-bottom:0}
-.tk-round{position:fixed;z-index:500;width:46px;height:46px;border-radius:50%;background:#fff;border:0;box-shadow:0 2px 10px rgba(0,0,0,.25);display:grid;place-items:center;color:#1C1B19;cursor:pointer;text-decoration:none}
+.trackpage .leaflet-tile-pane{filter:grayscale(.5) saturate(.85) brightness(1.05) contrast(.94)}
+.tk-flow{stroke-dasharray:2 12;animation:tkflow 1s linear infinite}
+.tk-round{position:fixed;z-index:500;width:46px;height:46px;border-radius:50%;background:#fff;border:0;box-shadow:0 3px 14px rgba(28,27,25,.28);display:grid;place-items:center;color:#1C1B19;cursor:pointer;text-decoration:none}
 .tk-back{left:14px;top:calc(14px + env(safe-area-inset-top))}
-.tk-top{position:fixed;z-index:500;left:70px;right:14px;top:calc(14px + env(safe-area-inset-top));background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,.22);padding:6px 14px}
-.tk-rt{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:14px;font-weight:700;min-width:0}
-.tk-rt+.tk-rt{border-top:1px solid #ECEAE5}
-.tk-rt span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tk-rt small{color:#8A857C;font-weight:500}
-.tk-a,.tk-b{flex:none;width:16px;height:16px;border-radius:50%;display:block}
-.tk-a{background:#1E9E4A;box-shadow:0 0 0 4px rgba(30,158,74,.2)}
-.tk-b{background:#F26B1D;box-shadow:0 0 0 4px rgba(242,107,29,.2)}
-.tk-locate{right:14px;bottom:calc(330px + env(safe-area-inset-bottom))}
-.tk-sheet{position:fixed;z-index:500;left:0;right:0;bottom:0;padding-bottom:env(safe-area-inset-bottom);background:#fff;border-radius:0}
-.tk-banner{display:flex;align-items:center;gap:12px;padding:14px 18px 22px;background:#1E9E4A;color:#fff;font-weight:800;font-size:15px;border-radius:26px 26px 0 0;margin-bottom:-14px;position:relative}
-.tk-banner.done{background:#157A38}
-.tk-bico{width:38px;height:38px;border-radius:50%;background:#FFD23F;color:#1C1B19;display:grid;place-items:center;flex:none}
-.tk-pill{margin-left:auto;background:rgba(255,255,255,.25);padding:5px 12px;border-radius:999px;font-size:14px;white-space:nowrap}
-.tk-card{position:relative;background:#fff;border-radius:26px 26px 0 0;padding:10px 18px 18px;box-shadow:0 -4px 14px rgba(0,0,0,.08)}
-.tk-handle{display:block;width:44px;height:5px;border-radius:3px;background:#D7D4CC;margin:0 auto 14px}
-.tk-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
-.tk-num{font-size:20px;font-weight:800;letter-spacing:-.3px}
-.tk-sub{margin-top:4px;color:#4A463F;font-size:14px;display:flex;align-items:center;gap:8px}
-.tk-tag{background:#E3F4E8;color:#157A38;font-weight:800;font-size:12px;padding:2px 10px;border-radius:999px}
-.tk-avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#D43C14,#F2994A);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center;flex:none;box-shadow:0 0 0 3px #fff,0 0 0 5px #E3F4E8}
-.tk-meta{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:1px dashed #DDD9D0;font-size:13px;color:#6A655C}
+.tk-locate{right:14px;bottom:calc(400px + env(safe-area-inset-bottom))}
+.tk-top{position:fixed;z-index:500;left:70px;right:14px;top:calc(14px + env(safe-area-inset-top))}
+.tk-route{position:relative;background:rgba(255,255,255,.97);border-radius:20px;box-shadow:0 4px 18px rgba(28,27,25,.25);padding:8px 16px}
+.tk-rline{position:absolute;left:23px;top:30px;bottom:32px;width:0;border-left:2px dotted #C9C5BB}
+.tk-rt{display:flex;align-items:center;gap:14px;padding:7px 0;min-width:0;position:relative}
+.tk-rt div{min-width:0}.tk-rt small{display:block;font-size:11px;color:#8A857C;font-weight:600;letter-spacing:.2px}
+.tk-rt b{display:block;font-size:14.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk-rt em{display:block;font-style:normal;font-size:12px;color:#8A857C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tk-a,.tk-b{flex:none;width:16px;height:16px;border-radius:50%;display:block;position:relative;z-index:1}
+.tk-a{background:#1C1B19;box-shadow:0 0 0 4px rgba(28,27,25,.14)}
+.tk-b{background:#D43C14;box-shadow:0 0 0 4px rgba(212,60,20,.2)}
+.tk-sheet{position:fixed;z-index:500;left:0;right:0;bottom:0;padding-bottom:env(safe-area-inset-bottom);background:#fff}
+.tk-eta{position:relative;margin-bottom:-22px;padding:16px 20px 36px;border-radius:30px 30px 0 0;color:#fff;background:linear-gradient(135deg,#2A1F1A 0%,#1C1B19 55%,#3A1B10 100%);overflow:hidden}
+.tk-eta::before{content:"";position:absolute;right:-60px;top:-70px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(212,60,20,.55),transparent 68%)}
+.tk-etatop{position:relative;display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:700;color:#E9E4DB}
+.tk-live{display:inline-flex;align-items:center;gap:6px;background:#D43C14;color:#fff;font-size:11px;font-weight:800;letter-spacing:1px;padding:3px 10px 3px 8px;border-radius:999px}
+.tk-live i{width:7px;height:7px;border-radius:50%;background:#fff;animation:tklive 1.2s infinite}
+.tk-etabig{position:relative;display:flex;align-items:baseline;gap:8px;margin:8px 0 14px}
+.tk-etabig b{font-size:46px;line-height:1;font-weight:800;letter-spacing:-1.5px}
+.tk-etabig small{font-size:16px;font-weight:700;color:#E9E4DB}
+.tk-arr{margin-left:auto;font-size:13px;color:#F2B49E;font-weight:700}
+.tk-prog{position:relative;height:6px;border-radius:6px;background:rgba(255,255,255,.18);margin-top:18px}
+.tk-prog>i{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:6px;background:linear-gradient(90deg,#F2994A,#D43C14);transition:width 1.2s ease}
+.tk-prog>span{position:absolute;left:6%;top:-30px;width:46px;height:30px;transform:translateX(-50%);transition:left 1.2s ease}
+.tk-prog .motor{width:46px;height:30px}
+.tk-flag{position:absolute;right:-4px;top:-5px;width:16px;height:16px;border-radius:50%;background:#fff;border:4px solid #D43C14}
+.tk-eta.done .tk-live{background:#fff;color:#1C1B19}
+.tk-card{position:relative;background:#fff;border-radius:28px 28px 0 0;padding:10px 18px 18px;box-shadow:0 -6px 18px rgba(28,27,25,.1)}
+.tk-handle{display:block;width:44px;height:5px;border-radius:3px;background:#DDD9D0;margin:0 auto 14px}
+.tk-row{display:flex;align-items:center;gap:14px}
+.tk-avatar{width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#D43C14,#F2994A);color:#fff;font-weight:800;font-size:19px;display:grid;place-items:center;flex:none;box-shadow:0 0 0 3px #fff,0 0 0 5px #F6D3C6}
+.tk-who{min-width:0}.tk-who>b{font-size:18px;font-weight:800;display:block}
+.tk-sub{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12.5px;color:#6A655C;font-weight:600;flex-wrap:wrap}
+.tk-tag{background:#FBE6DD;color:#B52F0C;font-weight:800;font-size:11.5px;padding:3px 10px;border-radius:999px}
+.tk-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.tk-stats div{background:#F6F4F0;border-radius:16px;padding:10px 12px}
+.tk-stats small{display:block;font-size:11px;color:#8A857C;font-weight:700}
+.tk-stats b{font-size:16px;font-weight:800;letter-spacing:-.3px}
 .tk-actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px}
-.tk-actions .btn{position:relative;min-height:48px}
-.tk-dot{position:absolute;top:8px;right:14px;width:10px;height:10px;border-radius:50%;background:#FFD23F}
+.tk-actions .btn{min-height:50px}
 .kbike{background:none;border:0}
-.kbike .motor{width:64px;height:42px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+.kbike .motor{position:absolute;left:4px;top:0;width:64px;height:42px;filter:drop-shadow(0 4px 5px rgba(0,0,0,.35))}
 .kbike.flip .motor{transform:scaleX(-1)}
-.tk-pin{width:34px;height:34px;border-radius:50%;background:rgba(242,107,29,.25);display:grid;place-items:center}
-.tk-pin i{width:18px;height:18px;border-radius:50%;background:#F26B1D;border:4px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.khalo{position:absolute;left:12px;top:14px;width:48px;height:48px;border-radius:50%;background:rgba(212,60,20,.35);animation:tkhalo 1.8s ease-out infinite}
+.tk-drop{position:relative;width:38px;height:48px}
+.tk-drop::before{content:"";position:absolute;left:4px;top:0;width:30px;height:30px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:#D43C14;box-shadow:0 3px 8px rgba(0,0,0,.4)}
+.tk-drop i{position:absolute;left:12px;top:8px;width:14px;height:14px;border-radius:50%;background:#fff}
 .tk-chat{position:fixed;inset:0;z-index:900;background:#F4F4F2;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));overflow:auto;animation:sheetup .25s both}
 .tk-chat[hidden]{display:none}
 .tk-chathead{display:flex;justify-content:space-between;align-items:center;padding:6px 2px 10px}
@@ -819,7 +842,6 @@ body.trackpage{margin:0;overflow:hidden;background:#E9E7E2;height:100dvh;padding
 .tk-chat .chat{margin-top:0!important;flex:1;display:flex;flex-direction:column}
 .tk-chat .chatlog{flex:1;max-height:none}
 .tk-chat .chat .sect{display:none}
+@media (prefers-reduced-motion:reduce){.tk-flow,.khalo,.tk-live i{animation:none}}
 .tk-setloc{position:fixed;z-index:450;left:14px;right:14px;top:calc(130px + env(safe-area-inset-top));background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.22);display:grid;gap:6px}
 .tk-setloc small{color:#6A655C}.tk-setloc .btn{min-height:44px;margin-top:4px}
-/* peta lebih lembut seperti ojek online (tile OSM diredam warnanya) */
-.trackpage .leaflet-tile-pane{filter:grayscale(.55) saturate(.8) brightness(1.06) contrast(.92)}
