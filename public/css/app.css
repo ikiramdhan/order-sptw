@@ -654,3 +654,14 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .prod input[type=number]{width:100%;min-width:0;text-align:center;padding:0 6px}
 .prod .btn.sm{min-height:44px;padding:0 18px}
 @media (min-width:861px){.prod{grid-template-columns:minmax(0,1fr) auto;align-items:center}.prod form{width:auto;grid-template-columns:200px 84px auto}}
+
+/* v23: detail surat jalan */
+.backlink{display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 14px 0 10px;margin:2px 0 6px;border-radius:20px;background:var(--bg-2);color:var(--ink);font-weight:700;font-size:13px;text-decoration:none}
+.actgrid2{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 14px}
+.actgrid2 .btn{flex:1 1 140px;min-height:46px}
+.recvlist .recv{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:12px 0;border-bottom:1px solid var(--bg-2)}
+.recvlist .recv:last-child{border-bottom:0}
+.recv .who b{display:block;font-size:14px}.recv .who small{color:var(--muted);font-size:12px}
+.recv .inp{display:flex;align-items:center;gap:8px}
+.recv .inp input{width:84px;min-height:44px;text-align:center}
+.recv .inp span{color:var(--muted);font-size:13px}
