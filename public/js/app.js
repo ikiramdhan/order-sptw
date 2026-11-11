@@ -330,3 +330,28 @@ document.addEventListener('focusin', function (e) {
   var i = e.target; if (!i.matches || !i.matches('input[type=number]')) return;
   setTimeout(function () { try { i.select(); } catch (_) {} }, 0);
 });
+
+/* Animasi angka naik (dashboard): elemen [data-count] menghitung dari 0 ke nilainya */
+(function () {
+  function run() {
+    var els = document.querySelectorAll('[data-count]'); if (!els.length) return;
+    if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    Array.prototype.forEach.call(els, function (el, idx) {
+      var txt = el.textContent, m = /\d[\d.]*(?:,\d+)?/.exec(txt); if (!m) return;
+      var raw = m[0], dec = /,(\d+)$/.exec(raw), digits = dec ? dec[1].length : 0;
+      var val = parseFloat(raw.replace(/\./g, '').replace(',', '.')); if (!isFinite(val) || val === 0) return;
+      var pre = txt.slice(0, m.index), post = txt.slice(m.index + raw.length);
+      var fmt = new Intl.NumberFormat('id-ID', { minimumFractionDigits: digits, maximumFractionDigits: digits });
+      var dur = 900, delay = 120 + idx * 60, start = null;
+      el.textContent = pre + fmt.format(0) + post;
+      function tick(t) {
+        if (start === null) start = t;
+        var k = Math.min(1, Math.max(0, (t - start) / dur)), e = 1 - Math.pow(1 - k, 3);
+        el.textContent = pre + fmt.format(val * e) + post;
+        if (k < 1) requestAnimationFrame(tick); else el.textContent = txt;
+      }
+      setTimeout(function () { requestAnimationFrame(tick); }, delay);
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
+})();

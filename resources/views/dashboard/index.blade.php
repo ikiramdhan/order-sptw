@@ -7,22 +7,22 @@
 </header>
 <div class="bento">
     <section class="tile hero w2 h2" aria-label="Sorotan">
-        <div><small>Penjualan bulan ini</small><div class="big">{{ Fmt::rp($sales) }}</div></div>
-        <div><small>Uang masuk bulan ini</small><div class="mid">{{ Fmt::rp($collected) }}</div></div>
+        <div><small>Penjualan bulan ini</small><div class="big" data-count>{{ Fmt::rp($sales) }}</div></div>
+        <div><small>Uang masuk bulan ini</small><div class="mid" data-count>{{ Fmt::rp($collected) }}</div></div>
     </section>
-    <div class="tile"><small>Piutang outlet</small><b>{{ Fmt::rp($receivable) }}</b></div>
-    <div class="tile warn"><small>Piutang lewat tempo</small><b>{{ Fmt::rp($receivableOverdue) }}</b></div>
-    <div class="tile w2"><small>Hutang supplier</small><b>{{ Fmt::rp($payable) }}</b></div>
-    <a class="tile link" href="{{ route('orders.index') }}"><small>PO menunggu</small><b>{{ $poWaiting }}</b></a>
-    <a class="tile link" href="{{ route('orders.index', ['status' => 'menunggu_backorder']) }}"><small>Backorder</small><b>{{ $backorder }}</b></a>
-    <a class="tile link" href="{{ route('returns.index', ['status' => 'diajukan']) }}"><small>Retur menunggu</small><b>{{ $returnsWaiting }}</b></a>
-    <a class="tile link" href="{{ route('stock.index', ['menipis' => 1]) }}"><small>Stok menipis</small><b>{{ $lowStock->count() }}</b></a>
+    <div class="tile"><small>Piutang outlet</small><b data-count>{{ Fmt::rp($receivable) }}</b></div>
+    <div class="tile warn"><small>Piutang lewat tempo</small><b data-count>{{ Fmt::rp($receivableOverdue) }}</b></div>
+    <div class="tile w2"><small>Hutang supplier</small><b data-count>{{ Fmt::rp($payable) }}</b></div>
+    <a class="tile link" href="{{ route('orders.index') }}"><small>PO menunggu</small><b data-count>{{ $poWaiting }}</b></a>
+    <a class="tile link" href="{{ route('orders.index', ['status' => 'menunggu_backorder']) }}"><small>Backorder</small><b data-count>{{ $backorder }}</b></a>
+    <a class="tile link" href="{{ route('returns.index', ['status' => 'diajukan']) }}"><small>Retur menunggu</small><b data-count>{{ $returnsWaiting }}</b></a>
+    <a class="tile link" href="{{ route('stock.index', ['menipis' => 1]) }}"><small>Stok menipis</small><b data-count>{{ $lowStock->count() }}</b></a>
 </div>
 <div class="two-col">
 <div class="grow stack">
     <div class="card">
         <h3 class="sect">Penjualan 6 bulan terakhir</h3>
-        <div class="bars" role="img" aria-label="Grafik penjualan 6 bulan terakhir">
+        <div class="bars grow" role="img" aria-label="Grafik penjualan 6 bulan terakhir">
             @foreach ($bars as $b)
                 <div class="bar {{ $loop->last ? 'now' : '' }}"><b>{{ $b['value'] > 0 ? number_format($b['value'] / 1000000, 1, ',', '.').' jt' : '-' }}</b><i style="height:{{ max(2, round($b['value'] / $maxBar * 100)) }}%"></i>{{ $b['label'] }}</div>
             @endforeach
