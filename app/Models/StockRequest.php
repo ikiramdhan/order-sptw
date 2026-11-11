@@ -9,7 +9,7 @@ class StockRequest extends Model
 {
     public const REASONS = ['rusak' => 'Rusak', 'kadaluarsa' => 'Kadaluarsa', 'tumpah' => 'Tumpah / salah olah', 'lainnya' => 'Lainnya'];
 
-    protected $fillable = ['type', 'outlet_id', 'item_id', 'qty_base', 'qty_system', 'reason', 'notes', 'status', 'created_by', 'decided_by', 'decided_at', 'decision_note'];
+    protected $fillable = ['type', 'outlet_id', 'item_id', 'qty_base', 'qty_system', 'unit_price', 'reason', 'notes', 'status', 'created_by', 'decided_by', 'decided_at', 'decision_note'];
 
     protected function casts(): array
     {

@@ -104,6 +104,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
 
     // Stok outlet: pantau (Admin CK, Gudang, Outlet); input penjualan/SO/waste (Outlet atau Admin CK)
     Route::middleware($semua)->get('/stok-outlet', [OutletStockController::class, 'index'])->name('outletstock.index');
+    Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->get('/stok-outlet/rekap-opname', [OutletStockController::class, 'recap'])->name('outletstock.recap');
     Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->group(function () {
         Route::get('/stok-outlet/penjualan', [OutletStockController::class, 'salesForm'])->name('outletstock.sales');
         Route::get('/stok-outlet/penjualan/contoh', [OutletStockController::class, 'salesTemplate'])->name('outletstock.sales.template');

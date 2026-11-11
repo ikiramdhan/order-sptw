@@ -174,7 +174,7 @@ class OutletStockController extends Controller
                 if ($v === null || $v === '') {
                     continue;
                 }
-                if (OutletStockService::submitCount($request->user(), $o->id, (int) $itemId, (float) $v, $request->input('notes'))) {
+                if (OutletStockService::submitCount($request->user(), $o->id, (int) $itemId, (float) $v, $request->input('notes'), $request->boolean('initial'))) {
                     $n++;
                 }
             }
@@ -249,5 +249,34 @@ class OutletStockController extends Controller
         }
 
         return back()->with('status', 'Pengajuan ditolak.');
+    }
+
+    // ---- Rekap stok opname: selisih kurang/lebih dalam rupiah ----
+    public function recap(Request $request)
+    {
+        $u = $request->user();
+        $outlet = $this->outlet($request);
+        $month = preg_match('/^\d{4}-\d{2}$/', (string) $request->query('bulan')) ? $request->query('bulan') : now()->format('Y-m');
+        $start = \Illuminate\Support\Carbon::parse($month.'-01')->startOfMonth();
+
+        $rows = $outlet ? StockRequest::with('item.baseUnit')->where('type', 'so')->where('status', 'disetujui')->where('outlet_id', $outlet->id)->where(fn ($q) => $q->whereNull('reason')->orWhere('reason', '!=', 'awal'))
+            ->whereBetween('decided_at', [$start, $start->copy()->endOfMonth()])->orderByDesc('decided_at')->orderBy('id')->get()
+            ->map(function ($r) {
+                $diff = round((float) $r->qty_base - (float) $r->qty_system, 3);
+                $price = (int) ($r->unit_price ?? round((float) $r->item->price));
+                $r->diff = $diff;
+                $r->value = (int) round($diff * $price);
+
+                return $r;
+            })->filter(fn ($r) => abs($r->diff) >= 0.0005)->values() : collect();
+
+        $short = (int) $rows->where('value', '<', 0)->sum('value');
+        $over = (int) $rows->where('value', '>', 0)->sum('value');
+
+        return view('outletstock.recap', [
+            'outlet' => $outlet, 'outlets' => $this->outlets($request), 'month' => $month, 'start' => $start,
+            'byDay' => $rows->groupBy(fn ($r) => $r->decided_at->toDateString()),
+            'short' => abs($short), 'over' => $over, 'net' => abs($short) - $over,
+        ]);
     }
 }

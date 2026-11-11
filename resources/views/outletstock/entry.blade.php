@@ -28,6 +28,7 @@
             @endif
             <label class="field">Catatan <span class="hint">(opsional)</span><input type="text" name="notes" value="{{ old('notes') }}" maxlength="200"></label>
         </div>
+        @if ($isSo)<label style="display:flex;gap:8px;align-items:center;margin-bottom:10px"><input type="checkbox" name="initial" value="1" @checked(old('initial'))> Ini stok awal (bukan selisih), jangan dihitung di rekap opname</label>@endif
         @error('qty')<div class="alert" role="alert">{{ $message }}</div>@enderror
         <div class="tbl-wrap"><table class="tbl stackable">
             <thead><tr><th>Barang</th><th class="num">Stok sistem</th><th style="min-width:130px">{{ $isSo ? 'Stok fisik' : 'Jumlah waste' }}</th></tr></thead>

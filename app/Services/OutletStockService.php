@@ -67,20 +67,20 @@ class OutletStockService
     }
 
     /** Stok opname outlet: hasil hitung fisik per barang. */
-    public static function submitCount(User $user, int $outletId, int $itemId, float $physical, ?string $notes): ?StockRequest
+    public static function submitCount(User $user, int $outletId, int $itemId, float $physical, ?string $notes, bool $initial = false): ?StockRequest
     {
         if ($physical < 0) {
             throw new \DomainException('Stok fisik tidak boleh negatif.');
         }
 
-        return DB::transaction(function () use ($user, $outletId, $itemId, $physical, $notes) {
+        return DB::transaction(function () use ($user, $outletId, $itemId, $physical, $notes, $initial) {
             $system = self::balance($outletId, $itemId);
             if (abs($physical - $system) < 0.0005) {
                 return null;
             }
             $req = StockRequest::create([
                 'type' => 'so', 'outlet_id' => $outletId, 'item_id' => $itemId, 'qty_base' => round($physical, 3), 'qty_system' => $system,
-                'notes' => $notes, 'status' => 'menunggu', 'created_by' => $user->id,
+                'reason' => $initial ? 'awal' : null, 'notes' => $notes, 'status' => 'menunggu', 'created_by' => $user->id,
             ]);
             if ($user->role !== 'outlet') {
                 self::apply($req, $user);
@@ -121,7 +121,7 @@ class OutletStockService
     private static function apply(StockRequest $req, User $user): void
     {
         $item = $req->item;
-        $label = $req->type === 'waste' ? 'Waste: '.(StockRequest::REASONS[$req->reason] ?? $req->reason).($req->notes ? ' · '.$req->notes : '') : 'Stok opname'.($req->notes ? ': '.$req->notes : '');
+        $label = $req->type === 'waste' ? 'Waste: '.(StockRequest::REASONS[$req->reason] ?? $req->reason).($req->notes ? ' · '.$req->notes : '') : ($req->reason === 'awal' ? 'Stok awal' : ($req->notes ?: 'Stok opname'));
 
         if ($req->outlet_id === null) {
             // Waste gudang CK
@@ -136,7 +136,7 @@ class OutletStockService
             }
         }
 
-        $req->update(['status' => 'disetujui', 'decided_by' => $user->id, 'decided_at' => now(), 'qty_system' => $req->qty_system]);
+        $req->update(['status' => 'disetujui', 'decided_by' => $user->id, 'decided_at' => now(), 'qty_system' => $req->qty_system, 'unit_price' => (int) round((float) $item->price)]);
         ActivityLog::record('stock_request_approved', "{$req->type} {$item->name} ".\App\Support\Fmt::qty($req->qty_base), $req, $user->id);
     }
 

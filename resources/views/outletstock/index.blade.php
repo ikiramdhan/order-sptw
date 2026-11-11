@@ -16,6 +16,7 @@
     <a class="btn primary" href="{{ route('outletstock.sales', ['outlet' => $outlet->id]) }}">Upload penjualan ESB</a>
     <a class="btn" href="{{ route('outletstock.count', ['outlet' => $outlet->id]) }}">Stok opname</a>
     <a class="btn" href="{{ route('outletstock.waste', ['outlet' => $outlet->id]) }}">Catat waste</a>
+    <a class="btn" href="{{ route('outletstock.recap', ['outlet' => $outlet->id]) }}">Rekap opname</a>
 </div>
 @endif
 @if (session('skipped') && count(session('skipped')))
@@ -43,7 +44,7 @@
         <thead><tr><th>Tanggal</th><th>Barang</th><th>Jenis</th><th class="num">Jumlah</th><th class="num">Saldo</th><th>Oleh</th></tr></thead>
         <tbody>@forelse ($history as $m)
             <tr><td>{{ \Illuminate\Support\Carbon::parse($m->occurred_on)->translatedFormat('j M') }}</td><td>{{ $m->item_name }}</td>
-                <td>{{ \App\Services\OutletStockService::LABELS[$m->type] ?? $m->type }}@if ($m->notes)<br><small style="color:var(--muted)">{{ $m->notes }}</small>@endif</td>
+                <td>{{ \App\Services\OutletStockService::LABELS[$m->type] ?? $m->type }}@if ($m->notes && $m->notes !== (\App\Services\OutletStockService::LABELS[$m->type] ?? '') && $m->notes !== 'Stok opname')<br><small style="color:var(--muted)">{{ $m->notes }}</small>@endif</td>
                 <td class="num" style="color:{{ $m->qty_base < 0 ? 'var(--bad)' : 'var(--ok)' }}">{{ $m->qty_base > 0 ? '+' : '' }}{{ Fmt::qty($m->qty_base) }}</td>
                 <td class="num">{{ Fmt::qty($m->balance_after) }}</td><td>{{ $m->user_name ?? '-' }}</td></tr>
         @empty<tr><td colspan="6" class="empty">Belum ada pergerakan.</td></tr>@endforelse</tbody>

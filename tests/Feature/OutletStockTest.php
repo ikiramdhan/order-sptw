@@ -108,4 +108,20 @@ class OutletStockTest extends TestCase
         $this->post(route('outletstock.count.store'), ['outlet' => $fresh->id, 'qty' => [$this->item->id => 30]])->assertSessionHasNoErrors();
         $this->assertEquals(30, S::balance($fresh->id, $this->item->id));
     }
+
+    public function test_opname_recap_values_shortage_and_ignores_initial_stock(): void
+    {
+        // stok awal (tidak dihitung)
+        $fresh = Outlet::create(['name' => 'Baru', 'payment_term_days' => 7, 'credit_balance' => 0, 'is_active' => true]);
+        $this->actingAs($this->admin)->post(route('outletstock.count.store'), ['outlet' => $fresh->id, 'initial' => 1, 'qty' => [$this->item->id => 30]]);
+        $this->get(route('outletstock.recap', ['outlet' => $fresh->id]))->assertOk()->assertSee('Belum ada selisih');
+
+        // opname outlet A: sistem 50, fisik 42 -> kurang 8 x Rp1.000
+        $this->post(route('outletstock.count.store'), ['outlet' => $this->outlet->id, 'qty' => [$this->item->id => 42]])->assertSessionHasNoErrors();
+        $r = StockRequest::where('outlet_id', $this->outlet->id)->where('type', 'so')->firstOrFail();
+        $this->assertEquals(1000, (int) $r->unit_price);
+
+        $this->get(route('outletstock.recap', ['outlet' => $this->outlet->id]))->assertOk()->assertSee('Rp 8.000')->assertSee('Bumbu');
+        $this->actingAs($this->ou)->get(route('outletstock.recap'))->assertOk()->assertSee('Rp 8.000');
+    }
 }
