@@ -72,7 +72,7 @@
 
   function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km'; }
   function clock(sec) { var d = new Date(Date.now() + sec * 1000); return ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
-  function progress(p) { var v = Math.max(0, Math.min(1, p || 0)) * 100; fill.style.width = v + '%'; bike.style.left = Math.max(6, Math.min(94, v)) + '%'; }
+  function progress(p) { var v = Math.max(0, Math.min(1, p || 0)) * 100; fill.style.width = v + '%'; bike.style.left = Math.max(4, Math.min(88, v)) + '%'; }
   function fit() {
     if (kmark && bmark) map.fitBounds(L.latLngBounds([kmark.getLatLng(), bmark.getLatLng()]), { paddingTopLeft: [40, 170], paddingBottomRight: [40, 380] });
     else if (kmark) map.setView(kmark.getLatLng(), 16);
