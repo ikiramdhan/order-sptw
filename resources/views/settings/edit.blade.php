@@ -64,6 +64,14 @@
         <div style="font-size:12px;color:var(--muted)">@if ($smtp['last_test'])<span style="color:var(--ok)">Email tes terakhir terkirim {{ \Illuminate\Support\Carbon::parse($smtp['last_test'])->translatedFormat('j M Y, H:i') }}</span>@else Pastikan pengaturan sudah disimpan dulu.@endif</div></div>
     <button type="submit" class="btn">Kirim email tes ke {{ auth()->user()->email }}</button>
 </form>
+@if ($locked)
+<div class="card wide" style="border:1px solid var(--ok,#2e7d32)"><h3 class="sect">Reset data latihan: dikunci</h3>
+    <p style="color:var(--muted);margin:0 0 10px">Aplikasi sudah live, jadi data tidak bisa dihapus lewat reset. Buka kunci hanya bila benar-benar perlu.</p>
+    <form method="POST" action="{{ route('settings.reset.lock') }}" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end">@csrf
+        <label class="field" style="flex:1 1 200px">Ketik <b>BUKA KUNCI</b><input type="text" name="lock_confirm" autocomplete="off" placeholder="BUKA KUNCI">@error('lock_confirm')<span class="err">{{ $message }}</span>@enderror</label>
+        <button type="submit" class="btn">Buka kunci</button>
+    </form></div>
+@else
 <form method="POST" action="{{ route('settings.reset') }}" class="card wide" style="border:1px solid var(--bad,#c0392b)" onsubmit="return confirm('Yakin hapus data? Tidak bisa dibatalkan.')">
     @csrf
     <h3 class="sect" style="color:var(--bad,#c0392b)">Reset data latihan</h3>
@@ -76,5 +84,11 @@
     </label>
     <button type="submit" class="btn" style="align-self:flex-start;background:var(--bad,#c0392b);color:#fff">Hapus data</button>
 </form>
+<form method="POST" action="{{ route('settings.reset.lock') }}" class="card wide" style="flex-direction:row;flex-wrap:wrap;align-items:flex-end;gap:12px">@csrf
+    <div style="flex:1 1 240px"><b>Aplikasi sudah live?</b><div style="font-size:12px;color:var(--muted)">Kunci fitur reset supaya data real tidak bisa terhapus tidak sengaja.</div>
+        <label class="field" style="margin-top:8px">Ketik <b>SUDAH LIVE</b><input type="text" name="lock_confirm" autocomplete="off" placeholder="SUDAH LIVE">@error('lock_confirm')<span class="err">{{ $message }}</span>@enderror</label></div>
+    <button type="submit" class="btn primary">Kunci reset</button>
+</form>
+@endif
 </div>
 @endsection

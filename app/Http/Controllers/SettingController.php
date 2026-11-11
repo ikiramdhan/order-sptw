@@ -17,6 +17,7 @@ class SettingController extends Controller
     public function edit()
     {
         return view('settings.edit', [
+            'locked' => (bool) Setting::get('reset_locked'),
             'smtp' => [
                 'host' => Setting::get('smtp_host', 'smtp.hostinger.com'),
                 'port' => Setting::get('smtp_port', '465'),
@@ -87,6 +88,10 @@ class SettingController extends Controller
     /** Hapus data latihan (transaksi, atau semuanya termasuk master barang/outlet/supplier). */
     public function reset(Request $request): RedirectResponse
     {
+        if (Setting::get('reset_locked')) {
+            return redirect()->route('settings.edit')->withErrors(['confirm' => 'Reset dikunci karena aplikasi sudah live. Buka kunci dulu bila memang perlu.']);
+        }
+
         $data = $request->validate([
             'scope' => ['required', Rule::in([\App\Services\PracticeReset::TRANSACTIONS, \App\Services\PracticeReset::ALL])],
             'confirm' => ['required', 'in:HAPUS DATA'],
@@ -101,5 +106,18 @@ class SettingController extends Controller
         return redirect()->route('settings.edit')->with('status', $data['scope'] === \App\Services\PracticeReset::ALL
             ? 'Semua data latihan dihapus (transaksi, barang, outlet, supplier).'
             : 'Semua transaksi dihapus. Barang, outlet, dan supplier tetap ada; stok kembali 0.');
+    }
+
+    /** Kunci / buka kunci fitur reset (aplikasi sudah live). */
+    public function lockReset(Request $request): RedirectResponse
+    {
+        $locked = (bool) Setting::get('reset_locked');
+        $phrase = $locked ? 'BUKA KUNCI' : 'SUDAH LIVE';
+        $request->validate(['lock_confirm' => ['required', 'in:'.$phrase]], ['lock_confirm.in' => "Ketik persis {$phrase} untuk melanjutkan.", 'lock_confirm.required' => "Ketik persis {$phrase} untuk melanjutkan."]);
+
+        Setting::put('reset_locked', $locked ? null : '1');
+        ActivityLog::record($locked ? 'reset_unlocked' : 'reset_locked', $locked ? 'Kunci reset data dibuka' : 'Reset data dikunci (aplikasi live)');
+
+        return redirect()->route('settings.edit')->with('status', $locked ? 'Kunci dibuka. Hati-hati, reset bisa menghapus data.' : 'Reset data dikunci. Data real aman dari penghapusan.');
     }
 }

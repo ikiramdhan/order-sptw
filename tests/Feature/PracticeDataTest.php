@@ -68,4 +68,24 @@ class PracticeDataTest extends TestCase
         $this->assertNull(User::find($ou->id));
         $this->assertNotNull(User::find($sa->id));
     }
+
+    public function test_reset_can_be_locked_and_unlocked_by_super_admin_only(): void
+    {
+        $this->actingAs($this->user('admin_ck'))->post(route('settings.reset.lock'), ['lock_confirm' => 'SUDAH LIVE'])->assertForbidden();
+
+        $sa = $this->user('super_admin');
+        $unit = Unit::create(['name' => 'Kg']);
+        Item::create(['name' => 'X', 'base_unit_id' => $unit->id, 'price' => 1, 'stock' => 0, 'min_stock' => 0, 'is_active' => true]);
+
+        $this->actingAs($sa)->post(route('settings.reset.lock'), ['lock_confirm' => 'salah'])->assertSessionHasErrors('lock_confirm');
+        $this->post(route('settings.reset.lock'), ['lock_confirm' => 'SUDAH LIVE'])->assertSessionHasNoErrors();
+
+        $this->post(route('settings.reset'), ['scope' => 'semua', 'confirm' => 'HAPUS DATA'])->assertSessionHasErrors('confirm');
+        $this->assertSame(1, Item::count());
+        $this->get(route('settings.edit'))->assertOk()->assertSee('dikunci');
+
+        $this->post(route('settings.reset.lock'), ['lock_confirm' => 'BUKA KUNCI'])->assertSessionHasNoErrors();
+        $this->post(route('settings.reset'), ['scope' => 'semua', 'confirm' => 'HAPUS DATA'])->assertSessionHasNoErrors();
+        $this->assertSame(0, Item::count());
+    }
 }
