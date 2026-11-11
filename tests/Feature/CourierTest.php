@@ -147,4 +147,34 @@ class CourierTest extends TestCase
         $this->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'lat' => '-6.2'])->assertSessionHasErrors('lng');
         $this->get(route('outlets.edit', $o))->assertOk()->assertSee('usegps');
     }
+
+    public function test_track_page_for_outlet_admin_and_blocked_for_others(): void
+    {
+        $this->actingAs($this->outletUser)->get(route('delivery.track', $this->note))->assertOk()->assertSee('tk-banner')->assertSee($this->note->number);
+        $this->actingAs($this->admin)->get(route('delivery.track', $this->note))->assertOk();
+        $this->actingAs($this->otherOutletUser)->get(route('delivery.track', $this->note))->assertNotFound();
+        $this->actingAs($this->outletUser)->get(route('delivery.show', $this->note))->assertOk()->assertDontSee('livemap"></div>');
+    }
+
+    public function test_outlet_sets_own_location_from_link_or_gps_and_not_others(): void
+    {
+        $o = $this->outletUser->outlet;
+        $this->actingAs($this->outletUser)->get(route('delivery.show', $this->note))->assertOk()->assertSee('Atur titik lokasi outlet');
+
+        $this->post(route('outlet.location', $o), ['link' => 'https://www.google.com/maps/place/X/@-6.2210,106.6420,17z/data=abc'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(-6.2210, $o->fresh()->lat, 0.0001);
+        $this->assertEqualsWithDelta(106.642, $o->fresh()->lng, 0.0001);
+
+        $this->post(route('outlet.location', $o), ['lat' => '-6.25', 'lng' => '106.7'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(-6.25, $o->fresh()->lat, 0.0001);
+
+        $this->post(route('outlet.location', $o), ['link' => 'bukan lokasi'])->assertSessionHasErrors('link');
+        $this->post(route('outlet.location', $o), ['link' => '-6.3, 106.8'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(106.8, $o->fresh()->lng, 0.0001);
+
+        $other = $this->otherOutletUser->outlet;
+        $this->post(route('outlet.location', $other), ['lat' => '-6.1', 'lng' => '106.1'])->assertNotFound();
+        $this->actingAs($this->admin)->post(route('outlet.location', $other), ['lat' => '-6.1', 'lng' => '106.1'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(-6.1, $other->fresh()->lat, 0.0001);
+    }
 }

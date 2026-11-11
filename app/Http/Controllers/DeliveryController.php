@@ -43,6 +43,16 @@ class DeliveryController extends Controller
         ]);
     }
 
+    /** Layar penuh pelacakan kurir (gaya ojek online). */
+    public function track(Request $request, DeliveryNote $note)
+    {
+        $this->authorizeNote($request, $note);
+        abort_unless($note->courier_id, 404);
+        $note->load(['outlet', 'courier', 'items']);
+
+        return view('delivery.track', ['note' => $note, 'isOutlet' => $request->user()->role === 'outlet']);
+    }
+
     /** Cetak: tanpa harga. */
     public function print(Request $request, DeliveryNote $note)
     {

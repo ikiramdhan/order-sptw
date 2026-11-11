@@ -12,6 +12,7 @@
 </div>
 @error('received')<div class="alert" role="alert">{{ $message }}</div>@enderror
 @php $pending = $note->status === 'dikirim'; @endphp
+@if ($note->courier_id && $note->status === 'dikirim' && ($isOutlet || auth()->user()->hasRole('admin_ck')) && $note->outlet->lat === null)@include('partials.outlet-location', ['outlet' => $note->outlet])@endif
 @if ($note->courier_id || $canAssign)
 <section class="card" style="margin-bottom:12px" id="courierbox">
     <h3 class="sect">Pengantaran</h3>
@@ -38,8 +39,9 @@
             @elseif (! $isOutlet)
                 <p style="margin:10px 0 0;color:var(--muted);font-size:13px">Estimasi waktu belum tersedia: titik lokasi outlet belum diisi (Super Admin: menu Outlet → Ubah).</p>
             @endif
-            <div class="livemap" id="livemap" data-url="{{ route('delivery.position', $note) }}"></div>
-            <small id="mapago" style="color:var(--muted)">Menunggu lokasi kurir…</small>
+            <span id="livemap" data-url="{{ route('delivery.position', $note) }}" hidden></span>
+            <a class="btn primary block" style="margin-top:12px" href="{{ route('delivery.track', $note) }}"><x-icon name="search" :size="18" /> Lacak di peta</a>
+            <small id="mapago" style="display:block;margin-top:8px;color:var(--muted)">Menunggu lokasi kurir…</small>
         @endif
     @else
         <p style="margin:0 0 10px;color:var(--muted)">Belum ada kurir untuk surat jalan ini.</p>
@@ -88,33 +90,17 @@
 </div>
 @endif
 @if ($note->courier_id && $note->status === 'dikirim' && $note->courier_status === 'diantar')
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 (function () {
   var el = document.getElementById('livemap'); if (!el) return;
   var ago = document.getElementById('mapago'), stat = document.getElementById('cstatus');
   var bar = document.getElementById('etabar'), fill = document.getElementById('etafill'), rider = document.getElementById('etarider');
   var emin = document.getElementById('etamin'), edist = document.getElementById('etadist'), hero = document.getElementById('herosub');
-  var map = L.map(el, { zoomControl: true, attributionControl: true }).setView([-6.2, 106.65], 14);
-  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-  var kicon = L.divIcon({ className: '', html: '<div class="kmarker"></div>', iconSize: [22, 22], iconAnchor: [11, 11] });
-  var bicon = L.divIcon({ className: '', html: '<div class="bmarker"></div>', iconSize: [26, 26], iconAnchor: [6, 26] });
-  var marker = null, bmark = null, line = null, first = true;
-  function fmtEta(s) { var m = Math.max(1, Math.round(s / 60)); if (m < 60) return '±' + m + ' menit'; var h = Math.floor(m / 60); return '±' + h + ' jam ' + (m % 60) + ' menit'; }
+  function fmtEta(s) { var m = Math.max(1, Math.round(s / 60)); if (m < 60) return '±' + m + ' menit'; return '±' + Math.floor(m / 60) + ' jam ' + (m % 60) + ' menit'; }
   function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m lagi' : (m / 1000).toFixed(1).replace('.', ',') + ' km lagi'; }
   function poll() {
     fetch(el.dataset.url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } }).then(function (r) { return r.json(); }).then(function (d) {
       if (d.status === 'sampai' || d.delivered) { if (stat) stat.textContent = 'Sudah sampai'; ago.textContent = 'Kurir sudah sampai.'; setTimeout(function () { location.reload(); }, 1500); return; }
-      if (d.outlet && d.outlet.lat != null && !bmark) bmark = L.marker([d.outlet.lat, d.outlet.lng], { icon: bicon }).addTo(map);
-      if (d.lat == null) { ago.textContent = 'Menunggu lokasi kurir…'; return; }
-      var ll = [d.lat, d.lng];
-      if (!marker) marker = L.marker(ll, { icon: kicon, zIndexOffset: 500 }).addTo(map); else marker.setLatLng(ll);
-      if (d.route && d.route.length > 1) { if (line) line.setLatLngs(d.route); else line = L.polyline(d.route, { color: '#D43C14', weight: 5, opacity: .75 }).addTo(map); }
-      if (first) {
-        if (bmark) map.fitBounds(L.latLngBounds([ll, bmark.getLatLng()]).pad(0.25)); else map.setView(ll, 16);
-        first = false;
-      } else if (!map.getBounds().pad(-0.1).contains(ll)) { map.panTo(ll); }
       if (bar && d.eta_s != null) {
         bar.hidden = false;
         var pct = Math.round((d.progress || 0) * 100);
@@ -122,7 +108,7 @@
         emin.textContent = d.dist_m < 80 ? 'Hampir sampai' : fmtEta(d.eta_s); edist.textContent = fmtDist(d.dist_m);
         if (hero) hero.textContent = d.dist_m < 80 ? 'Kurir sudah di depan' : 'Sampai sekitar ' + fmtEta(d.eta_s).replace('±', '') + ' lagi';
       }
-      ago.textContent = 'Terakhir update ' + d.ago;
+      ago.textContent = d.ago ? 'Terakhir update ' + d.ago : 'Menunggu lokasi kurir…';
     }).catch(function () {});
   }
   poll(); setInterval(poll, 6000);

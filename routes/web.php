@@ -136,6 +136,8 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
     });
     Route::middleware($ckGudang)->post('/surat-jalan/{note}/kurir', [CourierController::class, 'assign'])->name('delivery.courier');
 
+    Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->post('/outlet/{outlet}/lokasi', [OutletController::class, 'setLocation'])->name('outlet.location');
+
     // Chat pengantaran (kurir, outlet tujuan, Admin CK/Gudang)
     Route::middleware(RoleMiddleware::class.':admin_ck,gudang,outlet,kurir')->group(function () {
         Route::get('/surat-jalan/{note}/chat', [DeliveryChatController::class, 'index'])->name('delivery.chat');
@@ -163,6 +165,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::get('/surat-jalan', [DeliveryController::class, 'index'])->name('delivery.index');
         Route::get('/surat-jalan/{note}', [DeliveryController::class, 'show'])->name('delivery.show');
         Route::get('/surat-jalan/{note}/cetak', [DeliveryController::class, 'print'])->name('delivery.print');
+        Route::get('/surat-jalan/{note}/lacak', [DeliveryController::class, 'track'])->name('delivery.track');
         Route::get('/surat-jalan/{note}/posisi', [CourierController::class, 'position'])->name('delivery.position');
     });
 

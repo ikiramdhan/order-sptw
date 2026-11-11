@@ -776,3 +776,48 @@ html.is-app .web-only{display:none}
 .chatform{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}
 .chatform input{min-height:46px;padding:0 14px;border-radius:23px;border:1px solid var(--line);background:var(--field);font-size:16px}
 @media (prefers-reduced-motion:reduce){.motor .wheel,.motor .bike,.motor .speed path,.motorhero .road{animation:none}}
+
+/* v30: layar pelacakan penuh (gaya ojek online) */
+body.trackpage{margin:0;overflow:hidden;background:#E9E7E2;height:100dvh;padding:0}
+#gmap{position:fixed;inset:0;z-index:0}
+.trackpage .leaflet-control-attribution{font-size:9px;margin-bottom:0}
+.tk-round{position:fixed;z-index:500;width:46px;height:46px;border-radius:50%;background:#fff;border:0;box-shadow:0 2px 10px rgba(0,0,0,.25);display:grid;place-items:center;color:#1C1B19;cursor:pointer;text-decoration:none}
+.tk-back{left:14px;top:calc(14px + env(safe-area-inset-top))}
+.tk-top{position:fixed;z-index:500;left:70px;right:14px;top:calc(14px + env(safe-area-inset-top));background:#fff;border-radius:18px;box-shadow:0 2px 12px rgba(0,0,0,.22);padding:6px 14px}
+.tk-rt{display:flex;align-items:center;gap:12px;padding:9px 0;font-size:14px;font-weight:700;min-width:0}
+.tk-rt+.tk-rt{border-top:1px solid #ECEAE5}
+.tk-rt span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.tk-rt small{color:#8A857C;font-weight:500}
+.tk-a,.tk-b{flex:none;width:16px;height:16px;border-radius:50%;display:block}
+.tk-a{background:#1E9E4A;box-shadow:0 0 0 4px rgba(30,158,74,.2)}
+.tk-b{background:#F26B1D;box-shadow:0 0 0 4px rgba(242,107,29,.2)}
+.tk-locate{right:14px;bottom:calc(330px + env(safe-area-inset-bottom))}
+.tk-sheet{position:fixed;z-index:500;left:0;right:0;bottom:0;padding-bottom:env(safe-area-inset-bottom);background:#fff;border-radius:0}
+.tk-banner{display:flex;align-items:center;gap:12px;padding:14px 18px 22px;background:#1E9E4A;color:#fff;font-weight:800;font-size:15px;border-radius:26px 26px 0 0;margin-bottom:-14px;position:relative}
+.tk-banner.done{background:#157A38}
+.tk-bico{width:38px;height:38px;border-radius:50%;background:#FFD23F;color:#1C1B19;display:grid;place-items:center;flex:none}
+.tk-pill{margin-left:auto;background:rgba(255,255,255,.25);padding:5px 12px;border-radius:999px;font-size:14px;white-space:nowrap}
+.tk-card{position:relative;background:#fff;border-radius:26px 26px 0 0;padding:10px 18px 18px;box-shadow:0 -4px 14px rgba(0,0,0,.08)}
+.tk-handle{display:block;width:44px;height:5px;border-radius:3px;background:#D7D4CC;margin:0 auto 14px}
+.tk-row{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.tk-num{font-size:20px;font-weight:800;letter-spacing:-.3px}
+.tk-sub{margin-top:4px;color:#4A463F;font-size:14px;display:flex;align-items:center;gap:8px}
+.tk-tag{background:#E3F4E8;color:#157A38;font-weight:800;font-size:12px;padding:2px 10px;border-radius:999px}
+.tk-avatar{width:58px;height:58px;border-radius:50%;background:linear-gradient(135deg,#D43C14,#F2994A);color:#fff;font-weight:800;font-size:20px;display:grid;place-items:center;flex:none;box-shadow:0 0 0 3px #fff,0 0 0 5px #E3F4E8}
+.tk-meta{display:flex;justify-content:space-between;gap:10px;margin-top:14px;padding-top:12px;border-top:1px dashed #DDD9D0;font-size:13px;color:#6A655C}
+.tk-actions{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:14px}
+.tk-actions .btn{position:relative;min-height:48px}
+.tk-dot{position:absolute;top:8px;right:14px;width:10px;height:10px;border-radius:50%;background:#FFD23F}
+.kbike{background:none;border:0}
+.kbike .motor{width:64px;height:42px;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35))}
+.kbike.flip .motor{transform:scaleX(-1)}
+.tk-pin{width:34px;height:34px;border-radius:50%;background:rgba(242,107,29,.25);display:grid;place-items:center}
+.tk-pin i{width:18px;height:18px;border-radius:50%;background:#F26B1D;border:4px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.tk-chat{position:fixed;inset:0;z-index:900;background:#F4F4F2;display:flex;flex-direction:column;padding:calc(10px + env(safe-area-inset-top)) 14px calc(14px + env(safe-area-inset-bottom));overflow:auto;animation:sheetup .25s both}
+.tk-chat[hidden]{display:none}
+.tk-chathead{display:flex;justify-content:space-between;align-items:center;padding:6px 2px 10px}
+.tk-chathead b{font-size:20px}.tk-chathead button{width:42px;height:42px;border-radius:50%;border:0;background:#fff;font-size:18px;box-shadow:0 1px 4px rgba(0,0,0,.15)}
+.tk-chat .chat{margin-top:0!important;flex:1;display:flex;flex-direction:column}
+.tk-chat .chatlog{flex:1;max-height:none}
+.tk-chat .chat .sect{display:none}
+.tk-setloc{position:fixed;z-index:450;left:14px;right:14px;top:calc(130px + env(safe-area-inset-top));background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.22);display:grid;gap:6px}
+.tk-setloc small{color:#6A655C}.tk-setloc .btn{min-height:44px;margin-top:4px}

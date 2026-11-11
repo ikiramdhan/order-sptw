@@ -82,4 +82,39 @@ class OutletController extends Controller
             'payment_term_days.required' => 'Pilih termin tempo.',
         ]);
     }
+
+    /** Outlet (miliknya sendiri) atau Admin CK: isi titik lokasi dari GPS, link Google Maps, atau koordinat. */
+    public function setLocation(Request $request, Outlet $outlet): RedirectResponse
+    {
+        $u = $request->user();
+        abort_if($u->role === 'outlet' && (int) $u->outlet_id !== (int) $outlet->id, 404);
+
+        $d = $request->validate(['lat' => ['nullable', 'numeric', 'between:-90,90'], 'lng' => ['nullable', 'numeric', 'between:-180,180'], 'link' => ['nullable', 'string', 'max:500']]);
+        $lat = $d['lat'] ?? null;
+        $lng = $d['lng'] ?? null;
+        if (($lat === null || $lng === null) && ! empty($d['link'])) {
+            [$lat, $lng] = self::parseCoords($d['link']);
+        }
+        if ($lat === null || $lng === null) {
+            return back()->withErrors(['link' => 'Titik tidak terbaca. Gunakan tombol lokasi, atau tempel link Google Maps / koordinat (contoh: -6.2088, 106.8456).']);
+        }
+
+        $outlet->update(['lat' => $lat, 'lng' => $lng]);
+        ActivityLog::record('outlet_location_set', "Titik lokasi {$outlet->name} diatur", $outlet, $u->id);
+
+        return back()->with('status', 'Titik lokasi outlet tersimpan. Estimasi kedatangan kurir kini aktif.');
+    }
+
+    /** @return array{0: ?float, 1: ?float} */
+    public static function parseCoords(string $text): array
+    {
+        $text = urldecode(trim($text));
+        foreach (['/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/', '/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/', '/[?&](?:q|ll|query)=(-?\d{1,2}\.\d+)[, +]+(-?\d{1,3}\.\d+)/', '/^\s*(-?\d{1,2}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)\s*$/'] as $re) {
+            if (preg_match($re, $text, $m) && abs((float) $m[1]) <= 90 && abs((float) $m[2]) <= 180) {
+                return [(float) $m[1], (float) $m[2]];
+            }
+        }
+
+        return [null, null];
+    }
 }
