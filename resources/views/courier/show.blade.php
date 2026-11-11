@@ -51,8 +51,8 @@
     warn.hidden = document.visibilityState === 'visible';
     if (document.visibilityState === 'visible') { wake(); push(true); }
   });
-  function push(force) {
-    if (!last || sending || document.visibilityState !== 'visible') return;
+  function push(force, native) {
+    if (!last || sending || (!native && document.visibilityState !== 'visible')) return;
     var now = Date.now(); if (!force && now - sentAt < 6000) return;
     sending = true; sentAt = now;
     var fd = new FormData(); fd.append('lat', last.latitude); fd.append('lng', last.longitude); if (last.accuracy) fd.append('acc', last.accuracy);
@@ -60,6 +60,24 @@
       .then(function (r) { if (r.status === 409) { location.reload(); return; } if (!r.ok) throw new Error(); say('Lokasi terkirim', 'Terakhir ' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' })); })
       .catch(function () { say('Gagal mengirim lokasi', 'Mencoba lagi… cek sinyal internet'); })
       .then(function () { sending = false; });
+  }
+  var cap = window.Capacitor, BG = cap && cap.isNativePlatform && cap.isNativePlatform() ? (cap.Plugins || {}).BackgroundGeolocation : null;
+  if (BG) {
+    /* Aplikasi Android: lokasi tetap terkirim walau layar mati (foreground service) */
+    if (lock) { try { lock.release(); } catch (_) {} }
+    say('Menyalakan GPS…', 'Aplikasi kurir — lokasi tetap jalan walau layar mati');
+    warn.hidden = true;
+    BG.addWatcher({ backgroundTitle: 'Seblak CK — sedang mengantar', backgroundMessage: 'Lokasi dikirim ke outlet selama antaran', requestPermissions: true, stale: false, distanceFilter: 10 }, function (loc, err) {
+      if (err) {
+        if (err.code === 'NOT_AUTHORIZED') { say('Izin lokasi ditolak', 'Pilih "Izinkan sepanjang waktu" di pengaturan aplikasi'); }
+        else { say('GPS bermasalah', String(err.message || err.code || '')); }
+        return;
+      }
+      last = { latitude: loc.latitude, longitude: loc.longitude, accuracy: loc.accuracy };
+      push(true, true);
+    });
+    setInterval(function () { push(false, true); }, 8000);
+    return;
   }
   if (!navigator.geolocation) { say('GPS tidak tersedia', 'Gunakan HP lain atau browser lain'); return; }
   navigator.geolocation.watchPosition(function (p) { last = p.coords; push(false); }, function (e) {

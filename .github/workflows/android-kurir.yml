@@ -1,0 +1,57 @@
+name: Build APK Kurir
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'android-courier/**'
+      - '.github/workflows/android-kurir.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Install dependensi
+        working-directory: android-courier
+        run: npm install --no-audit --no-fund
+
+      - name: Buat proyek Android
+        working-directory: android-courier
+        run: |
+          npx cap add android
+          python3 patch-android.py
+          npx cap sync android
+
+      - name: Build APK (debug, bisa langsung diinstal)
+        working-directory: android-courier/android
+        run: ./gradlew assembleDebug --no-daemon
+
+      - name: Ganti nama APK
+        run: cp android-courier/android/app/build/outputs/apk/debug/app-debug.apk kurir-seblak.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: kurir-seblak-apk
+          path: kurir-seblak.apk
+
+      - name: Terbitkan sebagai Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release delete kurir-latest --yes --cleanup-tag || true
+          gh release create kurir-latest kurir-seblak.apk --title "Aplikasi Kurir Seblak (APK)" --notes "Unduh kurir-seblak.apk lalu instal di HP Android kurir. Build: ${{ github.sha }}" --latest=false

@@ -1,0 +1,13 @@
+{
+  "appId": "com.seblaktehwanti.kurir",
+  "appName": "Kurir Seblak",
+  "webDir": "www",
+  "server": {
+    "url": "https://order.seblaktehwanti.com/kurir",
+    "allowNavigation": ["order.seblaktehwanti.com"],
+    "cleartext": false
+  },
+  "android": {
+    "allowMixedContent": false
+  }
+}
