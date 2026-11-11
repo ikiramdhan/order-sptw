@@ -18,8 +18,8 @@
 
 <div class="tk-top">
     <div class="tk-route"><i class="tk-rline"></i>
-        <div class="tk-rt"><i class="tk-a"></i><div><small>Posisi kurir</small><b>{{ $note->courier?->name }}</b></div></div>
-        <div class="tk-rt"><i class="tk-b"></i><div><small>Tujuan</small><b>{{ $note->outlet->name }}</b>@if ($note->outlet->address)<em>{{ $note->outlet->address }}</em>@endif</div></div>
+        <div class="tk-rt r1"><i class="tk-a"><u></u></i><div><small>Posisi kurir</small><b>{{ $note->courier?->name }}</b></div><span class="tk-chip" id="tkchip1">Jalan</span></div>
+        <div class="tk-rt r2"><i class="tk-b"><u></u></i><div><small>Tujuan</small><b>{{ $note->outlet->name }}</b>@if ($note->outlet->address)<em>{{ $note->outlet->address }}</em>@endif</div><span class="tk-chip hot" id="tkchip2">–</span></div>
     </div>
 </div>
 
@@ -68,7 +68,7 @@
   var bicon = L.divIcon({ className: '', html: '<div class="tk-drop"><i></i></div>', iconSize: [38, 48], iconAnchor: [19, 46] });
   var kmark = null, bmark = hasB ? L.marker([olat, olng], { icon: bicon }).addTo(map) : null, casing = null, line = null, flow = null, first = true, prev = null, flip = false;
   var $ = function (id) { return document.getElementById(id); };
-  var msg = $('tkmsg'), big = $('tkbig'), unit = $('tkunit'), arr = $('tkarr'), fill = $('tkfill'), bike = $('tkbike'), dist = $('tkdist'), at = $('tkat'), panel = $('tkbanner');
+  var msg = $('tkmsg'), big = $('tkbig'), unit = $('tkunit'), arr = $('tkarr'), fill = $('tkfill'), bike = $('tkbike'), dist = $('tkdist'), at = $('tkat'), panel = $('tkbanner'), chip1 = $('tkchip1'), chip2 = $('tkchip2');
 
   function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m' : (m / 1000).toFixed(1).replace('.', ',') + ' km'; }
   function clock(sec) { var d = new Date(Date.now() + sec * 1000); return ('0' + d.getHours()).slice(-2) + '.' + ('0' + d.getMinutes()).slice(-2); }
@@ -82,7 +82,7 @@
   function poll() {
     fetch(el.dataset.url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } }).then(function (r) { return r.json(); }).then(function (d) {
       if (d.status === 'sampai' || d.delivered) {
-        panel.classList.add('done'); msg.textContent = 'Kurir sudah sampai'; big.textContent = '✓'; unit.textContent = ''; arr.textContent = ''; dist.textContent = '0 m'; at.textContent = 'Sampai'; progress(1); return;
+        panel.classList.add('done'); chip1.textContent = 'Selesai'; chip2.textContent = '✓'; msg.textContent = 'Kurir sudah sampai'; big.textContent = '✓'; unit.textContent = ''; arr.textContent = ''; dist.textContent = '0 m'; at.textContent = 'Sampai'; progress(1); return;
       }
       if (d.status !== 'diantar') { msg.textContent = 'Menunggu kurir berangkat'; return; }
       if (d.lat == null) { msg.textContent = 'Mencari posisi kurir…'; return; }
@@ -101,7 +101,7 @@
       }
       if (first) { fit(); first = false; } else if (!map.getBounds().pad(-0.12).contains(ll)) { map.panTo(ll); }
       if (d.eta_s != null) {
-        progress(d.progress); dist.textContent = fmtDist(d.dist_m); at.textContent = clock(d.eta_s);
+        progress(d.progress); dist.textContent = fmtDist(d.dist_m); at.textContent = clock(d.eta_s); chip1.textContent = 'Live'; chip2.textContent = d.dist_m < 80 ? 'Tiba' : fmtDist(d.dist_m);
         if (d.dist_m < 80) { msg.textContent = 'Kurir sudah di depan'; big.textContent = 'Tiba'; unit.textContent = ''; arr.textContent = ''; }
         else {
           var m = Math.max(1, Math.round(d.eta_s / 60));
