@@ -33,6 +33,7 @@ jobs:
       - name: Buat proyek Android
         working-directory: android-courier
         run: |
+          pip install pillow
           npx cap add android
           python3 patch-android.py
           npx cap sync android
