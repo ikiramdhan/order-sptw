@@ -7,6 +7,9 @@
 @php
     $u = auth()->user();
     $nav = [['home', 'Beranda', 'home']];
+    if ($u->role === 'kurir') {
+        $nav = [['courier.index', 'Antaran', 'truck']];
+    }
     if ($u->role === 'outlet') {
         $nav[] = ['catalog.index', 'Katalog', 'store'];
         $nav[] = ['orders.index', 'PO', 'list'];
@@ -48,11 +51,13 @@
     }));
 
     // 4 menu utama di bilah bawah + "Lainnya" (HP/tablet)
-    $primaryKeys = $u->role === 'outlet'
+    $primaryKeys = $u->role === 'kurir'
+        ? ['courier.index', 'notifications.index', 'account.password']
+        : ($u->role === 'outlet'
         ? ['home', 'catalog.index', 'orders.index', 'delivery.index']
         : ($u->role === 'gudang'
             ? ['home', 'orders.index', 'delivery.index', 'stock.index']
-            : ['home', 'dashboard', 'orders.index', 'delivery.index']);
+            : ['home', 'dashboard', 'orders.index', 'delivery.index']));
     $byKey = collect($nav)->keyBy(0);
     $primary = collect($primaryKeys)->map(fn ($k) => $byKey->get($k))->filter()->values()->all();
     $more = array_values(array_filter($nav, fn ($n) => ! in_array($n[0], $primaryKeys, true)));

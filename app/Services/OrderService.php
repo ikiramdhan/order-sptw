@@ -75,9 +75,9 @@ class OrderService
      * $ship: [purchase_order_item_id => qty dalam satuan PO]
      * Mengembalikan surat jalan baru, atau null bila tidak ada barang yang dikirim (semua jadi backorder).
      */
-    public static function approveAndShip(PurchaseOrder $po, array $ship, User $user): ?DeliveryNote
+    public static function approveAndShip(PurchaseOrder $po, array $ship, User $user, ?int $courierId = null): ?DeliveryNote
     {
-        return DB::transaction(function () use ($po, $ship, $user) {
+        return DB::transaction(function () use ($po, $ship, $user, $courierId) {
             $po = PurchaseOrder::whereKey($po->id)->lockForUpdate()->firstOrFail();
 
             if (! $po->isOpenForShipping()) {
@@ -123,6 +123,9 @@ class OrderService
                     'created_by' => $user->id,
                     'shipped_at' => now(),
                 ]);
+                if ($courierId) {
+                    CourierService::assign($note, $courierId);
+                }
 
                 foreach ($lines as [$poItem, $baseQty]) {
                     StockService::moveSale($poItem->item, 'penjualan', -$baseQty, $note, $user->id, $note->number);

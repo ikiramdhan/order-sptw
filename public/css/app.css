@@ -715,3 +715,21 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .ochip{align-self:flex-start;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 8px;margin-bottom:3px;border-radius:999px;font-size:12px;font-weight:800;letter-spacing:.1px;color:hsl(var(--h) 65% 28%);background:hsl(var(--h) 80% 90%)}
 .ochip i{width:8px;height:8px;border-radius:50%;background:hsl(var(--h) 70% 45%)}
 @media (prefers-color-scheme:dark){.ochip{color:hsl(var(--h) 80% 85%);background:hsl(var(--h) 40% 25%)}}
+
+/* v28: kurir */
+.courcard{display:grid;grid-template-columns:44px minmax(0,1fr) auto;gap:12px;align-items:center;padding:14px;margin-bottom:10px;background:var(--card);border-radius:22px;text-decoration:none;color:var(--ink);box-shadow:0 1px 3px rgba(28,27,25,.08);transition:transform .15s}
+.courcard:active{transform:scale(.98)}
+.courcard .ntxt b{font-size:16px}
+.trackstate{display:flex;gap:14px;align-items:center;padding:14px;border-radius:18px;background:#E2F3E7;margin-bottom:12px}
+.trackstate b{display:block;font-size:15px;color:#14532D}.trackstate small{display:block;color:#2F6B45;font-size:12.5px;margin-top:2px}
+.trackstate .live{width:14px;height:14px;border-radius:50%;background:#1E9E4A;box-shadow:0 0 0 0 rgba(30,158,74,.6);animation:livepulse 1.6s infinite;flex:none}
+@keyframes livepulse{0%{box-shadow:0 0 0 0 rgba(30,158,74,.55)}100%{box-shadow:0 0 0 16px rgba(30,158,74,0)}}
+.trackwarn{margin:0 0 12px;padding:10px 12px;border-radius:14px;background:#FBE3E0;color:#8E1C14;font-weight:600;font-size:13px}
+.livemap{height:280px;border-radius:18px;overflow:hidden;margin:10px 0 4px;background:var(--bg-2)}
+.livechip{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.livechip .who b{display:block}.livechip .who small{color:var(--muted);font-size:12.5px}
+.kmarker{width:22px;height:22px;border-radius:50%;background:#D43C14;border:3px solid #fff;box-shadow:0 0 0 0 rgba(212,60,20,.5),0 2px 6px rgba(0,0,0,.35);animation:livepulse2 1.8s infinite}
+@keyframes livepulse2{0%{box-shadow:0 0 0 0 rgba(212,60,20,.5),0 2px 6px rgba(0,0,0,.35)}100%{box-shadow:0 0 0 18px rgba(212,60,20,0),0 2px 6px rgba(0,0,0,.35)}}
+@media (prefers-reduced-motion:reduce){.trackstate .live,.kmarker{animation:none}}
+.courierform{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px}
+.courierform select{min-height:46px}

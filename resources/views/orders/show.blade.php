@@ -31,6 +31,12 @@
             </tr>
         @endforeach</tbody>
     </table></div>
+    @php $couriers = \App\Models\User::where('role', 'kurir')->where('is_active', true)->orderBy('name')->get(); @endphp
+    @if ($couriers->count())
+        <label class="field" style="margin-top:12px">Kurir pengantar <span class="hint">(opsional, bisa diatur nanti)</span>
+            <select name="courier_id"><option value="">— Belum dipilih —</option>@foreach ($couriers as $c)<option value="{{ $c->id }}">{{ $c->name }}</option>@endforeach</select>
+        </label>
+    @endif
     <div class="savebar"><button class="btn primary" type="submit">Setujui &amp; buat surat jalan</button></div>
 </form>
 @else

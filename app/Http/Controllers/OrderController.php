@@ -58,10 +58,11 @@ class OrderController extends Controller
         $data = $request->validate([
             'ship' => ['required', 'array'],
             'ship.*' => ['nullable', 'numeric', 'min:0'],
+            'courier_id' => ['nullable', \Illuminate\Validation\Rule::exists('users', 'id')->where('role', 'kurir')->where('is_active', true)],
         ]);
 
         try {
-            $note = OrderService::approveAndShip($order, $data['ship'], $request->user());
+            $note = OrderService::approveAndShip($order, $data['ship'], $request->user(), isset($data['courier_id']) ? (int) $data['courier_id'] : null);
         } catch (\DomainException $e) {
             return back()->withErrors(['ship' => $e->getMessage()]);
         }

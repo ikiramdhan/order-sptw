@@ -31,9 +31,16 @@ class DeliveryController extends Controller
     public function show(Request $request, DeliveryNote $note)
     {
         $this->authorizeNote($request, $note);
-        $note->load(['outlet', 'purchaseOrder', 'items.item.baseUnit', 'items.unit', 'receipt', 'invoice']);
+        $note->load(['outlet', 'purchaseOrder', 'items.item.baseUnit', 'items.unit', 'receipt', 'invoice', 'courier']);
 
-        return view('delivery.show', ['note' => $note, 'isOutlet' => $request->user()->role === 'outlet']);
+        $canAssign = $request->user()->hasRole('admin_ck', 'gudang') && $note->status === 'dikirim';
+
+        return view('delivery.show', [
+            'note' => $note,
+            'isOutlet' => $request->user()->role === 'outlet',
+            'canAssign' => $canAssign,
+            'couriers' => $canAssign ? \App\Models\User::where('role', 'kurir')->where('is_active', true)->orderBy('name')->get() : collect(),
+        ]);
     }
 
     /** Cetak: tanpa harga. */

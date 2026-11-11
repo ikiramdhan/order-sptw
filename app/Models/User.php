@@ -16,12 +16,14 @@ class User extends Authenticatable
     public const ROLE_ADMIN_CK = 'admin_ck';
     public const ROLE_GUDANG = 'gudang';
     public const ROLE_OUTLET = 'outlet';
+    public const ROLE_KURIR = 'kurir';
 
     /** Peran yang boleh dibuat lewat menu Pengguna. */
     public const ASSIGNABLE_ROLES = [
         self::ROLE_ADMIN_CK => 'Admin CK',
         self::ROLE_GUDANG => 'Staf Gudang',
         self::ROLE_OUTLET => 'Outlet',
+        self::ROLE_KURIR => 'Kurir',
     ];
 
     /** Peran yang bisa dipilih saat membuat akun baru (hanya Super Admin yang membuka menu ini). */

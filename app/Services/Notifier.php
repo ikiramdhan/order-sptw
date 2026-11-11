@@ -18,6 +18,11 @@ class Notifier
         self::send(User::where('is_active', true)->where('role', 'outlet')->where('outlet_id', $outletId)->pluck('id'), $title, $body, $url);
     }
 
+    public static function user(int $userId, string $title, ?string $body = null, ?string $url = null): void
+    {
+        self::send([$userId], $title, $body, $url);
+    }
+
     private static function send($userIds, string $title, ?string $body, ?string $url): void
     {
         try {

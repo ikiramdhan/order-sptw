@@ -10,10 +10,14 @@ use App\Models\User;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(): \Illuminate\Contracts\View\View|\Illuminate\Http\RedirectResponse
     {
         $user = auth()->user();
         $stats = [];
+
+        if ($user->role === 'kurir') {
+            return redirect()->route('courier.index');
+        }
 
         if ($user->isSuperAdmin()) {
             $stats['users'] = User::where('is_active', true)->count();

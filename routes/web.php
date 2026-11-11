@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\CourierController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
@@ -52,6 +53,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
     $ck = RoleMiddleware::class.':admin_ck';          // Admin CK (+ Super Admin)
     $ckGudang = RoleMiddleware::class.':admin_ck,gudang';
     $outletOnly = RoleMiddleware::class.':outlet';
+    $kurirOnly = RoleMiddleware::class.':kurir';
     $semua = RoleMiddleware::class.':admin_ck,gudang,outlet';
 
     // Master: barang, satuan, supplier, pembelian (Admin CK)
@@ -123,6 +125,16 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::post('/persetujuan-stok/{req}/tolak', [OutletStockController::class, 'reject'])->name('approvals.reject');
     });
 
+    // Kurir: antaran + kirim lokasi live
+    Route::middleware($kurirOnly)->group(function () {
+        Route::get('/kurir', [CourierController::class, 'index'])->name('courier.index');
+        Route::get('/kurir/{note}', [CourierController::class, 'show'])->name('courier.show');
+        Route::post('/kurir/{note}/mulai', [CourierController::class, 'start'])->name('courier.start');
+        Route::post('/kurir/{note}/lokasi', [CourierController::class, 'location'])->name('courier.location');
+        Route::post('/kurir/{note}/sampai', [CourierController::class, 'arrive'])->name('courier.arrive');
+    });
+    Route::middleware($ckGudang)->post('/surat-jalan/{note}/kurir', [CourierController::class, 'assign'])->name('delivery.courier');
+
     // Katalog & keranjang (Outlet)
     Route::middleware($outletOnly)->group(function () {
         Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog.index');
@@ -144,6 +156,7 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::get('/surat-jalan', [DeliveryController::class, 'index'])->name('delivery.index');
         Route::get('/surat-jalan/{note}', [DeliveryController::class, 'show'])->name('delivery.show');
         Route::get('/surat-jalan/{note}/cetak', [DeliveryController::class, 'print'])->name('delivery.print');
+        Route::get('/surat-jalan/{note}/posisi', [CourierController::class, 'position'])->name('delivery.position');
     });
 
     Route::middleware(RoleMiddleware::class.':admin_ck,outlet')->group(function () {
