@@ -149,11 +149,19 @@ class OutletStockController extends Controller
             ->where('s.outlet_id', $outlet->id)->orderBy('i.name')->get(['i.id', 'i.name', 'u.name as unit', 's.qty']);
     }
 
+    /** Semua barang aktif beserta stok outlet (0 bila belum pernah ada), untuk opname/stok awal. */
+    private function allItemsWithStock(Outlet $outlet)
+    {
+        return DB::table('items as i')->join('units as u', 'u.id', '=', 'i.base_unit_id')
+            ->leftJoin('outlet_stocks as s', fn ($j) => $j->on('s.item_id', '=', 'i.id')->where('s.outlet_id', '=', $outlet->id))
+            ->where('i.is_active', true)->orderBy('i.name')->get(['i.id', 'i.name', 'u.name as unit', DB::raw('COALESCE(s.qty, 0) as qty')]);
+    }
+
     public function countForm(Request $request)
     {
         $o = $this->outlet($request);
 
-        return view('outletstock.entry', ['mode' => 'so', 'outlet' => $o, 'outlets' => $this->outlets($request), 'items' => $o ? $this->itemsInOutlet($o) : collect(), 'reasons' => []]);
+        return view('outletstock.entry', ['mode' => 'so', 'outlet' => $o, 'outlets' => $this->outlets($request), 'items' => $o ? $this->allItemsWithStock($o) : collect(), 'reasons' => []]);
     }
 
     public function countStore(Request $request): RedirectResponse

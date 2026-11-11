@@ -100,4 +100,12 @@ class OutletStockTest extends TestCase
         $this->get(route('stock.waste'))->assertOk();
         $this->actingAs($this->ou)->get(route('stock.waste'))->assertForbidden();
     }
+
+    public function test_initial_outlet_stock_can_be_entered_via_opname_for_fresh_outlet(): void
+    {
+        $fresh = Outlet::create(['name' => 'Baru', 'payment_term_days' => 7, 'credit_balance' => 0, 'is_active' => true]);
+        $this->actingAs($this->admin)->get(route('outletstock.count', ['outlet' => $fresh->id]))->assertOk()->assertSee('Bumbu');
+        $this->post(route('outletstock.count.store'), ['outlet' => $fresh->id, 'qty' => [$this->item->id => 30]])->assertSessionHasNoErrors();
+        $this->assertEquals(30, S::balance($fresh->id, $this->item->id));
+    }
 }
