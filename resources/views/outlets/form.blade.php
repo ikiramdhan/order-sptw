@@ -33,7 +33,7 @@
             </label>
         </div>
         <label class="field"><span class="lbl">Lokasi di Google Maps <span class="hint">(untuk pelacakan kurir)</span></span>
-            <input type="text" name="maps_link" value="{{ old('maps_link') }}" placeholder="Tempel link Google Maps outlet">
+            <input type="text" name="maps_link" value="{{ old('maps_link') }}" placeholder="Tempel link Google Maps (boleh link pendek)">
             @error('maps_link')<span class="err">{{ $message }}</span>@enderror
         </label>
         @if ($outlet->lat !== null)
@@ -50,7 +50,7 @@
             </label>
         </div>
         <button type="button" class="btn outline" id="usegps">Pakai lokasi saya sekarang</button>
-        <small style="display:block;color:var(--muted);margin-top:6px">Tempel link Google Maps outlet di atas (koordinat terisi otomatis), atau tekan tombol ini saat HP berada di outlet.</small>
+        <small style="display:block;color:var(--muted);margin-top:6px">Tempel link dari tombol Bagikan di Google Maps, koordinat terisi otomatis. Atau tekan tombol ini saat HP berada di outlet.</small>
         <script>
         document.getElementById('usegps').addEventListener('click', function () {
           var b = this; b.textContent = 'Mencari lokasi…';

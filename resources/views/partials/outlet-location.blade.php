@@ -10,8 +10,8 @@
         <input type="hidden" name="lat" id="locLat"><input type="hidden" name="lng" id="locLng">
         <button type="button" class="btn {{ $o->lat !== null ? 'outline' : 'primary' }} block" id="locgps">{{ $o->lat !== null ? 'Perbarui dengan lokasi saya sekarang' : 'Pakai lokasi saya sekarang' }}</button>
         <small style="display:block;margin:6px 0 10px;color:var(--muted)">Lakukan hanya bila HP berada di outlet.</small>
-        <label class="field">Atau tempel link Google Maps / koordinat
-            <input type="text" name="link" placeholder="https://maps.app.goo.gl/… atau -6.2088, 106.8456">
+        <label class="field">Atau tempel link Google Maps (boleh link pendek)
+            <input type="text" name="link" placeholder="https://maps.app.goo.gl/…">
             @error('link')<span class="err">{{ $message }}</span>@enderror
         </label>
         <button type="submit" class="btn outline block">Simpan dari link</button>

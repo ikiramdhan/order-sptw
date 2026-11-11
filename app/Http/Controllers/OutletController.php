@@ -70,9 +70,9 @@ class OutletController extends Controller
     {
         $link = trim((string) $request->input('maps_link'));
         if ($link !== '') {
-            [$lat, $lng] = self::parseCoords($link);
+            [$lat, $lng] = \App\Services\MapsLink::resolve($link);
             if ($lat === null) {
-                throw \Illuminate\Validation\ValidationException::withMessages(['maps_link' => 'Link tidak berisi koordinat. Buka link Google Maps-nya dulu, lalu salin alamat panjang yang memuat angka seperti @-6.22,106.64 (atau tekan lama titik di peta dan salin koordinatnya).']);
+                throw \Illuminate\Validation\ValidationException::withMessages(['maps_link' => 'Titik tidak terbaca dari link itu. Pastikan link Google Maps outlet (boleh link pendek), atau tempel koordinat seperti -6.2105, 106.6188.']);
             }
             $data['lat'] = $lat;
             $data['lng'] = $lng;
@@ -108,28 +108,15 @@ class OutletController extends Controller
         $lat = $d['lat'] ?? null;
         $lng = $d['lng'] ?? null;
         if (($lat === null || $lng === null) && ! empty($d['link'])) {
-            [$lat, $lng] = self::parseCoords($d['link']);
+            [$lat, $lng] = \App\Services\MapsLink::resolve($d['link']);
         }
         if ($lat === null || $lng === null) {
-            return back()->withErrors(['link' => 'Titik tidak terbaca. Gunakan tombol lokasi, atau tempel link Google Maps / koordinat (contoh: -6.2088, 106.8456).']);
+            return back()->withErrors(['link' => 'Titik tidak terbaca. Tempel link Google Maps outlet (boleh link pendek), atau koordinat seperti -6.2105, 106.6188.']);
         }
 
         $outlet->update(['lat' => $lat, 'lng' => $lng]);
         ActivityLog::record('outlet_location_set', "Titik lokasi {$outlet->name} diatur", $outlet, $u->id);
 
         return back()->with('status', 'Titik lokasi outlet tersimpan. Estimasi kedatangan kurir kini aktif.');
-    }
-
-    /** @return array{0: ?float, 1: ?float} */
-    public static function parseCoords(string $text): array
-    {
-        $text = urldecode(trim($text));
-        foreach (['/@(-?\d{1,2}\.\d+),(-?\d{1,3}\.\d+)/', '/!3d(-?\d{1,2}\.\d+)!4d(-?\d{1,3}\.\d+)/', '/[?&](?:q|ll|query)=(-?\d{1,2}\.\d+)[, +]+(-?\d{1,3}\.\d+)/', '/^\s*(-?\d{1,2}\.\d+)\s*[,;\s]\s*(-?\d{1,3}\.\d+)\s*$/'] as $re) {
-            if (preg_match($re, $text, $m) && abs((float) $m[1]) <= 90 && abs((float) $m[2]) <= 180) {
-                return [(float) $m[1], (float) $m[2]];
-            }
-        }
-
-        return [null, null];
     }
 }

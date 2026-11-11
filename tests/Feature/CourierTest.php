@@ -180,6 +180,14 @@ class CourierTest extends TestCase
         $this->actingAs($sa)->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'maps_link' => 'https://www.google.com/maps/place/Gerendeng/@-6.2105,106.6188,17z'])->assertSessionHasNoErrors();
         $this->assertEqualsWithDelta(-6.2105, $o->fresh()->lat, 0.0001);
         $this->assertEqualsWithDelta(106.6188, $o->fresh()->lng, 0.0001);
-        $this->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'maps_link' => 'https://maps.app.goo.gl/abc'])->assertSessionHasErrors('maps_link');
+        $this->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'maps_link' => 'https://example.com/x'])->assertSessionHasErrors('maps_link');
+
+        // link pendek: diikuti sampai ke link panjang yang memuat koordinat
+        \Illuminate\Support\Facades\Http::fake([
+            'maps.app.goo.gl/*' => \Illuminate\Support\Facades\Http::response('', 302, ['Location' => 'https://www.google.com/maps/place/Gerendeng/@-6.3111,106.7222,17z/data=x']),
+        ]);
+        $this->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'maps_link' => 'Lokasi: https://maps.app.goo.gl/abc123'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(-6.3111, $o->fresh()->lat, 0.0001);
+        $this->assertEqualsWithDelta(106.7222, $o->fresh()->lng, 0.0001);
     }
 }
