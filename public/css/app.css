@@ -821,3 +821,5 @@ body.trackpage{margin:0;overflow:hidden;background:#E9E7E2;height:100dvh;padding
 .tk-chat .chat .sect{display:none}
 .tk-setloc{position:fixed;z-index:450;left:14px;right:14px;top:calc(130px + env(safe-area-inset-top));background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 12px rgba(0,0,0,.22);display:grid;gap:6px}
 .tk-setloc small{color:#6A655C}.tk-setloc .btn{min-height:44px;margin-top:4px}
+/* peta lebih lembut seperti ojek online (tile OSM diredam warnanya) */
+.trackpage .leaflet-tile-pane{filter:grayscale(.55) saturate(.8) brightness(1.06) contrast(.92)}

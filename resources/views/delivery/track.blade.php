@@ -58,7 +58,7 @@
   var el = document.getElementById('gmap');
   var olat = parseFloat(el.dataset.olat), olng = parseFloat(el.dataset.olng), hasB = isFinite(olat) && isFinite(olng);
   var map = L.map(el, { zoomControl: false, attributionControl: true }).setView(hasB ? [olat, olng] : [-6.2, 106.65], 15);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20, attribution: '© OpenStreetMap © CARTO' }).addTo(map);
+  L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
   var tpl = document.getElementById('motortpl').innerHTML;
   function kicon(flip) { return L.divIcon({ className: 'kbike' + (flip ? ' flip' : ''), html: tpl, iconSize: [64, 42], iconAnchor: [32, 30] }); }
   var bicon = L.divIcon({ className: '', html: '<div class="tk-pin"><i></i></div>', iconSize: [34, 34], iconAnchor: [17, 17] });
