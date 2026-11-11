@@ -34,6 +34,8 @@
     @endforeach
 </section>
 
+@include('partials.chat', ['note' => $note])
+
 @if ($st === 'diantar' && $active)
 <script>
 (function () {

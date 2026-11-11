@@ -27,6 +27,11 @@ class DeliveryNote extends Model
         return $this->belongsTo(Outlet::class);
     }
 
+    public function messages(): HasMany
+    {
+        return $this->hasMany(DeliveryMessage::class);
+    }
+
     public function courier(): BelongsTo
     {
         return $this->belongsTo(User::class, 'courier_id');

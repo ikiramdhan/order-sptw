@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\CatalogController;
 use App\Http\Controllers\CourierController;
+use App\Http\Controllers\DeliveryChatController;
 use App\Http\Controllers\DeliveryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
@@ -134,6 +135,12 @@ Route::middleware(['auth', EnsureActiveUser::class, EnsurePasswordChanged::class
         Route::post('/kurir/{note}/sampai', [CourierController::class, 'arrive'])->name('courier.arrive');
     });
     Route::middleware($ckGudang)->post('/surat-jalan/{note}/kurir', [CourierController::class, 'assign'])->name('delivery.courier');
+
+    // Chat pengantaran (kurir, outlet tujuan, Admin CK/Gudang)
+    Route::middleware(RoleMiddleware::class.':admin_ck,gudang,outlet,kurir')->group(function () {
+        Route::get('/surat-jalan/{note}/chat', [DeliveryChatController::class, 'index'])->name('delivery.chat');
+        Route::post('/surat-jalan/{note}/chat', [DeliveryChatController::class, 'store'])->middleware('throttle:40,1')->name('delivery.chat.store');
+    });
 
     // Katalog & keranjang (Outlet)
     Route::middleware($outletOnly)->group(function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\DeliveryNote;
 use App\Models\User;
 use App\Services\CourierService;
+use App\Services\RouteService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -88,6 +89,18 @@ class CourierController extends Controller
             abort(404);
         }
 
+        $note->loadMissing('outlet');
+        $o = $note->outlet;
+        $eta = null;
+        if ($note->last_lat !== null && $o && $o->lat !== null && $o->lng !== null && $note->courier_status === 'diantar') {
+            $eta = RouteService::estimate($note->last_lat, $note->last_lng, $o->lat, $o->lng);
+            if (! $note->route_total_m || $eta['dist_m'] > $note->route_total_m) {
+                $note->route_total_m = max($eta['dist_m'], 1);
+                $note->saveQuietly();
+            }
+        }
+        $total = $note->route_total_m ?: ($eta['dist_m'] ?? 0);
+
         return response()->json([
             'status' => $note->courier_status,
             'courier' => $note->courier?->name,
@@ -97,6 +110,11 @@ class CourierController extends Controller
             'at' => $note->last_loc_at?->toIso8601String(),
             'ago' => $note->last_loc_at ? $note->last_loc_at->diffForHumans() : null,
             'delivered' => $note->status !== 'dikirim',
+            'outlet' => ['name' => $o?->name, 'lat' => $o?->lat, 'lng' => $o?->lng],
+            'dist_m' => $eta['dist_m'] ?? null,
+            'eta_s' => $eta['eta_s'] ?? null,
+            'route' => $eta['route'] ?? [],
+            'progress' => ($eta && $total > 0) ? round(max(0, min(1, 1 - $eta['dist_m'] / $total)), 3) : null,
         ]);
     }
 }

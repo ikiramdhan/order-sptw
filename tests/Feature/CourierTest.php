@@ -96,4 +96,55 @@ class CourierTest extends TestCase
         $this->assertSame($baru->id, $this->note->fresh()->courier_id);
         $this->post(route('delivery.courier', $this->note), ['courier_id' => $this->outletUser->id])->assertSessionHasErrors('courier_id');
     }
+
+    public function test_eta_and_progress_from_outlet_coordinates(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['router.project-osrm.org/*' => \Illuminate\Support\Facades\Http::response(['routes' => [['distance' => 4000, 'duration' => 600, 'geometry' => ['coordinates' => [[106.65, -6.2], [106.66, -6.21]]]]]])]);
+        $this->note->outlet->update(['lat' => -6.21, 'lng' => 106.66]);
+        $this->actingAs($this->kurir)->post(route('courier.start', $this->note));
+        $this->postJson(route('courier.location', $this->note), ['lat' => -6.2, 'lng' => 106.65])->assertOk();
+
+        $r = $this->actingAs($this->outletUser)->getJson(route('delivery.position', $this->note))->assertOk();
+        $r->assertJson(['dist_m' => 4000, 'eta_s' => 600, 'progress' => 0.0]);
+        $this->assertCount(2, $r->json('route'));
+        $this->get(route('delivery.show', $this->note))->assertOk()->assertSee('etabar');
+    }
+
+    public function test_eta_falls_back_to_straight_line_when_router_fails(): void
+    {
+        \Illuminate\Support\Facades\Http::fake(['router.project-osrm.org/*' => \Illuminate\Support\Facades\Http::response('x', 500)]);
+        $this->note->outlet->update(['lat' => -6.21, 'lng' => 106.66]);
+        $this->actingAs($this->kurir)->post(route('courier.start', $this->note));
+        $this->postJson(route('courier.location', $this->note), ['lat' => -6.2, 'lng' => 106.65]);
+        $this->actingAs($this->admin)->getJson(route('delivery.position', $this->note))->assertOk()->assertJsonPath('eta_s', fn ($v) => $v > 0);
+    }
+
+    public function test_chat_between_outlet_and_courier_with_notifications(): void
+    {
+        $this->actingAs($this->outletUser)->postJson(route('delivery.chat.store', $this->note), ['body' => 'Tolong lebih cepat ya'])->assertOk();
+        $this->assertDatabaseHas('app_notifications', ['user_id' => $this->kurir->id, 'body' => 'Tolong lebih cepat ya']);
+
+        $this->actingAs($this->kurir)->postJson(route('delivery.chat.store', $this->note), ['body' => 'Siap'])->assertOk();
+        $this->assertDatabaseHas('app_notifications', ['user_id' => $this->outletUser->id, 'body' => 'Siap']);
+        $this->assertDatabaseHas('app_notifications', ['user_id' => $this->admin->id, 'body' => 'Siap']);
+
+        $r = $this->getJson(route('delivery.chat', $this->note))->assertOk();
+        $this->assertCount(2, $r->json('messages'));
+        $this->assertTrue($r->json('messages.1.mine'));
+        $this->getJson(route('delivery.chat', ['note' => $this->note, 'after' => $r->json('messages.0.id')]))->assertJsonCount(1, 'messages');
+
+        $this->actingAs($this->otherOutletUser)->getJson(route('delivery.chat', $this->note))->assertNotFound();
+        $this->actingAs($this->outletUser)->postJson(route('delivery.chat.store', $this->note), ['body' => ''])->assertStatus(422);
+        $this->actingAs($this->kurir)->get(route('courier.show', $this->note))->assertOk()->assertSee('Chat dengan outlet');
+    }
+
+    public function test_super_admin_can_set_outlet_coordinates(): void
+    {
+        $sa = $this->user('super_admin');
+        $o = $this->outletUser->outlet;
+        $this->actingAs($sa)->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'lat' => '-6.2088', 'lng' => '106.8456'])->assertSessionHasNoErrors();
+        $this->assertEqualsWithDelta(-6.2088, $o->fresh()->lat, 0.0001);
+        $this->put(route('outlets.update', $o), ['name' => $o->name, 'payment_term_days' => 7, 'lat' => '-6.2'])->assertSessionHasErrors('lng');
+        $this->get(route('outlets.edit', $o))->assertOk()->assertSee('usegps');
+    }
 }

@@ -25,6 +25,19 @@
             @if ($note->status === 'dikirim' && $note->courier_status !== 'sampai')<span class="badge {{ $note->courier_status === 'diantar' ? 'ok' : 'warn' }}">{{ $note->courier_status === 'diantar' ? 'Live' : 'Ditugaskan' }}</span>@endif
         </div>
         @if ($note->status === 'dikirim' && $note->courier_status === 'diantar')
+            <div class="motorhero"><span class="road"></span>
+                <div class="txt"><b>{{ $isOutlet ? 'Kurir menuju lokasi kamu' : 'Kurir menuju '.$note->outlet->name }}</b><small id="herosub">Pesanan sedang dalam perjalanan</small></div>
+                @include('partials.motor')
+            </div>
+            @if ($note->outlet->lat !== null)
+            <div class="etabar" id="etabar" hidden>
+                <div class="etaends"><span>Kurir</span><span>{{ $note->outlet->name }}</span></div>
+                <div class="etatrack"><i class="etadot"></i><div class="etafill" id="etafill"></div><div class="etarider" id="etarider">@include('partials.motor')</div><i class="etapin"></i></div>
+                <div class="etatxt"><b id="etamin">–</b><span id="etadist"></span></div>
+            </div>
+            @elseif (! $isOutlet)
+                <p style="margin:10px 0 0;color:var(--muted);font-size:13px">Estimasi waktu belum tersedia: titik lokasi outlet belum diisi (Super Admin: menu Outlet → Ubah).</p>
+            @endif
             <div class="livemap" id="livemap" data-url="{{ route('delivery.position', $note) }}"></div>
             <small id="mapago" style="color:var(--muted)">Menunggu lokasi kurir…</small>
         @endif
@@ -43,6 +56,7 @@
     @endif
 </section>
 @endif
+@if ($note->courier_id)@include('partials.chat', ['note' => $note])@endif
 
 
 @if ($isOutlet && $pending)
@@ -80,17 +94,34 @@
 (function () {
   var el = document.getElementById('livemap'); if (!el) return;
   var ago = document.getElementById('mapago'), stat = document.getElementById('cstatus');
+  var bar = document.getElementById('etabar'), fill = document.getElementById('etafill'), rider = document.getElementById('etarider');
+  var emin = document.getElementById('etamin'), edist = document.getElementById('etadist'), hero = document.getElementById('herosub');
   var map = L.map(el, { zoomControl: true, attributionControl: true }).setView([-6.2, 106.65], 14);
   L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' }).addTo(map);
-  var icon = L.divIcon({ className: '', html: '<div class="kmarker"></div>', iconSize: [22, 22], iconAnchor: [11, 11] });
-  var marker = null, first = true, lastAt = null;
+  var kicon = L.divIcon({ className: '', html: '<div class="kmarker"></div>', iconSize: [22, 22], iconAnchor: [11, 11] });
+  var bicon = L.divIcon({ className: '', html: '<div class="bmarker"></div>', iconSize: [26, 26], iconAnchor: [6, 26] });
+  var marker = null, bmark = null, line = null, first = true;
+  function fmtEta(s) { var m = Math.max(1, Math.round(s / 60)); if (m < 60) return '±' + m + ' menit'; var h = Math.floor(m / 60); return '±' + h + ' jam ' + (m % 60) + ' menit'; }
+  function fmtDist(m) { return m < 1000 ? Math.round(m / 10) * 10 + ' m lagi' : (m / 1000).toFixed(1).replace('.', ',') + ' km lagi'; }
   function poll() {
     fetch(el.dataset.url, { credentials: 'same-origin', headers: { 'Accept': 'application/json' } }).then(function (r) { return r.json(); }).then(function (d) {
       if (d.status === 'sampai' || d.delivered) { if (stat) stat.textContent = 'Sudah sampai'; ago.textContent = 'Kurir sudah sampai.'; setTimeout(function () { location.reload(); }, 1500); return; }
+      if (d.outlet && d.outlet.lat != null && !bmark) bmark = L.marker([d.outlet.lat, d.outlet.lng], { icon: bicon }).addTo(map);
       if (d.lat == null) { ago.textContent = 'Menunggu lokasi kurir…'; return; }
-      var ll = [d.lat, d.lng]; lastAt = d.at;
-      if (!marker) marker = L.marker(ll, { icon: icon }).addTo(map); else marker.setLatLng(ll);
-      if (first) { map.setView(ll, 16); first = false; } else if (!map.getBounds().pad(-0.2).contains(ll)) { map.panTo(ll); }
+      var ll = [d.lat, d.lng];
+      if (!marker) marker = L.marker(ll, { icon: kicon, zIndexOffset: 500 }).addTo(map); else marker.setLatLng(ll);
+      if (d.route && d.route.length > 1) { if (line) line.setLatLngs(d.route); else line = L.polyline(d.route, { color: '#D43C14', weight: 5, opacity: .75 }).addTo(map); }
+      if (first) {
+        if (bmark) map.fitBounds(L.latLngBounds([ll, bmark.getLatLng()]).pad(0.25)); else map.setView(ll, 16);
+        first = false;
+      } else if (!map.getBounds().pad(-0.1).contains(ll)) { map.panTo(ll); }
+      if (bar && d.eta_s != null) {
+        bar.hidden = false;
+        var pct = Math.round((d.progress || 0) * 100);
+        fill.style.width = pct + '%'; rider.style.left = Math.max(4, Math.min(96, pct)) + '%';
+        emin.textContent = d.dist_m < 80 ? 'Hampir sampai' : fmtEta(d.eta_s); edist.textContent = fmtDist(d.dist_m);
+        if (hero) hero.textContent = d.dist_m < 80 ? 'Kurir sudah di depan' : 'Sampai sekitar ' + fmtEta(d.eta_s).replace('±', '') + ' lagi';
+      }
       ago.textContent = 'Terakhir update ' + d.ago;
     }).catch(function () {});
   }

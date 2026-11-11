@@ -32,7 +32,28 @@
                 <input type="text" name="phone" value="{{ old('phone', $outlet->phone) }}" inputmode="tel" placeholder="08xx-xxxx-xxxx">
             </label>
         </div>
-
+        <div class="row">
+            <label class="field"><span class="lbl">Latitude <span class="hint">(titik lokasi untuk peta kurir)</span></span>
+                <input type="text" name="lat" id="olat" value="{{ old('lat', $outlet->lat) }}" inputmode="decimal" placeholder="-6.2088">
+                @error('lat')<span class="err">{{ $message }}</span>@enderror
+            </label>
+            <label class="field">Longitude
+                <input type="text" name="lng" id="olng" value="{{ old('lng', $outlet->lng) }}" inputmode="decimal" placeholder="106.8456">
+                @error('lng')<span class="err">{{ $message }}</span>@enderror
+            </label>
+        </div>
+        <button type="button" class="btn outline" id="usegps">Pakai lokasi saya sekarang</button>
+        <small style="display:block;color:var(--muted);margin-top:6px">Buka form ini dari HP saat berada di depan outlet, lalu tekan tombol di atas. Atau salin koordinat dari Google Maps (tekan lama di titik outlet).</small>
+        <script>
+        document.getElementById('usegps').addEventListener('click', function () {
+          var b = this; b.textContent = 'Mencari lokasi…';
+          navigator.geolocation.getCurrentPosition(function (p) {
+            document.getElementById('olat').value = p.coords.latitude.toFixed(7);
+            document.getElementById('olng').value = p.coords.longitude.toFixed(7);
+            b.textContent = 'Lokasi terisi ✓';
+          }, function () { b.textContent = 'Gagal. Izinkan lokasi atau isi manual'; }, { enableHighAccuracy: true, timeout: 15000 });
+        });
+        </script>
     </div>
     <div class="card">
         <h3 class="sect">Termin tempo</h3>

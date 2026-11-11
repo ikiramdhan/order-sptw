@@ -14,11 +14,11 @@ class Outlet extends Model
         30 => 'Tempo 30 hari',
     ];
 
-    protected $fillable = ['name', 'address', 'pic_name', 'phone', 'payment_term_days', 'credit_balance', 'is_active'];
+    protected $fillable = ['name', 'address', 'pic_name', 'phone', 'payment_term_days', 'credit_balance', 'is_active', 'lat', 'lng'];
 
     protected function casts(): array
     {
-        return ['is_active' => 'boolean'];
+        return ['is_active' => 'boolean', 'lat' => 'float', 'lng' => 'float'];
     }
 
     public function users(): HasMany

@@ -73,7 +73,10 @@ class OutletController extends Controller
             'pic_name' => ['nullable', 'string', 'max:100'],
             'phone' => ['nullable', 'string', 'max:30'],
             'payment_term_days' => ['required', Rule::in(array_keys(Outlet::TERMS))],
+            'lat' => ['nullable', 'numeric', 'between:-90,90'],
+            'lng' => ['nullable', 'numeric', 'between:-180,180', 'required_with:lat'],
         ], [
+            'lng.required_with' => 'Isi longitude juga.',
             'name.required' => 'Nama outlet wajib diisi.',
             'name.unique' => 'Nama outlet sudah ada.',
             'payment_term_days.required' => 'Pilih termin tempo.',
