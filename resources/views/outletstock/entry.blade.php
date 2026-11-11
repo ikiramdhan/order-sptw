@@ -13,9 +13,12 @@
         <p>{{ $isSo ? 'Isi hasil hitung fisik. Kolom kosong dilewati.' : 'Isi jumlah barang yang dibuang. Kolom kosong atau 0 dilewati.' }}@if (! $isCk && $needsApproval) Perlu persetujuan Admin CK.@endif</p></div>
     <a class="btn" href="{{ $back }}"><x-icon name="back" :size="18" /> Kembali</a>
 </header>
+<div class="stick-top toolbar">
 @if (! $isCk && $outlets->isNotEmpty())
-<form method="GET" class="toolbar"><select name="outlet" aria-label="Outlet" onchange="this.form.submit()">@foreach ($outlets as $o)<option value="{{ $o->id }}" @selected($outlet && $o->id === $outlet->id)>{{ $o->name }}</option>@endforeach</select></form>
+<form method="GET" style="display:contents"><select name="outlet" aria-label="Outlet" onchange="this.form.submit()">@foreach ($outlets as $o)<option value="{{ $o->id }}" @selected($outlet && $o->id === $outlet->id)>{{ $o->name }}</option>@endforeach</select></form>
 @endif
+<input type="search" id="rowfilter" placeholder="Cari barang" aria-label="Cari barang">
+</div>
 <div class="card">
     <form method="POST" action="{{ $action }}" novalidate>@csrf
         @if ($outlet && $outlets->isNotEmpty())<input type="hidden" name="outlet" value="{{ $outlet->id }}">@endif
@@ -33,7 +36,7 @@
                     <td class="has-input" data-label="{{ $isSo ? 'Stok fisik' : 'Jumlah waste' }}"><input type="number" name="qty[{{ $i->id }}]" value="{{ old("qty.$i->id") }}" step="any" min="0" inputmode="decimal" aria-label="{{ $i->name }}"></td></tr>
             @empty<tr><td colspan="3" class="empty">Belum ada barang. Barang muncul setelah outlet menerima kiriman dari CK.</td></tr>@endforelse</tbody>
         </table></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px"><a class="btn" href="{{ $back }}">Batal</a><button class="btn primary" type="submit">{{ $needsApproval ? 'Ajukan' : 'Simpan' }}</button></div>
+        <div class="savebar"><a class="btn" href="{{ $back }}">Batal</a><button class="btn primary" type="submit">{{ $needsApproval ? 'Ajukan' : 'Simpan' }}</button></div>
     </form>
 </div>
 @if ($isCk && isset($history))
@@ -42,4 +45,10 @@
     <tbody>@forelse ($history as $h)<tr><td>{{ $h->created_at->translatedFormat('j M H:i') }}</td><td>{{ $h->item->name }}</td><td class="num">{{ Fmt::qty($h->qty_base) }} {{ $h->item->baseUnit->name }}</td><td>{{ \App\Models\StockRequest::REASONS[$h->reason] ?? $h->reason }}</td><td class="num">{{ Fmt::rp((int) round($h->qty_base * $h->item->price)) }}</td><td>{{ $h->creator->name }}</td></tr>
     @empty<tr><td colspan="6" class="empty">Belum ada waste.</td></tr>@endforelse</tbody></table></div></div>
 @endif
+<script>
+document.getElementById('rowfilter').addEventListener('input', function () {
+    var q = this.value.toLowerCase();
+    document.querySelectorAll('.tbl tbody tr').forEach(function (tr) { tr.style.display = tr.textContent.toLowerCase().indexOf(q) === -1 ? 'none' : ''; });
+});
+</script>
 @endsection

@@ -557,3 +557,9 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 }
 .dd-panel.fx{position:fixed;right:auto;min-width:0;z-index:95}
 .dd-panel.fx.up{top:auto}
+
+/* v13: bilah pilih outlet/cari tetap di atas, tombol simpan tetap di bawah saat daftar panjang */
+.stick-top{position:sticky;top:calc(8px + env(safe-area-inset-top));z-index:20;background:var(--bg,transparent);padding:6px 0}
+.savebar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;position:sticky;bottom:calc(92px + env(safe-area-inset-bottom));z-index:15;background:var(--card);padding:10px;border-radius:24px;box-shadow:0 6px 20px rgba(28,27,25,.14);margin-top:16px}
+.savebar .btn{flex:1}
+@media (min-width:861px){.savebar{bottom:12px}.savebar .btn{flex:0 0 auto}}

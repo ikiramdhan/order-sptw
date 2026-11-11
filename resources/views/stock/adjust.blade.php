@@ -23,7 +23,7 @@
                     <td><input type="number" name="physical[{{ $i->id }}]" value="{{ old("physical.$i->id") }}" step="any" min="0" inputmode="decimal" aria-label="Stok fisik {{ $i->name }}"></td></tr>
             @endforeach</tbody>
         </table></div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:16px">
+        <div class="savebar">
             <a class="btn" href="{{ route('stock.index') }}">Batal</a>
             <button class="btn primary" type="submit">Simpan penyesuaian</button>
         </div>
