@@ -14,7 +14,7 @@
 <form method="POST" action="{{ route('orders.ship', $po) }}" class="card" novalidate>@csrf
     <h3 class="sect">Setujui &amp; kirim</h3>
     <p style="color:var(--muted);margin:0 0 10px">Qty kirim diisi otomatis sebesar yang bisa dipenuhi stok. Ubah bila perlu; sisanya menjadi backorder.</p>
-    <div class="tbl-wrap"><table class="tbl">
+    <div class="tbl-wrap"><table class="tbl stackable">
         <thead><tr><th>Barang</th><th class="num">Dipesan</th><th class="num">Sisa</th><th class="num">Stok</th><th style="min-width:110px">Kirim sekarang</th></tr></thead>
         <tbody>@foreach ($po->items as $row)
             @php
@@ -31,7 +31,7 @@
             </tr>
         @endforeach</tbody>
     </table></div>
-    <div style="margin-top:14px"><button class="btn primary" type="submit">Setujui &amp; buat surat jalan</button></div>
+    <div class="savebar"><button class="btn primary" type="submit">Setujui &amp; buat surat jalan</button></div>
 </form>
 @else
 <div class="card">
@@ -66,7 +66,7 @@
 @if ($canProcess && $open && $po->hasBackorder() && $po->deliveryNotes->count())
 <form method="POST" action="{{ route('orders.backorder.cancel', $po) }}" class="card" data-confirm="Batalkan sisa backorder? Sisa barang tidak akan dikirim.">@csrf
     <h3 class="sect">Batalkan sisa backorder</h3>
-    <div class="row" style="align-items:flex-end"><label class="field" style="margin:0">Alasan<input type="text" name="reason" maxlength="200" placeholder="mis. stok tidak tersedia" required></label>
+    <div class="cancelrow"><label class="field">Alasan<input type="text" name="reason" maxlength="200" placeholder="mis. stok tidak tersedia" required></label>
     <button class="btn danger" type="submit">Batalkan sisa</button></div>
 </form>
 @endif
@@ -74,7 +74,7 @@
 @if (in_array($po->status, ['diajukan', 'menunggu_backorder'], true) && ! $po->deliveryNotes->count() && ($canProcess || ($isOutlet && $po->status === 'diajukan')))
 <form method="POST" action="{{ route('orders.cancel', $po) }}" class="card" data-confirm="Batalkan PO ini?">@csrf
     <h3 class="sect">Batalkan PO</h3>
-    <div class="row" style="align-items:flex-end"><label class="field" style="margin:0">Alasan<input type="text" name="reason" maxlength="200" required></label>
+    <div class="cancelrow"><label class="field">Alasan<input type="text" name="reason" maxlength="200" required></label>
     <button class="btn danger" type="submit">Batalkan PO</button></div>
 </form>
 @endif
