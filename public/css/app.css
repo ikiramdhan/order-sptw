@@ -645,3 +645,12 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 .cartline .qtyf .un{color:var(--muted);font-size:13px}
 .cartline .delf{justify-self:end}
 .cartline .btn.sm{min-height:44px;padding:0 18px}
+
+/* v22: katalog — nama di atas, satuan + jumlah + Tambah satu baris */
+.prod{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;padding:14px 0}
+.prod .who b{font-size:14px}
+.prod form{display:grid;grid-template-columns:minmax(0,1fr) 76px auto;gap:8px;align-items:center;width:100%}
+.prod form .dd,.prod form .dd-wrap,.prod form select{min-width:0;width:100%}
+.prod input[type=number]{width:100%;min-width:0;text-align:center;padding:0 6px}
+.prod .btn.sm{min-height:44px;padding:0 18px}
+@media (min-width:861px){.prod{grid-template-columns:minmax(0,1fr) auto;align-items:center}.prod form{width:auto;grid-template-columns:200px 84px auto}}
