@@ -279,3 +279,29 @@ document.addEventListener('click', function (e) {
   var t = document.createElement('textarea'); t.value = txt; t.style.position = 'fixed'; t.style.opacity = '0'; document.body.appendChild(t); t.select();
   try { document.execCommand('copy'); done(); } catch (_) {} t.remove();
 });
+
+/* Unduh file tanpa meninggalkan aplikasi (PWA iOS tidak punya tombol kembali dari pratinjau file) */
+document.addEventListener('click', function (e) {
+  var a = e.target.closest('a[data-download]'); if (!a) return;
+  e.preventDefault();
+  if (a.dataset.busy) return; a.dataset.busy = '1';
+  var old = a.textContent; a.textContent = 'Menyiapkan…';
+  fetch(a.href, { credentials: 'same-origin' }).then(function (r) {
+    if (!r.ok) throw new Error('gagal');
+    var cd = r.headers.get('Content-Disposition') || '', m = /filename="?([^";]+)"?/i.exec(cd);
+    var name = m ? m[1] : (a.getAttribute('data-download') || 'file');
+    return r.blob().then(function (blob) { return { blob: blob, name: name }; });
+  }).then(function (f) {
+    var file = new File([f.blob], f.name, { type: f.blob.type });
+    function save() {
+      var url = URL.createObjectURL(f.blob), l = document.createElement('a');
+      l.href = url; l.download = f.name; document.body.appendChild(l); l.click(); l.remove();
+      setTimeout(function () { URL.revokeObjectURL(url); }, 4000);
+    }
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      return navigator.share({ files: [file], title: f.name }).catch(function (err) { if (err && err.name !== 'AbortError') save(); });
+    }
+    save();
+  }).catch(function () { alert('Gagal mengunduh. Coba lagi.'); })
+    .then(function () { a.textContent = old; delete a.dataset.busy; });
+});

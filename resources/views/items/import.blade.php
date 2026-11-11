@@ -28,7 +28,7 @@
             <li>Satuan Besar + Isi per Satuan Besar (opsional), mis. Dus dan 40</li>
         </ul>
         <p style="margin:0 0 12px;color:var(--muted)">Barang dengan nama yang sudah ada akan diperbarui harganya. Stok awal hanya berlaku untuk barang baru. Satuan yang belum ada dibuat otomatis.</p>
-        <a class="btn block" href="{{ route('items.import.template') }}">Unduh template Excel (.xlsx)</a>
+        <a class="btn block" data-download href="{{ route('items.import.template') }}">Unduh template Excel (.xlsx)</a>
     </div>
 </div>
 </div>

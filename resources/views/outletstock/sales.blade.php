@@ -24,7 +24,7 @@
         <li><b>Jumlah Terjual</b> dalam satuan dasar</li>
     </ul>
     <p style="margin:0 0 12px;color:var(--muted)">Baris yang tidak cocok dilewati dan ditampilkan setelah disimpan. Kolom lain di laporan diabaikan.</p>
-    <a class="btn block" href="{{ route('outletstock.sales.template') }}">Unduh contoh (.csv)</a>
+    <a class="btn block" data-download href="{{ route('outletstock.sales.template') }}">Unduh contoh (.csv)</a>
 </div></div>
 </div>
 @endsection
