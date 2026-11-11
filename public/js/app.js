@@ -355,3 +355,6 @@ document.addEventListener('focusin', function (e) {
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', run); else run();
 })();
+
+/* Dibuka dari aplikasi Android (Capacitor)? tandai supaya teks/aksi khusus aplikasi tampil */
+try { if (window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform()) document.documentElement.classList.add('is-app'); } catch (_) {}

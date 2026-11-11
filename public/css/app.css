@@ -733,3 +733,6 @@ html.theme-anim *,html.theme-anim *::before,html.theme-anim *::after{transition:
 @media (prefers-reduced-motion:reduce){.trackstate .live,.kmarker{animation:none}}
 .courierform{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-top:12px}
 .courierform select{min-height:46px}
+.app-only{display:none}
+html.is-app .app-only{display:inline}
+html.is-app .web-only{display:none}

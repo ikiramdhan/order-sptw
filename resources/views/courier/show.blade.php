@@ -17,7 +17,7 @@
             <button class="btn primary block" type="submit">Sudah sampai</button>
         </form>
     @elseif ($active)
-        <p style="margin:0 0 12px;color:var(--muted)">Tekan tombol di bawah saat berangkat. Lokasi kamu akan terlihat oleh outlet selama diantar. Biarkan layar tetap menyala dan HP dicas.</p>
+        <p style="margin:0 0 12px;color:var(--muted)">Tekan tombol di bawah saat berangkat. Lokasi kamu akan terlihat oleh outlet selama diantar. <span class="web-only">Biarkan layar tetap menyala dan HP dicas.</span><span class="app-only">Layar boleh dimatikan, lokasi tetap terkirim. Pilih izin lokasi "Izinkan sepanjang waktu".</span></p>
         <form method="POST" action="{{ route('courier.start', $note) }}">@csrf
             <button class="btn primary block" type="submit">Mulai antar</button>
         </form>
