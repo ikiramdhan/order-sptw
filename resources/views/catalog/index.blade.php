@@ -8,14 +8,14 @@
 @error('qty')<div class="alert" role="alert">{{ $message }}</div>@enderror
 <div class="stick-top toolbar catbar">
     <form method="GET"><input type="search" name="q" value="{{ $q }}" placeholder="Cari barang" aria-label="Cari barang"></form>
-    <a class="btn primary" href="{{ route('cart.show') }}"><x-icon name="cart" :size="18" /> Keranjang @if($cartCount)({{ $cartCount }})@endif</a>
+    <a class="btn primary" id="cartbtn" href="{{ route('cart.show') }}"><x-icon name="cart" :size="18" /> Keranjang <span id="cartcount">@if($cartCount)({{ $cartCount }})@endif</span></a>
 </div>
 <section class="card">
     @forelse ($items as $i)
         @php $units = $i->sellableUnits(); @endphp
         <div class="prod">
             <div class="who"><b>{{ $i->name }}</b><small>{{ $i->category }}@if ($i->retail_price) · harga konsumen {{ Fmt::rp($i->retail_price) }}@endif</small></div>
-            <form method="POST" action="{{ route('cart.add') }}">@csrf
+            <form method="POST" action="{{ route('cart.add') }}" data-addcart>@csrf
                 <input type="hidden" name="item_id" value="{{ $i->id }}">
                 <select name="unit_id" aria-label="Satuan {{ $i->name }}">
                     @foreach ($units->reverse() as $u)

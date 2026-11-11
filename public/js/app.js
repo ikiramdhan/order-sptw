@@ -305,3 +305,22 @@ document.addEventListener('click', function (e) {
   }).catch(function () { alert('Gagal mengunduh. Coba lagi.'); })
     .then(function () { a.textContent = old; delete a.dataset.busy; });
 });
+
+/* Tambah ke keranjang tanpa reload halaman (posisi scroll tetap) */
+document.addEventListener('submit', function (e) {
+  var f = e.target; if (!f.matches || !f.matches('form[data-addcart]')) return;
+  e.preventDefault();
+  var btn = f.querySelector('button[type=submit]'); if (btn.disabled) return;
+  var old = btn.textContent; btn.disabled = true; btn.textContent = '…';
+  fetch(f.action, { method: 'POST', body: new FormData(f), credentials: 'same-origin',
+    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' } })
+  .then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+  .then(function (x) {
+    if (!x.ok) throw new Error((x.j && x.j.errors && x.j.errors.qty && x.j.errors.qty[0]) || (x.j && x.j.message) || 'Gagal menambah');
+    var c = document.getElementById('cartcount'); if (c) c.textContent = '(' + x.j.count + ')';
+    btn.textContent = '✓ Masuk'; f.querySelector('input[name=qty]').value = 1;
+    setTimeout(function () { btn.textContent = old; btn.disabled = false; }, 1200);
+  }).catch(function (err) {
+    btn.textContent = old; btn.disabled = false; alert(err.message);
+  });
+});

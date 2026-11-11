@@ -62,6 +62,16 @@ class OrderFlowTest extends TestCase
         ])->assertSessionHasNoErrors();
     }
 
+    public function test_add_to_cart_ajax_returns_json_without_redirect(): void
+    {
+        $this->actingAs($this->outletUser)
+            ->postJson(route('cart.add'), ['item_id' => $this->item->id, 'unit_id' => $this->dus->id, 'qty' => 2])
+            ->assertOk()->assertJson(['count' => 1]);
+
+        $this->postJson(route('cart.add'), ['item_id' => $this->item->id, 'unit_id' => $this->dus->id, 'qty' => 0])
+            ->assertStatus(422);
+    }
+
     private function orderFromOutlet(float $dusQty): PurchaseOrder
     {
         $this->actingAs($this->outletUser)

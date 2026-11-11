@@ -24,7 +24,7 @@ class CatalogController extends Controller
         return view('catalog.index', ['items' => $items, 'q' => $q, 'cartCount' => count(session(self::CART, []))]);
     }
 
-    public function add(Request $request): RedirectResponse
+    public function add(Request $request): RedirectResponse|\Illuminate\Http\JsonResponse
     {
         $data = $request->validate([
             'item_id' => ['required', 'exists:items,id'],
@@ -46,6 +46,10 @@ class CatalogController extends Controller
             'qty' => round(($cart[$key]['qty'] ?? 0) + (float) $data['qty'], 3),
         ];
         session([self::CART => $cart]);
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => "{$item->name} masuk keranjang.", 'count' => count($cart)]);
+        }
 
         return back()->with('status', "{$item->name} masuk keranjang.");
     }
